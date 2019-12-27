@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Loremaker
+namespace Loremaker.Names
 {
-    interface IOrganizationNameGenerator
+    public interface IOrganizationNameGenerator
     {
         string NextGovernmentName();
         string NextReligiousOrderName();

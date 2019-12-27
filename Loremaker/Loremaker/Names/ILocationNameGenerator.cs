@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Loremaker
+namespace Loremaker.Names
 {
-    interface ILocationNameGenerator
+    public interface ILocationNameGenerator
     {
         string NextWorldName();
         string NextContinentName();

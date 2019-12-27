@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Loremaker
+namespace Loremaker.Names
 {
-    interface ICharacterNameGenerator
+    public interface ICharacterNameGenerator
     {
         string NextName();
         string NextFamilyName();
