@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker", "Loremaker\Loremaker.csproj", "{AFB9D560-EC46-448B-9D84-25ED011F648D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Example", "Loremaker.Example\Loremaker.Example.csproj", "{7503F3C2-FBCB-4B45-814D-6E20C60B8C37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Example", "Loremaker.Example\Loremaker.Example.csproj", "{7503F3C2-FBCB-4B45-814D-6E20C60B8C37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Example.MapRenderer", "Loremaker.Example.MapRenderer\Loremaker.Example.MapRenderer.csproj", "{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7503F3C2-FBCB-4B45-814D-6E20C60B8C37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7503F3C2-FBCB-4B45-814D-6E20C60B8C37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7503F3C2-FBCB-4B45-814D-6E20C60B8C37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
