@@ -10,7 +10,6 @@ namespace Loremaker.Maps
     public class DefaultHeightMapGenerator : IHeightMapGenerator
     {
         private Random Random { get; set; }
-
         public bool SeedCorners { get; set; }
 
         public DefaultHeightMapGenerator()
@@ -19,7 +18,7 @@ namespace Loremaker.Maps
             this.SeedCorners = true;
         }
 
-        public double[,] Next(int width, int height)
+        public virtual double[,] Next(int width, int height)
         {
             // The diamond-square algorithm can only generate maps of size 2^n+1.
             // In order to generate maps of any dimension, we generate a 2^n+1 map that
@@ -61,10 +60,10 @@ namespace Loremaker.Maps
 
             if (this.SeedCorners)
             {
-                map[0, 0] = this.Random.NextDouble() / 2 + 0.25;
-                map[0, mapsize - 1] = this.Random.NextDouble() / 2 + 0.25;
-                map[mapsize - 1, 0] = this.Random.NextDouble() / 2 + 0.25;
-                map[mapsize - 1, mapsize - 1] = this.Random.NextDouble() / 2 + 0.25;
+                map[0, 0] = this.Random.NextDouble();
+                map[0, mapsize - 1] = this.Random.NextDouble();
+                map[mapsize - 1, 0] = this.Random.NextDouble();
+                map[mapsize - 1, mapsize - 1] = this.Random.NextDouble();
             }
 
             int step = mapsize - 1;
@@ -78,12 +77,11 @@ namespace Loremaker.Maps
                 {
                     for (int j = 0; j < mapsize - 1; j += step)
                     {
-
-                        double average = (map[i, j] + map[i + step, j] + map[i, j + step] + map[i + step, j + step]) / 4;
-
                         if (map[i + step / 2, j + step / 2] == 0)  // check if not pre-seeded
                         {
-                            map[i + step / 2, j + step / 2] = average + GetRandomVariance(variance);
+                            double average = (map[i, j] + map[i + step, j] + map[i, j + step] + map[i + step, j + step]) / 4;
+                            map[i + step / 2, j + step / 2] = average + this.GetRandomVariance(variance);
+                            this.EnforceBounds(map, i + step / 2, j + step / 2);
                         }
                     }
                 }
@@ -93,25 +91,10 @@ namespace Loremaker.Maps
                 {
                     for (int j = 0; j < mapsize - 1; j += step)
                     {
-                        if (map[i + step / 2, j] == 0)
-                        {
-                            map[i + step / 2, j] = GetDiamondAverage(map, i + step / 2, j, step) + GetRandomVariance(variance);
-                        }
-
-                        if (map[i, j + step / 2] == 0)
-                        {
-                            map[i, j + step / 2] = GetDiamondAverage(map, i, j + step / 2, step) + GetRandomVariance(variance);
-                        }
-
-                        if (map[i + step, j + step / 2] == 0)
-                        {
-                            map[i + step, j + step / 2] = GetDiamondAverage(map, i + step, j + step / 2, step) + GetRandomVariance(variance);
-                        }
-
-                        if (map[i + step / 2, j + step] == 0)
-                        {
-                            map[i + step / 2, j + step] = GetDiamondAverage(map, i + step / 2, j + step, step) + GetRandomVariance(variance);
-                        }
+                        this.CalculateDiamondStep(map, i + step / 2, j, step, variance);
+                        this.CalculateDiamondStep(map, i, j + step / 2, step, variance);
+                        this.CalculateDiamondStep(map, i + step, j + step / 2, step, variance);
+                        this.CalculateDiamondStep(map, i + step / 2, j + step, step, variance);
                     }
                 }
 
@@ -122,7 +105,17 @@ namespace Loremaker.Maps
             return map;
         }
 
-        private double GetDiamondAverage(double[,] map, int x, int y, int step)
+        private void CalculateDiamondStep(double[,] map, int x, int y, int step, double variance)
+        {
+            if (map[x, y] == 0)
+            {
+                map[x, y] = this.GetDiamondStepAverage(map, x, y, step) + this.GetRandomVariance(variance);
+                this.EnforceBounds(map, x, y);
+            }
+        }
+
+
+        private double GetDiamondStepAverage(double[,] map, int x, int y, int step)
         {
 
             int count = 0;
@@ -154,11 +147,22 @@ namespace Loremaker.Maps
 
             return average / count;
         }
-
-        private double GetRandomVariance(double v)
+        private double GetRandomVariance(double variance)
         {
-            return this.Random.NextDouble() * 2 * v - v;
+            return this.Random.NextDouble() * 2 * variance - variance;
         }
+        private void EnforceBounds(double[,] map, int x, int y)
+        {
+            if (map[x, y] < 0)
+            {
+                map[x, y] = 0;
+            }
+            else if (map[x, y] > 1)
+            {
+                map[x, y] = 1;
+            }
+        }
+
 
     }
 }
