@@ -11,13 +11,26 @@ namespace Loremaker.Example.MapRenderer
     {
         public static void Main(string[] args)
         {
-            var generator = new DefaultHeightMapGenerator();
+            var defaultGenerator = new DefaultHeightMapGenerator();
+            defaultGenerator.SeedCorners = false;
+            Generate(defaultGenerator, "Default", 10);
 
-            for (int run = 0; run < 10; run++)
+            var constrainedGenerator = new ConstrainedHeightMapGenerator();
+            constrainedGenerator.SeedCorners = false;
+            constrainedGenerator.MaximumAttemps = 1000;
+            constrainedGenerator.HeightThreshold = 0.25;
+            constrainedGenerator.DesiredMinimumPercentageBelowThreshold = 0.5;
+
+            Generate(constrainedGenerator, "Constrained", 10);
+        }
+
+        private static void Generate(IHeightMapGenerator generator, string fileprefix, int runs)
+        {
+            for (int run = 0; run < runs; run++)
             {
                 var start = DateTime.Now;
                 var map = generator.Next(800, 600);
-                var imageName = "test" + run + ".png";
+                var imageName = fileprefix + "-test-" + run + ".png";
 
                 using (var image = new Image<Rgba32>(map.GetLength(0), map.GetLength(1)))
                 {
@@ -26,16 +39,6 @@ namespace Loremaker.Example.MapRenderer
                         for (int j = 0; j < map.GetLength(1); j++)
                         {
                             var mapval = map[i, j];
-
-                            if (mapval < 0)
-                            {
-                                mapval = 0;
-                            }
-                            else if (mapval > 1)
-                            {
-                                mapval = 1;
-                            }
-
                             var color = Convert.ToByte(Math.Ceiling(mapval * 255));
                             image[i, j] = new Rgba32() { R = color, G = color, B = color, A = 255 };
                         }
@@ -49,11 +52,7 @@ namespace Loremaker.Example.MapRenderer
                 }
 
                 Console.WriteLine("Generated {0} in {1} seconds", imageName, (DateTime.Now - start).TotalSeconds);
-
             }
-
-            
-
         }
     }
 }
