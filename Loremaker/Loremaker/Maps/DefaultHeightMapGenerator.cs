@@ -12,14 +12,29 @@ namespace Loremaker.Maps
         private Random Random { get; set; }
         public bool AllowSeeding { get; set; }
 
+        /// <summary>
+        /// This property adjusts the rate at which variance drops
+        /// in each diamond-square step. The property of this value must
+        /// be between 0 and 1 inclusive. Values closer to 0 make generated
+        /// maps smoother. Values closer to 1 make generated maps bumpier.
+        /// </summary>
+        public double VarianceDropModifier { get; set; }
+
         public DefaultHeightMapGenerator()
         {
             this.Random = new Random();
             this.AllowSeeding = true;
+            this.VarianceDropModifier = 0.5;
         }
 
         public virtual double[,] Next(int width, int height)
         {
+
+            if(this.VarianceDropModifier < 0 || this.VarianceDropModifier > 1)
+            {
+                throw new InvalidOperationException("VarianceModifier must be a value between 0 and 1 inclusive");
+            }
+
             // The diamond-square algorithm can only generate maps of size 2^n+1.
             // In order to generate maps of any dimension, we generate a 2^n+1 map that
             // is larger than the desired dimensions than remove the "extra" parts.
@@ -95,7 +110,7 @@ namespace Loremaker.Maps
                     }
                 }
 
-                variance /= 2;
+                variance *= this.VarianceDropModifier;
                 step /= 2;
             }
 
