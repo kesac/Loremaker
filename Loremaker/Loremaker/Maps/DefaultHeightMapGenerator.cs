@@ -10,12 +10,12 @@ namespace Loremaker.Maps
     public class DefaultHeightMapGenerator : IHeightMapGenerator
     {
         private Random Random { get; set; }
-        public bool SeedCorners { get; set; }
+        public bool AllowSeeding { get; set; }
 
         public DefaultHeightMapGenerator()
         {
             this.Random = new Random();
-            this.SeedCorners = true;
+            this.AllowSeeding = true;
         }
 
         public virtual double[,] Next(int width, int height)
@@ -58,12 +58,9 @@ namespace Loremaker.Maps
         {
             double[,] map = new double[mapsize,mapsize];
 
-            if (this.SeedCorners)
+            if (this.AllowSeeding)
             {
-                map[0, 0] = this.Random.NextDouble();
-                map[0, mapsize - 1] = this.Random.NextDouble();
-                map[mapsize - 1, 0] = this.Random.NextDouble();
-                map[mapsize - 1, mapsize - 1] = this.Random.NextDouble();
+                this.SeedMap(map);
             }
 
             int step = mapsize - 1;
@@ -103,6 +100,14 @@ namespace Loremaker.Maps
             }
 
             return map;
+        }
+
+        protected virtual void SeedMap(double[,] map)
+        {
+            map[0, 0] = this.Random.NextDouble();
+            map[0, map.GetLength(1) - 1] = this.Random.NextDouble();
+            map[map.GetLength(0) - 1, 0] = this.Random.NextDouble();
+            map[map.GetLength(0) - 1, map.GetLength(1) - 1] = this.Random.NextDouble();
         }
 
         private void CalculateDiamondStep(double[,] map, int x, int y, int step, double variance)
