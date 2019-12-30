@@ -4,8 +4,17 @@ using System.Text;
 
 namespace Loremaker.Maps
 {
+    /// <summary>
+    /// Identical to the DefaultHeightMapGenerator except it seeds the borders
+    /// of the map with a uniform low value. This causes generated height maps
+    /// to look like an island or continent.
+    /// </summary>
     public class IslandHeightMapGenerator : DefaultHeightMapGenerator
     {
+        /// <summary>
+        /// Essentially how thick the space between the map
+        /// border and land should be.
+        /// </summary>
         public int Margin { get; set; }
 
         public IslandHeightMapGenerator()

@@ -12,16 +12,19 @@ namespace Loremaker.Example.MapRenderer
         public static void Main(string[] args)
         {
             var defaultGenerator = new DefaultHeightMapGenerator();
-            defaultGenerator.SeedCorners = false;
-            Generate(defaultGenerator, "Default", 10);
+            defaultGenerator.AllowSeeding = false;
+            Generate(defaultGenerator, "Default", 3);
 
             var constrainedGenerator = new ConstrainedHeightMapGenerator();
-            constrainedGenerator.SeedCorners = false;
+            constrainedGenerator.AllowSeeding = false;
             constrainedGenerator.MaximumAttemps = 1000;
             constrainedGenerator.HeightThreshold = 0.25;
             constrainedGenerator.DesiredMinimumPercentageBelowThreshold = 0.5;
+            Generate(constrainedGenerator, "Constrained", 3);
 
-            Generate(constrainedGenerator, "Constrained", 10);
+            var islandGenerator = new IslandHeightMapGenerator();
+            islandGenerator.Margin = 10;
+            Generate(islandGenerator, "Island", 3);
         }
 
         private static void Generate(IHeightMapGenerator generator, string fileprefix, int runs)
@@ -29,7 +32,7 @@ namespace Loremaker.Example.MapRenderer
             for (int run = 0; run < runs; run++)
             {
                 var start = DateTime.Now;
-                var map = generator.Next(800, 600);
+                var map = generator.Next(4000, 4000);
                 var imageName = fileprefix + "-test-" + run + ".png";
 
                 using (var image = new Image<Rgba32>(map.GetLength(0), map.GetLength(1)))
@@ -48,7 +51,6 @@ namespace Loremaker.Example.MapRenderer
                     {
                         image.SaveAsPng(filestream);
                     }
-
                 }
 
                 Console.WriteLine("Generated {0} in {1} seconds", imageName, (DateTime.Now - start).TotalSeconds);
