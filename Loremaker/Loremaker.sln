@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker", "Loremaker\Lore
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Example", "Loremaker.Example\Loremaker.Example.csproj", "{7503F3C2-FBCB-4B45-814D-6E20C60B8C37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Example.MapRenderer", "Loremaker.Example.MapRenderer\Loremaker.Example.MapRenderer.csproj", "{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Example.MapRenderer", "Loremaker.Example.MapRenderer\Loremaker.Example.MapRenderer.csproj", "{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Experiments.Maps", "Loremaker.Experiments.Maps\Loremaker.Experiments.Maps.csproj", "{F031055C-8A39-45DD-8F7E-8152040ECBEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CBEF4E9-0F8E-4383-B70A-5602A28B56AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F031055C-8A39-45DD-8F7E-8152040ECBEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F031055C-8A39-45DD-8F7E-8152040ECBEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F031055C-8A39-45DD-8F7E-8152040ECBEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F031055C-8A39-45DD-8F7E-8152040ECBEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -23,7 +23,8 @@ namespace Loremaker.Example.MapRenderer
             Generate(constrainedGenerator, "Constrained", 3);
 
             var islandGenerator = new IslandHeightMapGenerator();
-            islandGenerator.Margin = 10;
+            islandGenerator.Margin = 2;
+            islandGenerator.VarianceDropModifier = 0.4;
             Generate(islandGenerator, "Island", 3);
         }
 
@@ -32,7 +33,7 @@ namespace Loremaker.Example.MapRenderer
             for (int run = 0; run < runs; run++)
             {
                 var start = DateTime.Now;
-                var map = generator.Next(4000, 4000);
+                var map = generator.Next(1000, 1000);
                 var imageName = fileprefix + "-test-" + run + ".png";
 
                 using (var image = new Image<Rgba32>(map.GetLength(0), map.GetLength(1)))
