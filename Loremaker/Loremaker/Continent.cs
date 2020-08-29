@@ -7,6 +7,6 @@ namespace Loremaker
     public class Continent
     {
         public string Name { get; set; }
-
+        public double[,] HeightMap { get; set; }
     }
 }
