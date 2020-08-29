@@ -26,7 +26,7 @@ namespace Loremaker.Maps
             this.AllowSeeding = true;
             this.VarianceDropModifier = 0.5;
         }
-
+                
         public virtual double[,] Next(int width, int height)
         {
 

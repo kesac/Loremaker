@@ -22,6 +22,11 @@ namespace Loremaker.Maps
             this.Margin = 1;
         }
 
+        public IslandHeightMapGenerator(int margin)
+        {
+            this.Margin = margin;
+        }
+
         protected override void SeedMap(double[,] map)
         {
             var width = map.GetLength(0);
