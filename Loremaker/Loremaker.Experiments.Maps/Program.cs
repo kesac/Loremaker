@@ -15,7 +15,7 @@ namespace Loremaker.Experiments.Maps
 
         private static FontCollection DefaultFontCollection = new FontCollection();
         private static FontFamily DefaultFontFamily = DefaultFontCollection.Install("GlacialIndifference-Regular.ttf");
-        private static Font DefaultFont = DefaultFontFamily.CreateFont(30, FontStyle.Regular);
+        private static Font DefaultFont = DefaultFontFamily.CreateFont(30, FontStyle.Regular); 
 
         public static void Main(string[] args)
         {
