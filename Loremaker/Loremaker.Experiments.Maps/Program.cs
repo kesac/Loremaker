@@ -27,6 +27,9 @@ namespace Loremaker.Experiments.Maps
                         Margin = 2,
                         VarianceDropModifier = 0.4
                     }
+                )
+                .SetNameGenerator(
+                    new CustomNameGenerator("CustomNames.xml")
                 );
 
             var world = worldGenerator.Next();

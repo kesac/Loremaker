@@ -1,0 +1,86 @@
+﻿<syllabore>
+  <define name="World">
+    <components>
+      <add type="Vowels" values="a e i o u"/>
+      <add type="VowelSequences" values="ae ea ai ia au ay ie oi ou ey"/>
+      <add type="LeadingConsonants" values="b c d f g h l m n p r s t v"/>
+      <add type="LeadingConsonantSequences" values="ts fr gr gl pr sc sr"/>
+    </components>
+    <constraints>
+      <invalidate when="NameEndsWith" values="b c d f g h j k l m n p q r s t v w x z"/>
+    </constraints>
+    <probability>
+      <set type="LeadingVowelProbability" value="0.80"/>
+      <set type="LeadingConsonantSequenceProbability" value="0.20" />
+      <set type="VowelSequenceProbability" value = "0.25" />
+      <set type="TrailingConsonantProbability" value = "0" />
+      <set type="TrailingConsonantSequenceProbability" value = "0" />
+    </probability>
+  </define>
+  <define name="Continent">
+    <components>
+      <add type="Vowels" values="a e i o u"/>
+      <add type="VowelSequences" values="ae ea ai ia au ay ie oi ou ey"/>
+      <add type="LeadingConsonants" values="b c d f g h l m n p r s t v y"/>
+      <add type="LeadingConsonantSequences" values="gr"/>
+      <add type="LeadingConsonantSequences" values="tr th"/>
+      <add type="TrailingConsonants" values="c d g l m n p r s t v"/>
+      <add type="TrailingConsonantSequences" values="rg rd rt rph st"/>
+    </components>
+    <constraints>
+      <invalidate when="NameEndsWith" values="j p q v w z"/>
+      <invalidate when="NameMatchesRegex" regex="([a-zA-Z])\1\1"/>
+    </constraints>
+    <probability>
+      <set type="LeadingVowelProbability" value="0.10"/>
+      <set type="LeadingConsonantSequenceProbability" value="0.20" />
+      <set type="VowelSequenceProbability" value = "0.20" />
+      <set type="TrailingConsonantProbability" value = "0.05" />
+      <set type="TrailingConsonantSequenceProbability" value = "0.05" />
+    </probability>
+  </define>
+  <define name="Region">
+    <components>
+      <add type="Vowels" values="a e i o u"/>
+      <add type="VowelSequences" values="ae ea ai ia au ay ie oi ou ey"/>
+      <add type="LeadingConsonants" values="b c d f g h j k l m n p q r s t v w x y z"/>
+      <add type="LeadingConsonantSequences" values="ch sh bl cl fl pl gl br cr"/>
+      <add type="LeadingConsonantSequences" values="dr pr tr th sc sp st sl spr"/>
+      <add type="TrailingConsonants" values="b c d f g h k l m n p r s t v x y"/>
+      <add type="TrailingConsonantSequences" values="ck st sc ng nk rsh lsh rk rst nct xt"/>
+    </components>
+    <constraints>
+      <invalidate when="NameEndsWith" values="j p q v w z"/>
+      <invalidate when="NameMatchesRegex" regex="([a-zA-Z])\1\1"/>
+    </constraints>
+    <probability>
+      <set type="LeadingVowelProbability" value="0.10"/>
+      <set type="LeadingConsonantSequenceProbability" value="0.20" />
+      <set type="VowelSequenceProbability" value = "0.20" />
+      <set type="TrailingConsonantProbability" value = "0.10" />
+      <set type="TrailingConsonantSequenceProbability" value = "0.10" />
+    </probability>
+  </define>
+  <define name="Settlement">
+    <components>
+      <add type="Vowels" values="a e i o u"/>
+      <add type="VowelSequences" values="ae ea ai ia au ay ie oi ou ey"/>
+      <add type="LeadingConsonants" values="b c d f g h j k l m n p q r s t v w x y z"/>
+      <add type="LeadingConsonantSequences" values="ch sh bl cl fl pl gl br cr"/>
+      <add type="LeadingConsonantSequences" values="dr pr tr th sc sp st sl spr"/>
+      <add type="TrailingConsonants" values="b c d f g h k l m n p r s t v x y"/>
+      <add type="TrailingConsonantSequences" values="ck st sc ng nk rsh lsh rk rst nct xt"/>
+    </components>
+    <constraints>
+      <invalidate when="NameEndsWith" values="j p q v w z"/>
+      <invalidate when="NameMatchesRegex" regex="([a-zA-Z])\1\1"/>
+    </constraints>
+    <probability>
+      <set type="LeadingVowelProbability" value="0.10"/>
+      <set type="LeadingConsonantSequenceProbability" value="0.20" />
+      <set type="VowelSequenceProbability" value = "0.20" />
+      <set type="TrailingConsonantProbability" value = "0.10" />
+      <set type="TrailingConsonantSequenceProbability" value = "0.10" />
+    </probability>
+  </define>
+</syllabore>
