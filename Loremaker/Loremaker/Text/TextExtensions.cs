@@ -11,6 +11,12 @@ namespace Loremaker.Text
         {
             return Regex.IsMatch(s, @"(\[[^\]]+\])");
         }
+
+        public static string RemoveCurlyBrackets(this string s)
+        {
+            return s.Replace("{", string.Empty).Replace("}", string.Empty);
+        }
+
         public static string RemoveSquareBrackets(this string s)
         {
             return s.Replace("[", string.Empty).Replace("]", string.Empty);

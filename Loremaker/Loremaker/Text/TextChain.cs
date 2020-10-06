@@ -17,7 +17,11 @@ namespace Loremaker.Text
             this.GlobalEntities = new Dictionary<string, TextEntity>();
         }
 
-        public TextChain DefineGlobally(string key, Func<TextEntity, TextEntity> configureEntity)
+        /// <summary>
+        /// Used to define <c>TextEntities</c> for use across multiple <c>TextTemplates</c>
+        /// in a <c>TextChain</c>.
+        /// </summary>
+        public TextChain Initialize(string key, Func<TextEntity, TextEntity> configureEntity)
         {
             var e = configureEntity(new TextEntity(key));
 
@@ -33,6 +37,12 @@ namespace Loremaker.Text
             return this;
         }
 
+        public TextChain Append(string template)
+        {
+            this.Templates.Add(new TextTemplate(template));
+            return this;
+        }
+
         public TextChain Append(string template, Func<TextTemplate, TextTemplate> configure)
         {
             this.Templates.Add(configure(new TextTemplate(template)));
@@ -42,13 +52,15 @@ namespace Loremaker.Text
         public string Next()
         {
             var result = new StringBuilder();
+            var previousValues = new Dictionary<string, string>();
             var currentContext = new List<string>();
 
             foreach(var template in this.Templates)
             {
                 if (template.IsFulfilledBy(currentContext.ToArray()))
                 {
-                    var output = template.NextOutput(this.GlobalEntities);
+                    var output = template.NextOutput(this.GlobalEntities, previousValues);
+                    previousValues.AddRange(output.TextEntityOutput);
                     currentContext.AddRange(output.Context); // adds new context hints
 
                     result.Append(output.Value);

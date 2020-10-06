@@ -93,7 +93,7 @@ namespace Loremaker.Text
 
         public string Next()
         {
-            return this.NextOutput(null).Value;
+            return this.NextOutput(null, null).Value;
         }
 
         /// <summary>
@@ -103,28 +103,88 @@ namespace Loremaker.Text
         /// </summary>
         public TextOutput NextOutput()
         {
-            return this.NextOutput(null);
+            return this.NextOutput(null, null);
         }
 
 
+        /// TODO this method doesn't need two for-loops
         /// <summary>
+        /// This method is used by <c>TextChain</c>.
         /// Identical to the parameterless <c>NextOutput()</c> except it
-        /// also uses the specified Dictionary of TextEntities to replace
-        /// placeholders. This method is used in <c>TextChains</c>.
+        /// takes a Dictionary of TextEntities to supplement this template's
+        /// TextEntities (generation pulls from both pools of entities). This is useful
+        /// when "globally" defining TextEntities across multiple templates. 
+        /// This method also takes a Dictionary representing previously generated
+        /// values. This is useful when the first output of a TextEntity must be
+        /// used across multiple templates.
         /// </summary>
-        public TextOutput NextOutput(Dictionary<string, TextEntity> supplementaryEntities)
+        /// 
+
+        public TextOutput NextOutput(Dictionary<string, TextEntity> supplementaryEntities, Dictionary<string, string> overrideValues)
+        {
+            var result = new StringBuilder(this.Template);
+            var output = new TextOutput();
+
+            foreach (var m in Regex.Matches(result.ToString(), @"({[^}]+})"))
+            {
+                var bracketedKey = m.ToString();
+                var key = bracketedKey.RemoveCurlyBrackets();
+
+                if (overrideValues != null && overrideValues.ContainsKey(key))
+                {
+                    result.Replace("{" + key + "}", overrideValues[key]);
+                    output.TextEntityOutput[key] = overrideValues[key];
+                }
+                else if (supplementaryEntities.ContainsKey(key))
+                {
+                    var s = supplementaryEntities[key].NextOutput();
+                    result.Replace("{" + key + "}", s.Value);
+                    output.Context.AddRange(s.Context);
+                    output.TextEntityOutput[key] = s.Value;
+                }
+                else if (this.Entities.ContainsKey(key))
+                {
+                    var e = this.Entities[key].NextOutput();
+                    result.Replace("{" + key + "}", e.Value);
+                    output.Context.AddRange(e.Context);
+                    output.TextEntityOutput[key] = e.Value;
+                }
+
+            }
+
+            output.Value = result.ToString().Trim();
+
+            // Are there are context clues in the template?
+            if (output.Value.HasContextClues())
+            {
+                output.Context.AddRange(output.Value.GetContextClues());
+                output.Value = output.Value.RemoveSquareBrackets();
+            }
+
+            return output;
+        }
+
+        /*
+        public TextOutput NextOutput(Dictionary<string, TextEntity> supplementaryEntities, Dictionary<string, string> outputValues)
         {
             var result = new StringBuilder(this.Template);
             var output = new TextOutput();
 
             foreach (string key in this.Entities.Keys)
             {
-                var entity = this.Entities[key].NextOutput();
-                output.Context.AddRange(entity.Context);
-                output.TextEntityOutput[key] = entity.Value;
-                result.Replace("{" + key + "}", entity.Value);
+                if(outputValues != null && outputValues.ContainsKey(key))
+                {
+                    output.TextEntityOutput[key] = outputValues[key];
+                    result.Replace("{" + key + "}", outputValues[key]);
+                }
+                else
+                {
+                    var entity = this.Entities[key].NextOutput();
+                    output.Context.AddRange(entity.Context);
+                    output.TextEntityOutput[key] = entity.Value;
+                    result.Replace("{" + key + "}", entity.Value);
+                }
             }
-
 
             // If there are still placeholders and supplementary text entities were supplied...
             if (Regex.IsMatch(result.ToString(), @"({[^}]+})") && supplementaryEntities != null)
@@ -134,7 +194,12 @@ namespace Loremaker.Text
                     var s = m.ToString();
                     var key = s.Substring(1, s.Length - 2);
 
-                    if (supplementaryEntities.Keys.Contains(key))
+                    if(outputValues != null && outputValues.ContainsKey(key))
+                    {
+                        output.TextEntityOutput[key] = outputValues[key];
+                        result.Replace("{" + key + "}", outputValues[key]);
+                    }
+                    else if (supplementaryEntities.Keys.Contains(key))
                     {
                         var entity = supplementaryEntities[key].NextOutput();
                         output.Context.AddRange(entity.Context);
@@ -156,6 +221,7 @@ namespace Loremaker.Text
 
             return output;
         }
+        */
 
     }
 }
