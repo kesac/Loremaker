@@ -31,29 +31,45 @@ namespace Loremaker.Text
             return this;
         }
 
+        private void Add(ref List<string> list, string[] strings)
+        {
+            // There used to be additional logic here.
+            // That's why this has been abstracted out.
+            // Might not need it anymore.
+            list.AddRange(strings);
+        }
+
         public TextEntity As(params string[] objects)
         {
-            this.Objects.AddRange(objects);
+            var list = this.Objects;
+            this.Add(ref list, objects);
             return this;
         }
 
         public TextEntity UsingAdjectives(params string[] adjectives)
         {
-            this.Adjectives.AddRange(adjectives);
+            var list = this.Adjectives;
+            this.Add(ref list, adjectives);
             return this;
         }
 
         public TextEntity UsingDeterminers(params string[] determiners)
         {
-            this.Determiners.AddRange(determiners);
+            var list = this.Determiners;
+            this.Add(ref list, determiners);
             return this;
         }
-
         public string Next()
         {
+            return NextOutput().Value;
+        }
+        public TextOutput NextOutput()
+        {
             var result = new StringBuilder();
+            var output = new TextOutput();
+            var context = new List<string>();
 
-            if(this.NameGenerator != null)
+            if (this.NameGenerator != null)
             {
                 result.Append(" ");
                 result.Append(this.NameGenerator.Next());
@@ -61,32 +77,65 @@ namespace Loremaker.Text
 
             if (this.Objects.Count > 0)
             {
+
+                var o = this.Objects.GetRandom();
+
+                if (o.HasContextClues())
+                {
+                    context.AddRange(o.GetContextClues());
+                    o = o.RemoveSquareBrackets();
+                }
+
                 result.Append(" ");
-                result.Append(this.Objects[this.Random.Next(this.Objects.Count)]);
+                result.Append(o);
             }
 
             if (this.Adjectives.Count > 0)
             {
-                result.Insert(0, this.Adjectives[this.Random.Next(this.Adjectives.Count)]);
+
+                var adjective = this.Adjectives.GetRandom();
+
+                if (adjective.HasContextClues())
+                {
+                    context.AddRange(adjective.GetContextClues());
+                    adjective = adjective.RemoveSquareBrackets();
+                }
+
+                result.Insert(0, adjective);
                 result.Insert(0, " ");
             }
 
             if (this.Determiners.Count > 0)
             {
 
-                var determiner = this.Determiners[this.Random.Next(this.Determiners.Count)];
-               
-                if(determiner == "a" && Regex.IsMatch(result.ToString().Trim(), "^[aieouAIEOU]"))
+                var determiner = this.Determiners.GetRandom();
+
+                if (determiner.HasContextClues())
+                {
+                    context.AddRange(determiner.GetContextClues());
+                    determiner = determiner.RemoveSquareBrackets();
+                }
+
+                if (determiner == "a" && Regex.IsMatch(result.ToString().Trim(), "^[aieouAIEOU]"))
                 {
                     determiner = "an";
+                }
+                else if (determiner == "an" && Regex.IsMatch(result.ToString().Trim(), "^[^aieouAIEOU]"))
+                {
+                    determiner = "a";
                 }
 
                 result.Insert(0, determiner);
                 result.Insert(0, " ");
             }
 
-            return result.ToString().Trim();
+            output.Value = result.ToString().Trim();
+            output.Context.AddRange(context);
+            return output;
+            
         }
+
+
 
     }
 }
