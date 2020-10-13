@@ -116,11 +116,11 @@ namespace Loremaker.Text
                     determiner = determiner.RemoveSquareBrackets();
                 }
 
-                if (determiner == "a" && Regex.IsMatch(result.ToString().Trim(), "^[aieouAIEOU]"))
+                if (determiner == "a" && result.ToString().Trim().StartsWithVowel())
                 {
                     determiner = "an";
                 }
-                else if (determiner == "an" && Regex.IsMatch(result.ToString().Trim(), "^[^aieouAIEOU]"))
+                else if (determiner == "an" && !result.ToString().Trim().StartsWithVowel())
                 {
                     determiner = "a";
                 }

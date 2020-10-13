@@ -8,19 +8,22 @@ namespace Loremaker.Text
 {
     public class TextTemplate
     {
-        private string Template;
-        private HashSet<string> EntityKeys;
-        private Dictionary<string, TextEntity> Entities;
+        public string Template { get; set; }
+        public HashSet<string> EntityKeys { get; set; }
+        public Dictionary<string, TextEntity> Entities { get; set; }
         
-        
-        private List<string> ContextRequirements; // Used by TextChain to generate context aware chains of text
+        public List<string> MandatoryContextTags { get; set; } // Used by TextChain to generate context aware chains of text
+        public List<string> RejectedContextTags { get; set; } 
+
+        public bool EnableCapitalization { get; set; }
 
         public TextTemplate(string template)
         {
             this.Template = template;
             this.EntityKeys = new HashSet<string>();
             this.Entities = new Dictionary<string, TextEntity>();
-            this.ContextRequirements = new List<string>();
+            this.MandatoryContextTags = new List<string>();
+            this.RejectedContextTags = new List<string>();
 
             foreach (var m in Regex.Matches(template, @"({[^}]+})"))
             {
@@ -55,40 +58,72 @@ namespace Loremaker.Text
             return this;
         }
 
+        public TextTemplate CapitalizeFirstWord()
+        {
+            this.EnableCapitalization = true;
+            return this;
+        }
+
+        public TextTemplate DoNotCapitalizeFirstWord()
+        {
+            this.EnableCapitalization = false;
+            return this;
+        }
+
         /// <summary>
         /// Adds context tags that represent this template's context requirements.
         /// Context tags affect the return value of <c>MeetsContextRequirements()</c>
         /// </summary>
-        public TextTemplate RequiresContext(params string[] contextRequirements)
+        public TextTemplate WhenContextHas(params string[] contextRequirements)
         {
             foreach(var c in contextRequirements)
             {
-                this.ContextRequirements.Add(c.ToLower());
+                this.MandatoryContextTags.Add(c.ToLower());
+            }
+            return this;
+        }
+
+        public TextTemplate AvoidWhenContextHas(params string[] rejectedContextRequirements)
+        {
+            foreach (var c in rejectedContextRequirements)
+            {
+                this.RejectedContextTags.Add(c.ToLower());
             }
             return this;
         }
 
         /// <summary>
         /// Returns true if all the provided context tags are in the 
-        /// pre-defined list of context requirements of this template.
+        /// list of approved context tags and none are in the list of 
+        /// rejected context tags..
         /// Context requirements are defined through <c>RequiredContext()</c>.
         /// This method is used in <c>TextChains</c> where text that appears
         /// earlier in a chain influences text added later to the chain.
         /// </summary>
-        public bool IsFulfilledBy(params string[] context)
+        public bool IsFulfilledBy(List<string> contextTags)
         {
-            if(context.Length == 0) { return true; }
+            if(contextTags.Count == 0) { return true; }
 
-            bool usesContext = true;
-            foreach(var c in this.ContextRequirements)
+            bool isFullfilled = true;
+            foreach(var tag in this.MandatoryContextTags)
             {
-                if (!context.Contains(c.ToLower()))
+                if (!contextTags.Contains(tag.ToLower()))
                 {
-                    usesContext = false;
+                    isFullfilled = false;
                     break;
                 }
             }
-            return usesContext;
+
+            foreach (var tag in this.RejectedContextTags)
+            {
+                if (contextTags.Contains(tag.ToLower()))
+                {
+                    isFullfilled = false;
+                    break;
+                }
+            }
+
+            return isFullfilled;
         }
 
         public string Next()
@@ -105,6 +140,7 @@ namespace Loremaker.Text
         {
             return this.NextOutput(null, null);
         }
+
 
 
         /// TODO this method doesn't need two for-loops
@@ -135,13 +171,6 @@ namespace Loremaker.Text
                     result.Replace("{" + key + "}", overrideValues[key]);
                     output.TextEntityOutput[key] = overrideValues[key];
                 }
-                else if (supplementaryEntities.ContainsKey(key))
-                {
-                    var s = supplementaryEntities[key].NextOutput();
-                    result.Replace("{" + key + "}", s.Value);
-                    output.Context.AddRange(s.Context);
-                    output.TextEntityOutput[key] = s.Value;
-                }
                 else if (this.Entities.ContainsKey(key))
                 {
                     var e = this.Entities[key].NextOutput();
@@ -149,6 +178,14 @@ namespace Loremaker.Text
                     output.Context.AddRange(e.Context);
                     output.TextEntityOutput[key] = e.Value;
                 }
+                else if (supplementaryEntities.ContainsKey(key))
+                {
+                    var s = supplementaryEntities[key].NextOutput();
+                    result.Replace("{" + key + "}", s.Value);
+                    output.Context.AddRange(s.Context);
+                    output.TextEntityOutput[key] = s.Value;
+                }
+                
 
             }
 
@@ -161,67 +198,14 @@ namespace Loremaker.Text
                 output.Value = output.Value.RemoveSquareBrackets();
             }
 
-            return output;
-        }
-
-        /*
-        public TextOutput NextOutput(Dictionary<string, TextEntity> supplementaryEntities, Dictionary<string, string> outputValues)
-        {
-            var result = new StringBuilder(this.Template);
-            var output = new TextOutput();
-
-            foreach (string key in this.Entities.Keys)
+            if (this.EnableCapitalization)
             {
-                if(outputValues != null && outputValues.ContainsKey(key))
-                {
-                    output.TextEntityOutput[key] = outputValues[key];
-                    result.Replace("{" + key + "}", outputValues[key]);
-                }
-                else
-                {
-                    var entity = this.Entities[key].NextOutput();
-                    output.Context.AddRange(entity.Context);
-                    output.TextEntityOutput[key] = entity.Value;
-                    result.Replace("{" + key + "}", entity.Value);
-                }
-            }
-
-            // If there are still placeholders and supplementary text entities were supplied...
-            if (Regex.IsMatch(result.ToString(), @"({[^}]+})") && supplementaryEntities != null)
-            {
-                foreach (var m in Regex.Matches(result.ToString(), @"({[^}]+})"))
-                {
-                    var s = m.ToString();
-                    var key = s.Substring(1, s.Length - 2);
-
-                    if(outputValues != null && outputValues.ContainsKey(key))
-                    {
-                        output.TextEntityOutput[key] = outputValues[key];
-                        result.Replace("{" + key + "}", outputValues[key]);
-                    }
-                    else if (supplementaryEntities.Keys.Contains(key))
-                    {
-                        var entity = supplementaryEntities[key].NextOutput();
-                        output.Context.AddRange(entity.Context);
-                        output.TextEntityOutput[key] = entity.Value;
-                        result.Replace("{" + key + "}", entity.Value);
-                    }
-                    
-                }
-            }
-
-            output.Value = result.ToString().Trim();
-
-            // Are there are context clues in the template?
-            if (output.Value.HasContextClues())
-            {
-                output.Context.AddRange(output.Value.GetContextClues());
-                output.Value = output.Value.RemoveSquareBrackets();
+                output.Value = output.Value.Substring(0, 1).ToUpper() + output.Value.Substring(1);
             }
 
             return output;
         }
-        */
+
 
     }
 }

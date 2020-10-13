@@ -7,9 +7,8 @@ namespace Loremaker.Text
 {
     public class TextChain
     {
-
-        private List<TextTemplate> Templates;
-        private Dictionary<string, TextEntity> GlobalEntities;
+        public List<TextTemplate> Templates { get; set; }
+        public Dictionary<string, TextEntity> GlobalEntities { get; set; }
 
         public TextChain()
         {
@@ -21,7 +20,7 @@ namespace Loremaker.Text
         /// Used to define <c>TextEntities</c> for use across multiple <c>TextTemplates</c>
         /// in a <c>TextChain</c>.
         /// </summary>
-        public TextChain Initialize(string key, Func<TextEntity, TextEntity> configureEntity)
+        public TextChain DefineGlobally(string key, Func<TextEntity, TextEntity> configureEntity)
         {
             var e = configureEntity(new TextEntity(key));
 
@@ -57,7 +56,7 @@ namespace Loremaker.Text
 
             foreach(var template in this.Templates)
             {
-                if (template.IsFulfilledBy(currentContext.ToArray()))
+                if (template.IsFulfilledBy(currentContext))
                 {
                     var output = template.NextOutput(this.GlobalEntities, previousValues);
                     previousValues.AddRange(output.TextEntityOutput);
