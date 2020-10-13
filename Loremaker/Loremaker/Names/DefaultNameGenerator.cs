@@ -28,7 +28,7 @@ namespace Loremaker.Names
                     .WithMutation(x => x.Syllables.Add("gard"))
                     .WithMutation(x => x.Syllables.Insert(0, "gran")))
                 .UsingValidator(v => v
-                    .InvalidateRegex(@"(\w)\1\1"))
+                    .DoNotAllowPattern(@"(\w)\1\1"))
                 .LimitMutationChance(0.50)
                 .LimitSyllableCount(2,3);
         }
