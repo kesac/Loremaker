@@ -25,8 +25,8 @@ namespace Loremaker.Names
                     .WithLeadingConsonants("strlpn")
                     .WithTrailingConsonantSequences("rt", "py"))
                 .UsingMutator(m => m
-                    .WithMutation(x => x.Syllables.Add("gard"))
-                    .WithMutation(x => x.Syllables.Insert(0, "gran")))
+                    .WithMutation(x => x.AppendSyllable("gard"))
+                    .WithMutation(x => x.InsertSyllable(0, "gran")))
                 .UsingValidator(v => v
                     .DoNotAllowPattern(@"(\w)\1\1"))
                 .LimitMutationChance(0.50)

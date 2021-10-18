@@ -92,9 +92,10 @@ namespace Loremaker.Example
 
                 var shipNames = new NameGenerator()
                     .LimitSyllableCount(2,3)
-                    .UsingProvider(new DefaultSyllableProvider()
-                        .DisallowTrailingConsonants()
-                        .DisallowVowelSequences())
+                    .UsingProvider(x => new DefaultSyllableProvider()
+                        .WithProbability(x => x
+                            .TrailingConsonantExists(0)
+                            .VowelBecomesSequence(0)))
                     .UsingValidator(x => x
                         .DoNotAllowPattern("[wyz]")
                         .DoNotAllowPattern("[^aeiou]{3,}"));

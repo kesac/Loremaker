@@ -9,40 +9,64 @@ namespace Loremaker.Experiments.Maps
     public class CustomNameGenerator : ILocationNameGenerator
     {
 
-        private NameGenerator _worldNameGenerator;
-        private NameGenerator _continentNameGenerator;
-        private NameGenerator _regionNameGenerator;
-        private NameGenerator _SettlementNameGenerator;
+        private NameGenerator worlds;
+        private NameGenerator continents;
+        private NameGenerator regions;
+        private NameGenerator settlements;
 
-        public CustomNameGenerator(string filename)
+        public CustomNameGenerator()
         {
-            var loader = new XmlFileLoader(filename);
-            loader.Load();
+            worlds = new NameGenerator()
+                        .UsingProvider(x => x
+                            .WithLeadingConsonants("vrstl").Weight(4)
+                            .WithLeadingConsonants("wznm")
+                            .WithVowels("a").Weight(4)
+                            .WithVowels("ei").Weight(2)
+                            .WithVowels("ou"))
+                        .UsingMutator(x => x
+                            .WithMutation(x => x.AppendSyllable("gard"))
+                            .WithMutation(x => x.AppendSyllable("grim"))
+                            .WithMutation(x => x.AppendSyllable("dar")))
+                        .LimitMutationChance(0.33)
+                        .LimitSyllableCount(2, 2);
 
-            _worldNameGenerator = loader.GetNameGenerator("World");
-            _continentNameGenerator = loader.GetNameGenerator("Continent");
-            _regionNameGenerator = loader.GetNameGenerator("Region");
-            _SettlementNameGenerator = loader.GetNameGenerator("Settlement");
+            continents = new NameGenerator()
+                        .UsingProvider(x => x
+                            .WithLeadingConsonants("vrznmstl").Weight(2)
+                            .WithLeadingConsonants("bckghw")
+                            .WithVowels("a").Weight(4)
+                            .WithVowels("ei").Weight(2)
+                            .WithVowels("ou"))
+                        .LimitSyllableCount(2, 3);
+
+            regions = new NameGenerator()
+                        .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
+                        .LimitSyllableCount(2, 3);
+
+            settlements = new NameGenerator()
+                        .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
+                        .LimitSyllableCount(2, 4);
+
         }
 
         public string NextContinentName()
         {
-            return _continentNameGenerator.Next();
+            return continents.Next();
         }
 
         public string NextRegionName()
         {
-            return _regionNameGenerator.Next();
+            return regions.Next();
         }
 
         public string NextSettlementName()
         {
-            return _SettlementNameGenerator.Next();
+            return settlements.Next();
         }
 
         public string NextWorldName()
         {
-            return _worldNameGenerator.Next();
+            return worlds.Next();
         }
     }
 }

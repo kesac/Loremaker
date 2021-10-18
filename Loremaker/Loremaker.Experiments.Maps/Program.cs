@@ -29,7 +29,7 @@ namespace Loremaker.Experiments.Maps
                     }
                 )
                 .SetNameGenerator(
-                    new CustomNameGenerator("CustomNames.xml")
+                    new CustomNameGenerator()
                 );
 
             var world = worldGenerator.Next();
