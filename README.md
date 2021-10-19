@@ -1,5 +1,5 @@
 # Loremaker
-A fantasy lore generator useful for building fictional worlds. This project supports some basic procedural text generation and map generation. Procedural name generation is mostly done through [Syllabore](https://github.com/kesac/Syllabore).
+A fantasy lore generator useful for building fictional worlds. This project is still growing and currently only supports basic procedural text generation and map generation. Procedural name generation is mostly done through [Syllabore](https://github.com/kesac/Syllabore).
 
 ## Basic Text Generation
 
