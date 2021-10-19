@@ -16,5 +16,10 @@ namespace Loremaker.Text
             this.TextEntityOutput = new Dictionary<string, string>();
         }
 
+        public override string ToString()
+        {
+            return this.Value;
+        }
+
     }
 }
