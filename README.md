@@ -3,7 +3,7 @@ A fantasy lore generator useful for building fictional worlds. This project is s
 
 ## Basic Text Generation
 
-Use a TextTemplate to declare a string with substitutions as follows:
+Use a TextTemplate to declare a string with substitutions. A string in curly brackets (`{` and `}`) can be substituted like so:
 
 ```C#
 var text = new TextTemplate("{subject} {verb} to {place}.")
@@ -80,6 +80,7 @@ Alice was brought up in a poor village near the Rota Plains.
 ```
 
 ## Generating Contextual Text
+`TextChain` can be used to tie together multiple `TextTemplates` in a sequence. Square brackets (`[` and `]`) can be used to mark certain words as contextual towards text further down the chain. This is useful when wanting to generate specific text that references previously generated text. Here is an example:
 ```C#
 var chain = new TextChain()
             .Append("{subject} {raised} in {birthplace} near {place}.", x => x
