@@ -3,7 +3,7 @@ A fantasy lore generator useful for building fictional worlds. This project is s
 
 ## Basic Text Generation
 
-Use a TextTemplate to declare a string with substitutions. A string in curly brackets (`{` and `}`) can be substituted like so:
+Use a `TextTemplate` to declare a string with substitutions. Any substring inside curly brackets (`{` and `}`) can be substituted like so:
 
 ```C#
 var text = new TextTemplate("{subject} {verb} to {place}.")
