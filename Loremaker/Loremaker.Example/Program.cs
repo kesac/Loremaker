@@ -1,8 +1,10 @@
 ﻿using Loremaker.Names;
 using Loremaker.Text;
+using Markov;
 using Syllabore;
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace Loremaker.Example
@@ -18,35 +20,37 @@ namespace Loremaker.Example
             {
                 // Basic substitution
                 var text = new TextTemplate("{subject} {verb} to {place}.")
-                    .Define("subject", x => x.As("Alice", "Brian", "Cam"))
-                    .Define("verb", x => x.As("ran", "walked", "hopped"))
-                    .Define("place", x => x.As("store", "park", "house").UsingDeterminers("a", "the"));
+                            .Define("subject", x => x.As("Alice", "Brian", "Cam"))
+                            .Define("verb", x => x.As("ran", "walked", "hopped"))
+                            .Define("place", x => x.As("store", "park", "house").UsingDeterminers("a", "the"));
 
                 for (int i = 0; i < 10; i++)
                 {
                     Console.WriteLine(text.Next());
                 }
+
                 Console.WriteLine();
             }
             {
                 // More complicated
                 var text = new TextTemplate("{subject} {verb} to {place}.")
-                    .CapitalizeFirstWord()
-                    .Define("subject", x => x
-                        .As("Alice", "Bob", "Chris")
-                        .UsingAdjectives("busy", "impatient", "energetic")
-                        .UsingDeterminers("the",""))
-                    .Define("verb", x => x
-                        .As("ran", "walked", "hopped"))
-                    .Define("place", x => x
-                        .As("store", "park", "house")
-                        .UsingAdjectives("green", "busy", "bustling")
-                        .UsingDeterminers("a", "the"));
+                            .CapitalizeFirstWord()
+                            .Define("subject", x => x
+                                .As("Alice", "Bob", "Chris")
+                                .UsingAdjectives("busy", "impatient", "energetic")
+                                .UsingDeterminers("the",""))
+                            .Define("verb", x => x
+                                .As("ran", "walked", "hopped"))
+                            .Define("place", x => x
+                                .As("store", "park", "house")
+                                .UsingAdjectives("green", "busy", "bustling")
+                                .UsingDeterminers("a", "the"));
 
                 for (int i = 0; i < 10; i++)
                 {
                     Console.WriteLine(text.Next());
                 }
+
                 Console.WriteLine();
             }
             {
@@ -145,6 +149,26 @@ namespace Loremaker.Example
                 {
                     Console.WriteLine(chain.Next());
                 }
+            }
+
+            {
+                var t = new TextGenerator()
+                        .FromCorpus("sample.txt");
+
+                t = new TextGenerator()
+                        .FromCorpus("sample.txt")
+                        .FromCorpus("sample2.txt")
+                        .UsingDepth(2)             // Default is 2
+                        .UsingDelimiter(' ')       // Default is a single space character ' '
+                        .BeginTextWith("The")      // Try to start all generated text with this substring
+                        .EndTextWith("with")       // There are nuances to this
+                        .LoadCorpus();             // If not called, corpuses will be implicitly loaded on first call to Next()
+
+                for(int i = 0; i < 20; i++)
+                {
+                    Console.WriteLine(t.Next());
+                }
+
             }
 
             Console.ReadLine();

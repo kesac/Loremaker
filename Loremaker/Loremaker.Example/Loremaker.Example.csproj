@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markov" Version="2.0.0" />
     <PackageReference Include="Syllabore" Version="2.0.0-alpha" />
   </ItemGroup>
 
