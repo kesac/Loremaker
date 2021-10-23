@@ -42,6 +42,11 @@ namespace Loremaker.Text
 
         }
 
+
+
+        /// <summary>
+        /// Defines a new <see cref="TextEntity"/> and adds it to this TextTemplate.
+        /// </summary>
         public TextTemplate Define(string key, Func<TextEntity, TextEntity> configureEntity)
         {
             var e = configureEntity(new TextEntity(key));
@@ -55,6 +60,17 @@ namespace Loremaker.Text
                 this.Entities[key] = e;
             }
 
+            return this;
+        }
+
+
+        /// <summary>
+        /// Convenience method for defining text substitutions if you don't
+        /// need to specify determiners, adjectives, context, etc. 
+        /// </summary>
+        public TextTemplate Define(string key, params string[] substitutions)
+        {
+            this.Define(key, x => x.As(substitutions));
             return this;
         }
 

@@ -106,7 +106,7 @@ namespace Loremaker.Example
 
                 var chain = new TextChain()
                     .Append("{subject} {raised} in {birthplace} near {place}.", x => x
-                        .Define("raised", x => x.As("grew up", "was raised", "was brought up"))
+                        .Define("raised", "grew up", "was raised", "was brought up")
                         .Define("birthplace", x => x
                             .As("[village]", "[town]") // square brackets tells text generator to record these as context tags
                             .UsingAdjectives("small", "modest", "poor", "large", "busy", "remote", "trade", "coastal", "underground")
@@ -116,8 +116,8 @@ namespace Loremaker.Example
                             .UsingDeterminers("", "the")
                             .UsingNamesFrom(locationNames)))
                     .Append("Growing up, {pronoun} {waswere} always drawn to {passion}.", x => x
-                        .Define("waswere", x => x.As("was"))
-                        .Define("passion", x => x.As("the beauty and power of [fire]", "the vastness of the [ocean]"))
+                        .Define("waswere", "was")
+                        .Define("passion", "the beauty and power of [fire]", "the vastness of the [ocean]")
                         .WhenContextHas("mountain")) // this line of text won't be used unless "mountain" was used in previous lines of text
                     .Append("{pronoun} {waswere} banished from the community after accidentally setting the [house] of the local [priest] on fire.", x => x
                         .CapitalizeFirstWord()
@@ -126,11 +126,11 @@ namespace Loremaker.Example
                         .WhenContextHas("fire", "priest"))
                     .Append("{pronoun} became a [sailor] at the age of {age}.", x => x
                         .CapitalizeFirstWord()
-                        .Define("age", x => x.As("16", "17", "18"))
+                        .Define("age", "16", "17", "18")
                         .WhenContextHas("ocean")
                         .AvoidWhenContextHas("mountain"))
                     .Append("At the age of {olderAge}, {pronoun} became captain of the {shipname}.", x => x
-                        .Define("olderAge", x => x.As("29", "30", "31"))
+                        .Define("olderAge", "29", "30", "31")
                         .Define("shipname", x => x.UsingNamesFrom(shipNames))
                         .WhenContextHas("sailor"))
                     .Append("{subject} now sails {place}.", x => x
@@ -153,16 +153,14 @@ namespace Loremaker.Example
 
             {
                 var t = new TextGenerator()
-                        .FromCorpus("sample.txt");
-
-                t = new TextGenerator()
                         .FromCorpus("sample.txt")
                         .FromCorpus("sample2.txt")
-                        .UsingDepth(2)             // Default is 2
-                        .UsingDelimiter(' ')       // Default is a single space character ' '
-                        .BeginTextWith("The")      // Try to start all generated text with this substring
-                        .EndTextWith("with")       // There are nuances to this
-                        .LoadCorpus();             // If not called, corpuses will be implicitly loaded on first call to Next()
+                        // .FromCorpus("shakespeare.txt")
+                        // .UsingDepth(2)             // Default is 2
+                        // .UsingDelimiter(' ')       // Default is a single space character ' '
+                        // .BeginTextWith("The")      // Try to start all generated text with this substring
+                        // .EndTextWith("with")       // There are nuances to this
+                        .LoadCorpus();                // If not called, corpuses will be implicitly loaded on first call to Next()
 
                 for(int i = 0; i < 20; i++)
                 {
