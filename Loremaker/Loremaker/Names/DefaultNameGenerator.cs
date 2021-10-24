@@ -8,7 +8,7 @@ namespace Loremaker.Names
     /// <summary>
     /// A quick and dirty standalone name generator useful for prototyping.
     /// </summary>
-    public class DefaultNameGenerator : INameGenerator
+    public class DefaultNameGenerator : ILocationNameGenerator, ICharacterNameGenerator, IOrganizationNameGenerator
     {
 
         private NameGenerator GeneralNames { get; set; }
