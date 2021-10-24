@@ -8,7 +8,6 @@ namespace Loremaker.Text
 {
     public class TextEntity : ITextGenerator
     {
-        private Random Random { get; set; }
         public string Value { get; set; }
         public List<string> Adjectives { get; set; }
         public List<string> Determiners { get; set; }
@@ -18,7 +17,6 @@ namespace Loremaker.Text
         public TextEntity(string value = "")
         {
             this.Value = value;
-            this.Random = new Random();
             this.Adjectives = new List<string>();
             this.Determiners = new List<string>();
         }
@@ -65,12 +63,14 @@ namespace Loremaker.Text
 
             if(this.Determiners.Count > 0)
             {
-                builder.Append(this.Determiners[this.Random.Next(this.Determiners.Count)] + " ");
+                //builder.Append(this.Determiners[this.Random.Next(this.Determiners.Count)] + " ");
+                builder.Append(this.Determiners.GetRandom<string>() + " ");
             }
 
             if (this.Adjectives.Count > 0)
             {
-                builder.Append(this.Adjectives[this.Random.Next(this.Adjectives.Count)] + " ");
+                //builder.Append(this.Adjectives[this.Random.Next(this.Adjectives.Count)] + " ");
+                builder.Append(this.Adjectives.GetRandom<string>() + " ");
             }
 
             if (this.NameGenerator != null)

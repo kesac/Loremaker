@@ -15,14 +15,12 @@ namespace Loremaker.Text
     /// </summary>
     public class TextEntityPool : ITextGenerator
     {
-        private Random Random { get; set; }
         public List<TextEntity> Entities { get; set; }
 
         private List<TextEntity> LastAddedEntities { get; set; }
 
         public TextEntityPool()
         {
-            this.Random = new Random();
             this.Entities = new List<TextEntity>();
         }
 

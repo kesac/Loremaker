@@ -13,8 +13,6 @@ namespace Loremaker.Text
         public List<string> CorpusFilepaths { get; set; }
         public List<string> StartingWords { get; set; }
         public string EndingWord { get; set; }
-
-        private Random Random { get; set; }
         private MarkovChain<string> MarkovChain { get; set; }
 
         public MarkovTextGenerator()
@@ -23,7 +21,6 @@ namespace Loremaker.Text
             this.Depth = 2;
             this.StartingWords = new List<string>();
             this.CorpusFilepaths = new List<string>();
-            this.Random = new Random();
         }
 
         public MarkovTextGenerator UsingDepth(int depth)
