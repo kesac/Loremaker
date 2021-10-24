@@ -23,12 +23,12 @@ namespace Loremaker.Experiments.Maps
                             .WithVowels("a").Weight(4)
                             .WithVowels("ei").Weight(2)
                             .WithVowels("ou"))
-                        .UsingMutator(x => x
-                            .WithMutation(x => x.AppendSyllable("gard"))
-                            .WithMutation(x => x.AppendSyllable("grim"))
-                            .WithMutation(x => x.AppendSyllable("dar")))
-                        .LimitMutationChance(0.33)
-                        .LimitSyllableCount(2, 2);
+                        .UsingTransformer(x => x
+                            .Select(1).Chance(0.33)
+                            .WithTransform(x => x.AppendSyllable("gard"))
+                            .WithTransform(x => x.AppendSyllable("grim"))
+                            .WithTransform(x => x.AppendSyllable("dar")))
+                        .UsingSyllableCount(2);
 
             continents = new NameGenerator()
                         .UsingProvider(x => x
@@ -37,15 +37,15 @@ namespace Loremaker.Experiments.Maps
                             .WithVowels("a").Weight(4)
                             .WithVowels("ei").Weight(2)
                             .WithVowels("ou"))
-                        .LimitSyllableCount(2, 3);
+                        .UsingSyllableCount(2, 3);
 
             regions = new NameGenerator()
                         .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
-                        .LimitSyllableCount(2, 3);
+                        .UsingSyllableCount(2, 3);
 
             settlements = new NameGenerator()
                         .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
-                        .LimitSyllableCount(2, 4);
+                        .UsingSyllableCount(2, 4);
 
         }
 

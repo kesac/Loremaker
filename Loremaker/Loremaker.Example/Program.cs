@@ -67,7 +67,7 @@ namespace Loremaker.Example
                                 .Define("place", x => x
                                     .As("River", "Mountain", "Mountains", "Mountain Range", "Forest", "Ruins", "Canyon", "Sea", "Lake", "Plains")
                                     .UsingDeterminers("", "the")
-                                    .UsingNamesFrom(new NameGenerator()
+                                    .UsingNameGenerator(x => x
                                         .UsingProvider(x => x
                                             .WithVowels("aeo")
                                             .WithLeadingConsonants("tvr"))));
@@ -82,25 +82,25 @@ namespace Loremaker.Example
                 // Complex example multiple templates using context from each other
 
                 var worldNames = new NameGenerator()
-                   .LimitSyllableCount(3)
+                   .UsingSyllableCount(3)
                     .UsingProvider(x => x
                         .WithVowels("aeo")
                         .WithLeadingConsonants("tvr"));
 
                 var locationNames = new NameGenerator()
-                    .LimitSyllableCount(3)
+                    .UsingSyllableCount(3)
                     .UsingProvider(x => x
                         .WithVowels("aieou")
                         .WithLeadingConsonants("strvbc")
                         .WithTrailingConsonants("strvgfc"));
 
                 var shipNames = new NameGenerator()
-                    .LimitSyllableCount(2,3)
+                    .UsingSyllableCount(2,3)
                     .UsingProvider(x => new DefaultSyllableProvider()
                         .WithProbability(x => x
                             .TrailingConsonantExists(0)
                             .VowelBecomesSequence(0)))
-                    .UsingValidator(x => x
+                    .UsingFilter(x => x
                         .DoNotAllowPattern("[wyz]")
                         .DoNotAllowPattern("[^aeiou]{3,}"));
 
@@ -114,7 +114,7 @@ namespace Loremaker.Example
                         .Define("place", x => x
                             .As("[Mountain]", "[Mountain] Range", "[Ocean]")
                             .UsingDeterminers("", "the")
-                            .UsingNamesFrom(locationNames)))
+                            .UsingNames(locationNames)))
                     .Append("Growing up, {pronoun} {waswere} always drawn to {passion}.", x => x
                         .Define("waswere", "was")
                         .Define("passion", "the beauty and power of [fire]", "the vastness of the [ocean]")
@@ -131,13 +131,13 @@ namespace Loremaker.Example
                         .AvoidWhenContextHas("mountain"))
                     .Append("At the age of {olderAge}, {pronoun} became captain of the {shipname}.", x => x
                         .Define("olderAge", "29", "30", "31")
-                        .Define("shipname", x => x.UsingNamesFrom(shipNames))
+                        .Define("shipname", x => x.UsingNames(shipNames))
                         .WhenContextHas("sailor"))
                     .Append("{subject} now sails {place}.", x => x
                         .WhenContextHas("sailor"))
                     .Append("{subject} now travels {world}.", x => x
                         .AvoidWhenContextHas("sailor"))
-                    .DefineGlobally("world", x => x.UsingNamesFrom(worldNames))
+                    .DefineGlobally("world", x => x.UsingNames(worldNames))
                     .DefineGlobally("subject", x => x.As("Alice", "Brian", "Cam"))
                     .DefineGlobally("pronoun", x => x.As("he", "she"));
 
@@ -152,7 +152,7 @@ namespace Loremaker.Example
             }
 
             {
-                var t = new TextGenerator()
+                var t = new MarkovTextGenerator()
                         .FromCorpus("sample.txt")
                         .FromCorpus("sample2.txt")
                         // .FromCorpus("shakespeare.txt")
