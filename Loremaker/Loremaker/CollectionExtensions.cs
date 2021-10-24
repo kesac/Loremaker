@@ -8,7 +8,7 @@ namespace Loremaker
     {
         public static readonly Random Random = new Random();
 
-        public static string GetRandom(this List<string> list)
+        public static T GetRandom<T>(this List<T> list)
         {
             return list[Random.Next(list.Count)];
         }
