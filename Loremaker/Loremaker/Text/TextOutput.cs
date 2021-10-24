@@ -14,14 +14,10 @@ namespace Loremaker.Text
         public List<string> Context { get; private set; }
         public Dictionary<string, string> TextEntityOutput {get; private set;}
 
-        public TextOutput()
+        public TextOutput(string value = "")
         {
             this.Context = new List<string>();
             this.TextEntityOutput = new Dictionary<string, string>();
-        }
-
-        public TextOutput(string value) : base()
-        {
             this.Value = value;
         }
 
