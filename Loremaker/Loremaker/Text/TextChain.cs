@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Syllabore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,9 @@ namespace Loremaker.Text
         /// Used to define <c>TextEntities</c> for use across multiple <c>TextTemplates</c>
         /// in a <c>TextChain</c>.
         /// </summary>
-        public TextChain DefineGlobally(string key, Func<TextEntity, TextEntity> configureEntity)
+        public TextChain DefineGlobally(string key, Func<TextEntityPool, TextEntityPool> configureEntity)
         {
-            var e = configureEntity(new TextEntity(key));
+            var e = configureEntity(new TextEntityPool());
 
             if (this.GlobalEntities.Keys.Contains(key))
             {
@@ -47,6 +48,18 @@ namespace Loremaker.Text
                 this.GlobalEntities[key] = generator;
             }
 
+            return this;
+        }
+
+        public TextChain DefineGlobally(string key, INameGenerator generator)
+        {
+            this.DefineGlobally(key, new TextEntity().UsingNameGenerator(generator));
+            return this;
+        }
+
+        public TextChain DefineGlobally(string key, params string[] substitutions)
+        {
+            this.DefineGlobally(key, x => x.As(substitutions));
             return this;
         }
 
