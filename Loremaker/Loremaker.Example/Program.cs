@@ -20,9 +20,11 @@ namespace Loremaker.Example
             {
                 // Basic substitution
                 var text = new TextTemplate("{subject} {verb} to {place}.")
-                            .Define("subject", x => x.As("Alice", "Brian", "Cam"))
-                            .Define("verb", x => x.As("ran", "walked", "hopped"))
-                            .Define("place", x => x.As("store", "park", "house").UsingDeterminers("a", "the"));
+                            .Define("subject", "Alice", "Brian", "Cam")
+                            .Define("verb", "ran", "walked", "hopped" )  
+                            .Define("place", x => x
+                                .As("store", "park", "house")
+                                .ApplyDeterminersToAll("a", "the"));
 
                 for (int i = 0; i < 10; i++)
                 {
@@ -37,14 +39,15 @@ namespace Loremaker.Example
                             .CapitalizeFirstWord()
                             .Define("subject", x => x
                                 .As("Alice", "Bob", "Chris")
-                                .UsingAdjectives("busy", "impatient", "energetic")
-                                .UsingDeterminers("the",""))
-                            .Define("verb", x => x
-                                .As("ran", "walked", "hopped"))
+                                .ApplyAdjectivesToAll("outgoing", "impatient", "energetic")
+                                .ApplyDeterminersToAll("an",""))
+                            .Define("verb", "ran", "walked", "hopped")
                             .Define("place", x => x
+                                .As("lake")
+                                .ApplyAdjectives("placid", "still", "crystal-clear") // This only applies to "lake"
                                 .As("store", "park", "house")
-                                .UsingAdjectives("green", "busy", "bustling")
-                                .UsingDeterminers("a", "the"));
+                                .ApplyAdjectives("green", "busy", "bustling")       // This only applies to "store", "park", and "house"
+                                .ApplyDeterminersToAll("a", "the"));                // This applies to everything
 
                 for (int i = 0; i < 10; i++)
                 {
@@ -62,12 +65,12 @@ namespace Loremaker.Example
                                     .As("grew up", "was raised", "was brought up"))
                                 .Define("birthplace", x => x
                                     .As("[village]", "[town]")
-                                    .UsingAdjectives("small", "modest", "poor", "large", "busy", "remote", "trade", "coastal", "underground")
-                                    .UsingDeterminers("a"))
+                                    .ApplyAdjectives("small", "modest", "poor", "large", "busy", "remote", "trade", "coastal", "underground")
+                                    .ApplyDeterminers("a"))
                                 .Define("place", x => x
                                     .As("River", "Mountain", "Mountains", "Mountain Range", "Forest", "Ruins", "Canyon", "Sea", "Lake", "Plains")
-                                    .UsingDeterminers("", "the")
-                                    .UsingNameGenerator(x => x
+                                    .ApplyDeterminers("", "the")
+                                    .ApplyNameGenerator(x => x
                                         .UsingProvider(x => x
                                             .WithVowels("aeo")
                                             .WithLeadingConsonants("tvr"))));
@@ -108,13 +111,15 @@ namespace Loremaker.Example
                     .Append("{subject} {raised} in {birthplace} near {place}.", x => x
                         .Define("raised", "grew up", "was raised", "was brought up")
                         .Define("birthplace", x => x
-                            .As("[village]", "[town]") // square brackets tells text generator to record these as context tags
-                            .UsingAdjectives("small", "modest", "poor", "large", "busy", "remote", "trade", "coastal", "underground")
-                            .UsingDeterminers("a"))
+                            .As("[village]") // square brackets tells text generator to record these as context tags
+                            .ApplyAdjectives("small", "modest", "poor", "remote")
+                            .As("[town]")
+                            .ApplyAdjectives("large", "busy", "trade", "coastal", "underground")
+                            .ApplyDeterminersToAll("a"))
                         .Define("place", x => x
                             .As("[Mountain]", "[Mountain] Range", "[Ocean]")
-                            .UsingDeterminers("", "the")
-                            .UsingNames(locationNames)))
+                            .ApplyDeterminers("", "the")
+                            .ApplyNameGenerator(locationNames)))
                     .Append("Growing up, {pronoun} {waswere} always drawn to {passion}.", x => x
                         .Define("waswere", "was")
                         .Define("passion", "the beauty and power of [fire]", "the vastness of the [ocean]")
@@ -131,21 +136,22 @@ namespace Loremaker.Example
                         .AvoidWhenContextHas("mountain"))
                     .Append("At the age of {olderAge}, {pronoun} became captain of the {shipname}.", x => x
                         .Define("olderAge", "29", "30", "31")
-                        .Define("shipname", x => x.UsingNames(shipNames))
+                        .Define("shipname", shipNames)
                         .WhenContextHas("sailor"))
                     .Append("{subject} now sails {place}.", x => x
                         .WhenContextHas("sailor"))
                     .Append("{subject} now travels {world}.", x => x
                         .AvoidWhenContextHas("sailor"))
-                    .DefineGlobally("world", x => x.UsingNames(worldNames))
-                    .DefineGlobally("subject", x => x.As("Alice", "Brian", "Cam"))
-                    .DefineGlobally("pronoun", x => x.As("he", "she"));
+                    .DefineGlobally("world", worldNames)
+                    .DefineGlobally("subject", "Alice", "Brian", "Cam")
+                    .DefineGlobally("pronoun", "he", "she");
+
 
                 var options = new JsonSerializerOptions() { WriteIndented = true };
                 string result = JsonSerializer.Serialize<TextChain>(chain, options);
                 File.WriteAllText("test.json.txt", result);
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     Console.WriteLine(chain.Next());
                 }
@@ -158,11 +164,11 @@ namespace Loremaker.Example
                         // .FromCorpus("shakespeare.txt")
                         // .UsingDepth(2)             // Default is 2
                         // .UsingDelimiter(' ')       // Default is a single space character ' '
-                        // .BeginTextWith("The")      // Try to start all generated text with this substring
+                        .BeginTextWith("The")      // Try to start all generated text with this substring
                         // .EndTextWith("with")       // There are nuances to this
                         .LoadCorpus();                // If not called, corpuses will be implicitly loaded on first call to Next()
 
-                for(int i = 0; i < 20; i++)
+                for(int i = 0; i < 10; i++)
                 {
                     Console.WriteLine(t.Next());
                 }
