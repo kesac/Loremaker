@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Syllabore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace Loremaker.Text
     /// A TextTemplate is specfically formatted string where
     /// specific substrings can be substituted by <see cref="TextOutput"/>
     /// generated from <see cref="ITextGenerator">ITextGenerators</see>,
-    /// especially those created by <see cref="TextEntity">TextEntities</see>
+    /// especially those created by <see cref="TextEntityPool">TextEntities</see>
     /// </summary>
     public class TextTemplate : ITextGenerator
     {
@@ -55,11 +56,11 @@ namespace Loremaker.Text
 
 
         /// <summary>
-        /// Defines a new <see cref="TextEntity"/> and adds it to this TextTemplate.
+        /// Defines a new <see cref="TextEntityPool"/> and adds it to this TextTemplate.
         /// </summary>
-        public TextTemplate Define(string key, Func<TextEntity, TextEntity> configureEntity)
+        public TextTemplate Define(string key, Func<TextEntityPool, TextEntityPool> configureEntity)
         {
-            var e = configureEntity(new TextEntity(key));
+            var e = configureEntity(new TextEntityPool());
 
             if (!this.EntityPlaceholders.Contains(key))
             {
@@ -87,6 +88,11 @@ namespace Loremaker.Text
             return this;
         }
 
+        public TextTemplate Define(string key, INameGenerator generator)
+        {
+            this.Define(key, new TextEntity().UsingNameGenerator(generator));
+            return this;
+        }
 
         /// <summary>
         /// Convenience method for defining text substitutions if you don't
