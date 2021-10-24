@@ -6,7 +6,7 @@ using Markov;
 
 namespace Loremaker.Text
 {
-    public class TextGenerator
+    public class MarkovTextGenerator : ITextGenerator
     {
         public int Depth { get; set; }
         public char Delimiter { get; set; }
@@ -17,7 +17,7 @@ namespace Loremaker.Text
         private Random Random { get; set; }
         private MarkovChain<string> MarkovChain { get; set; }
 
-        public TextGenerator()
+        public MarkovTextGenerator()
         {
             this.Delimiter = ' ';
             this.Depth = 2;
@@ -26,19 +26,19 @@ namespace Loremaker.Text
             this.Random = new Random();
         }
 
-        public TextGenerator UsingDepth(int depth)
+        public MarkovTextGenerator UsingDepth(int depth)
         {
             this.Depth = depth;
             return this;
         }
 
-        public TextGenerator UsingDelimiter(char c)
+        public MarkovTextGenerator UsingDelimiter(char c)
         {
             this.Delimiter = c;
             return this;
         }
 
-        public TextGenerator FromCorpus(params string[] filepaths)
+        public MarkovTextGenerator FromCorpus(params string[] filepaths)
         {
             foreach(var filepath in filepaths)
             {
@@ -48,7 +48,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public TextGenerator LoadCorpus()
+        public MarkovTextGenerator LoadCorpus()
         {
             foreach (var filepath in this.CorpusFilepaths)
             {
@@ -64,7 +64,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public TextGenerator BeginTextWith(params string[] words)
+        public MarkovTextGenerator BeginTextWith(params string[] words)
         {
             foreach(var w in words)
             {
@@ -77,7 +77,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public TextGenerator EndTextWith(string substring)
+        public MarkovTextGenerator EndTextWith(string substring)
         {
             this.EndingWord = substring;
             return this;
@@ -121,5 +121,9 @@ namespace Loremaker.Text
 
         }
 
+        public TextOutput NextOutput()
+        {
+            return new TextOutput(this.Next());
+        }
     }
 }

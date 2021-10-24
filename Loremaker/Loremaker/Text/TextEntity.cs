@@ -6,63 +6,66 @@ using System.Text.RegularExpressions;
 
 namespace Loremaker.Text
 {
-    public class TextEntity
+    /// <summary>
+    /// Represents one or more entities that can be captured
+    /// as a single word of text. Entities can have adjectives,
+    /// determiners, or form part of a name. TextEntities produce
+    /// <see cref="TextOutput"/>.
+    /// </summary>
+    public class TextEntity : ITextGenerator
     {
         private Random Random { get; set; }
 
-        public string Key { get; set; }
-        public NameGenerator NameGenerator { get; set; }
+        public string Id { get; set; }
         public List<string> Objects { get; set; }
         public List<string> Adjectives { get; set; }
         public List<string> Determiners { get; set; }
+        public INameGenerator NameGenerator { get; set; }
 
         public TextEntity(string key)
         {
-            this.Key = key;
+            this.Id = key;
             this.Random = new Random();
             this.Objects = new List<string>();
             this.Adjectives = new List<string>();
-            this.Determiners = new List<string>();
-        }
-
-        public TextEntity UsingNamesFrom(NameGenerator generator)
-        {
-            this.NameGenerator = generator;
-            return this;
-        }
-
-        private void Add(ref List<string> list, string[] strings)
-        {
-            // There used to be additional logic here.
-            // That's why this has been abstracted out.
-            // Might not need it anymore.
-            list.AddRange(strings);
+            this.Determiners = new List<string>();   
         }
 
         public TextEntity As(params string[] objects)
         {
-            var list = this.Objects;
-            this.Add(ref list, objects);
+            this.Objects.AddRange(objects);
             return this;
         }
 
         public TextEntity UsingAdjectives(params string[] adjectives)
         {
-            var list = this.Adjectives;
-            this.Add(ref list, adjectives);
+            this.Adjectives.AddRange(adjectives);
             return this;
         }
 
         public TextEntity UsingDeterminers(params string[] determiners)
         {
-            var list = this.Determiners;
-            this.Add(ref list, determiners);
+            this.Determiners.AddRange(determiners);
             return this;
         }
+
+        public TextEntity UsingNames(INameGenerator nameGenerator)
+        {
+            this.NameGenerator = nameGenerator;
+            return this;
+        }
+
+        public TextEntity UsingNameGenerator(Func<NameGenerator, NameGenerator> configure)
+        {
+            this.NameGenerator = configure(new NameGenerator());
+            return this;
+        }
+
         public string Next()
         {
             return NextOutput().Value;
         }
+
         public TextOutput NextOutput()
         {
             var result = new StringBuilder();

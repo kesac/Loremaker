@@ -6,11 +6,21 @@ using System.Text.RegularExpressions;
 
 namespace Loremaker.Text
 {
-    public class TextTemplate
+    /// <summary>
+    /// A TextTemplate is specfically formatted string where
+    /// specific substrings can be substituted by <see cref="TextOutput"/>
+    /// generated from <see cref="ITextGenerator">ITextGenerators</see>,
+    /// especially those created by <see cref="TextEntity">TextEntities</see>
+    /// </summary>
+    public class TextTemplate : ITextGenerator
     {
         public string Template { get; set; }
-        public HashSet<string> EntityKeys { get; set; }
-        public Dictionary<string, TextEntity> Entities { get; set; }
+
+        // When a template is initantiated, only the placeholders for TextEntities are known.
+        // When a TextEntity is defined, the specified entity ID is checked with the list
+        // EntityPlaceholders before being stored in EntityDefinitions.
+        public HashSet<string> EntityPlaceholders { get; set; } 
+        public Dictionary<string, ITextGenerator> EntityDefinitions { get; set; }
         
         public List<string> MandatoryContextTags { get; set; } // Used by TextChain to generate context aware chains of text
         public List<string> RejectedContextTags { get; set; } 
@@ -20,8 +30,8 @@ namespace Loremaker.Text
         public TextTemplate(string template)
         {
             this.Template = template;
-            this.EntityKeys = new HashSet<string>();
-            this.Entities = new Dictionary<string, TextEntity>();
+            this.EntityPlaceholders = new HashSet<string>();
+            this.EntityDefinitions = new Dictionary<string, ITextGenerator>();
             this.MandatoryContextTags = new List<string>();
             this.RejectedContextTags = new List<string>();
 
@@ -30,13 +40,13 @@ namespace Loremaker.Text
                 var s = m.ToString();
                 var key = s.Substring(1, s.Length - 2);
 
-                if (this.EntityKeys.Contains(key))
+                if (this.EntityPlaceholders.Contains(key))
                 {
                     throw new InvalidOperationException(string.Format("An entity with key '{0}' already exists.", key));
                 }
                 else
                 {
-                    this.EntityKeys.Add(key);
+                    this.EntityPlaceholders.Add(key);
                 }
             }
 
@@ -51,13 +61,27 @@ namespace Loremaker.Text
         {
             var e = configureEntity(new TextEntity(key));
 
-            if (!this.EntityKeys.Contains(key))
+            if (!this.EntityPlaceholders.Contains(key))
             {
                 throw new InvalidOperationException(string.Format("No entity with key '{0}' was defined through the TextGenerator constructor.", key));
             }
             else
             {
-                this.Entities[key] = e;
+                this.EntityDefinitions[key] = e;
+            }
+
+            return this;
+        }
+
+        public TextTemplate Define(string key, ITextGenerator generator)
+        {
+            if (!this.EntityPlaceholders.Contains(key))
+            {
+                throw new InvalidOperationException(string.Format("No entity with key '{0}' was defined through the TextGenerator constructor.", key));
+            }
+            else
+            {
+                this.EntityDefinitions[key] = generator;
             }
 
             return this;
@@ -172,7 +196,7 @@ namespace Loremaker.Text
         /// </summary>
         /// 
 
-        public TextOutput NextOutput(Dictionary<string, TextEntity> supplementaryEntities, Dictionary<string, string> overrideValues)
+        public TextOutput NextOutput(Dictionary<string, ITextGenerator> supplementaryEntities, Dictionary<string, string> overrideValues)
         {
             var result = new StringBuilder(this.Template);
             var output = new TextOutput();
@@ -187,9 +211,9 @@ namespace Loremaker.Text
                     result.Replace("{" + key + "}", overrideValues[key]);
                     output.TextEntityOutput[key] = overrideValues[key];
                 }
-                else if (this.Entities.ContainsKey(key))
+                else if (this.EntityDefinitions.ContainsKey(key))
                 {
-                    var e = this.Entities[key].NextOutput();
+                    var e = this.EntityDefinitions[key].NextOutput();
                     result.Replace("{" + key + "}", e.Value);
                     output.Context.AddRange(e.Context);
                     output.TextEntityOutput[key] = e.Value;

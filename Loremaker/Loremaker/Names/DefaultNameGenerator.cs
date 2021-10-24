@@ -24,13 +24,13 @@ namespace Loremaker.Names
                     .WithVowels("aeio")
                     .WithLeadingConsonants("strlpn")
                     .WithTrailingConsonantSequences("rt", "py"))
-                .UsingMutator(m => m
-                    .WithMutation(x => x.AppendSyllable("gard"))
-                    .WithMutation(x => x.InsertSyllable(0, "gran")))
-                .UsingValidator(v => v
+                .UsingTransformer(m => m
+                    .Select(1).Chance(0.5)
+                    .WithTransform(x => x.AppendSyllable("gard"))
+                    .WithTransform(x => x.InsertSyllable(0, "gran")))
+                .UsingFilter(v => v
                     .DoNotAllowPattern(@"(\w)\1\1"))
-                .LimitMutationChance(0.50)
-                .LimitSyllableCount(2,3);
+                .UsingSyllableCount(2,3);
         }
 
         public string Next()

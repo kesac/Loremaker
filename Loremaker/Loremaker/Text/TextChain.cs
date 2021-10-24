@@ -5,15 +5,15 @@ using System.Text;
 
 namespace Loremaker.Text
 {
-    public class TextChain
+    public class TextChain : ITextGenerator
     {
         public List<TextTemplate> Templates { get; set; }
-        public Dictionary<string, TextEntity> GlobalEntities { get; set; }
+        public Dictionary<string, ITextGenerator> GlobalEntities { get; set; }
 
         public TextChain()
         {
             this.Templates = new List<TextTemplate>();
-            this.GlobalEntities = new Dictionary<string, TextEntity>();
+            this.GlobalEntities = new Dictionary<string, ITextGenerator>();
         }
 
         /// <summary>
@@ -31,6 +31,20 @@ namespace Loremaker.Text
             else
             {
                 this.GlobalEntities[key] = e;
+            }
+
+            return this;
+        }
+
+        public TextChain DefineGlobally(string key, ITextGenerator generator)
+        {
+            if (this.GlobalEntities.Keys.Contains(key))
+            {
+                throw new InvalidOperationException(string.Format("A global entity with key '{0}' was previously defined.", key));
+            }
+            else
+            {
+                this.GlobalEntities[key] = generator;
             }
 
             return this;
@@ -70,5 +84,10 @@ namespace Loremaker.Text
             return result.ToString().Trim();
         }
 
+        public TextOutput NextOutput()
+        {
+            // TODO: Should contain contexts?
+            return new TextOutput(this.Next());
+        }
     }
 }
