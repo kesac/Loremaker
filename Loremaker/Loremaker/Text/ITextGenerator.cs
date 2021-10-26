@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Archigen;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Loremaker.Text
 {
-    public interface ITextGenerator
+    public interface ITextGenerator : IGenerator<string>
     {
-        string Next();
+        // string Next();
         TextOutput NextOutput();
     }
 }
