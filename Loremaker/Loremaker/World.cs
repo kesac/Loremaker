@@ -7,6 +7,8 @@ namespace Loremaker
     {
         public string Name { get;  set; }
 
+        public string Description { get; set; }
+
         public List<Continent> Continents { get; set; }
 
         public World()
