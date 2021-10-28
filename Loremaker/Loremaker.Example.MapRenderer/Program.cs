@@ -11,7 +11,7 @@ namespace Loremaker.Example.MapRenderer
     {
         public static void Main(string[] args)
         {
-            var defaultGenerator = new DefaultHeightMapGenerator();
+            var defaultGenerator = new HeightMapGenerator();
             defaultGenerator.AllowSeeding = false;
             Generate(defaultGenerator, "Default", 3);
 
