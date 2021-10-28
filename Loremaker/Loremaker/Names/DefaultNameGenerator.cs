@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Archigen;
 using Syllabore;
 
 namespace Loremaker.Names
@@ -8,7 +9,7 @@ namespace Loremaker.Names
     /// <summary>
     /// A quick and dirty standalone name generator useful for prototyping.
     /// </summary>
-    public class DefaultNameGenerator : ILocationNameGenerator, ICharacterNameGenerator, IOrganizationNameGenerator
+    public class DefaultNameGenerator : ILocationNameGenerator, ICharacterNameGenerator, IOrganizationNameGenerator, IGenerator<string>
     {
 
         private NameGenerator GeneralNames { get; set; }
