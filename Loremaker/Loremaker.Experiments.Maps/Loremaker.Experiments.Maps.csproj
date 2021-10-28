@@ -14,10 +14,4 @@
     <ProjectReference Include="..\Loremaker\Loremaker.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="CustomNames.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
