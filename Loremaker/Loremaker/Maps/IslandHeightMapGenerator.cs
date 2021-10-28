@@ -9,7 +9,7 @@ namespace Loremaker.Maps
     /// of the map with a uniform low value. This causes generated height maps
     /// to look like an island or continent.
     /// </summary>
-    public class IslandHeightMapGenerator : DefaultHeightMapGenerator
+    public class IslandHeightMapGenerator : HeightMapGenerator
     {
         /// <summary>
         /// Essentially how thick the space between the map

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Archigen;
 
 namespace Loremaker.Maps
 {
     /// <summary>
     /// Generates height map data.
     /// </summary>
-    public interface IHeightMapGenerator
+    public interface IHeightMapGenerator : IGenerator<double[,]>
     {
         /// <summary>
         /// Given a specified grid width and height, this method returns a 2-dimensional

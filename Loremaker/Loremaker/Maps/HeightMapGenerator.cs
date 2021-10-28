@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Archigen;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,10 +8,12 @@ namespace Loremaker.Maps
     /// <summary>
     /// A basic height map generator that uses the diamond-square algorithm.
     /// </summary>
-    public class DefaultHeightMapGenerator : IHeightMapGenerator
+    public class HeightMapGenerator : IHeightMapGenerator
     {
         private Random Random { get; set; }
         public bool AllowSeeding { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
         /// <summary>
         /// This property adjusts the rate at which variance drops
@@ -20,13 +23,27 @@ namespace Loremaker.Maps
         /// </summary>
         public double VarianceDropModifier { get; set; }
 
-        public DefaultHeightMapGenerator()
+        public HeightMapGenerator()
         {
             this.Random = new Random();
             this.AllowSeeding = true;
+            this.Width = 1001;
+            this.Height = 1001;
             this.VarianceDropModifier = 0.5;
         }
-                
+
+        public HeightMapGenerator UsingSize(int width, int height)
+        {
+            this.Width = width;
+            this.Height = height;
+            return this;
+        }
+
+        public virtual double[,] Next()
+        {
+            return this.Next(this.Width, this.Height);
+        }
+
         public virtual double[,] Next(int width, int height)
         {
 
@@ -182,7 +199,6 @@ namespace Loremaker.Maps
                 map[x, y] = 1;
             }
         }
-
 
     }
 }

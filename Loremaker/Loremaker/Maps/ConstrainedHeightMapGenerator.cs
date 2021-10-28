@@ -7,7 +7,7 @@ namespace Loremaker.Maps
     /// <summary>
     /// This is an experimental class for trying to learn how to tune or control the output of the DefaultHeightMapGenerator
     /// </summary>
-    public class ConstrainedHeightMapGenerator : DefaultHeightMapGenerator
+    public class ConstrainedHeightMapGenerator : HeightMapGenerator
     {
         public double HeightThreshold { get; set; }
         public double DesiredMinimumPercentageBelowThreshold { get; set; }
