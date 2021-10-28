@@ -20,17 +20,15 @@ namespace Loremaker.Experiments.Maps
         public static void Main(string[] args)
         {
             var worldGenerator = new WorldGenerator()
-                .SetTotalContinents(2, 5)
-                .SetHeightMapGenerator(
+                .UsingNameGenerator(new CustomNameGenerator())
+                .UsingHeightMapGenerator(
                     new IslandHeightMapGenerator()
                     {
                         Margin = 2,
                         VarianceDropModifier = 0.4
                     }
-                )
-                .SetNameGenerator(
-                    new CustomNameGenerator()
                 );
+                
 
             var world = worldGenerator.Next();
             RenderWorld(world, "world.png");

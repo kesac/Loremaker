@@ -1,4 +1,5 @@
-﻿using Loremaker.Names;
+﻿using Archigen;
+using Loremaker.Names;
 using Syllabore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace Loremaker.Experiments.Maps
 {
-    public class CustomNameGenerator : ILocationNameGenerator
+    public class CustomNameGenerator : ILocationNameGenerator, IGenerator<string>
     {
 
         private NameGenerator worlds;
@@ -47,6 +48,11 @@ namespace Loremaker.Experiments.Maps
                         .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
                         .UsingSyllableCount(2, 4);
 
+        }
+
+        public string Next()
+        {
+            return this.settlements.Next();
         }
 
         public string NextContinentName()
