@@ -40,13 +40,9 @@ namespace Loremaker.Experiments.Maps
                             .WithVowels("ou"))
                         .UsingSyllableCount(2, 3);
 
-            regions = new NameGenerator()
-                        .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
-                        .UsingSyllableCount(2, 3);
+            regions = new NameGenerator().UsingSyllableCount(2, 3);
 
-            settlements = new NameGenerator()
-                        .UsingProvider(x => x.WithProbability(x => x.TrailingConsonantExists(0)))
-                        .UsingSyllableCount(2, 4);
+            settlements = new NameGenerator().UsingSyllableCount(2, 4);
 
         }
 
