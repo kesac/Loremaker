@@ -172,8 +172,6 @@ namespace Loremaker.Example
                 var t = new MarkovTextGenerator()
                         .FromCorpus("sample.txt")
                         .FromCorpus("sample2.txt")
-                        .FromCorpus(@"G:\Transient\NLG-Training-Data\WordNet-3.0-glosstag\WordNet-3.0\glosstag\standoff\result.txt")
-                        // .FromCorpus("shakespeare.txt")
                         // .UsingDepth(2)             // Default is 2
                         // .UsingDelimiter(' ')       // Default is a single space character ' '
                         .BeginTextWith("a")      // Try to start all generated text with this substring

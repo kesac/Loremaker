@@ -13,7 +13,6 @@ namespace Loremaker.Text
         public List<string> Determiners { get; set; }
         public INameGenerator NameGenerator { get; set; }
 
-
         public TextEntity(string value = "")
         {
             this.Value = value;
@@ -75,10 +74,23 @@ namespace Loremaker.Text
 
             if (this.NameGenerator != null)
             {
-                builder.Append(this.NameGenerator.Next() + " ");
+                if (Chance.Roll(0.50))
+                {
+                    builder.Append(this.NameGenerator.Next() + " ");
+                    builder.Append(this.Value);
+                }
+                else
+                {
+                    builder.Append(this.Value);
+                    builder.Append(" of " + this.NameGenerator.Next());
+                }
+            }
+            else
+            {
+                builder.Append(this.Value);
             }
 
-            builder.Append(this.Value);
+            
 
             return new TextOutput(builder.ToString().Trim());
 

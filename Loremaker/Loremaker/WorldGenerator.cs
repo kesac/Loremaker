@@ -1,80 +1,67 @@
-﻿using Loremaker.Maps;
+﻿using Archigen;
+using Loremaker.Maps;
 using Loremaker.Names;
+using Loremaker.Text;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Loremaker
 {
-    public class WorldGenerator
+    public class WorldGenerator : Generator<World>
     {
 
-        public ILocationNameGenerator LocationNameGenerator { get; private set; }
-        public IHeightMapGenerator HeightMapGenerator { get; private set; }
+        public IGenerator<string> LocationNameGenerator { get; private set; }
+        public IGenerator<string> DescriptionGenerator { get; private set; }
+        public HeightMapGenerator HeightMapGenerator { get; private set; }
+
+        public int HeightMapWidth { get; set; }
+        public int HeightMapHeight { get; set; }
 
         public int MinimumContinents { get; private set; }
         public int MaximumContinents { get; private set; }
 
-        private Random _random;
-
         public WorldGenerator()
         {
             this.LocationNameGenerator = new DefaultNameGenerator();
-            this.HeightMapGenerator = new DefaultHeightMapGenerator();
-            _random = new Random();
+            this.DescriptionGenerator = new GibberishTextGenerator().UsingSentenceLength(2);
+            this.HeightMapGenerator = new HeightMapGenerator();
+
+            this.HeightMapWidth = 1001;
+            this.HeightMapHeight = 1001;
+
+            this.RefreshWorldsProperty();
+            this.RefreshContinentsProperty();
         }
 
-        public WorldGenerator SetNameGenerator(ILocationNameGenerator generator)
+        private void RefreshWorldsProperty()
+        {
+            this.ForProperty<string>(x => x.Name, this.LocationNameGenerator)
+                .ForProperty<string>(x => x.Description, this.DescriptionGenerator);
+        }
+
+        private void RefreshContinentsProperty()
+        {
+            this.ForListProperty<Continent>(x => x.Continents, new Generator<Continent>()
+                    .ForProperty<string>(x => x.Name, this.LocationNameGenerator)
+                    .ForProperty<double[,]>(x => x.HeightMap, this.HeightMapGenerator
+                        .UsingSize(this.HeightMapWidth, this.HeightMapHeight)))
+                .UsingSize(5);
+        }
+
+        public WorldGenerator UsingNameGenerator(IGenerator<string> generator)
         {
             this.LocationNameGenerator = generator;
+            this.RefreshWorldsProperty();
+            this.RefreshContinentsProperty();
             return this;
         }
 
-        public WorldGenerator SetHeightMapGenerator(IHeightMapGenerator generator)
+        public WorldGenerator UsingHeightMapGenerator(HeightMapGenerator generator)
         {
             this.HeightMapGenerator = generator;
+            this.RefreshContinentsProperty();
             return this;
-        }
-
-        public WorldGenerator SetTotalContinents(int total)
-        {
-            return this.SetTotalContinents(total, total);
-        }
-
-        public WorldGenerator SetTotalContinents(int min, int max)
-        {
-
-            if(min < 1)
-            {
-                throw new ArgumentException("There must be at least one continent in the world.");
-            }
-            else if (min > max)
-            {
-                throw new ArgumentException("The desired minimum number of continents cannot exceed the desired maximum.");
-            }
-
-            this.MinimumContinents = min;
-            this.MaximumContinents = max;
-            return this;
-        }
-
-        public World Next()
-        {
-            var world = new World();
-            world.Name = this.LocationNameGenerator.NextWorldName();
-
-            var totalContinents = this.MinimumContinents + _random.Next(this.MaximumContinents - this.MinimumContinents);
-
-            for (int i = 0; i < totalContinents; i++) {
-
-                world.Continents.Add(new Continent()
-                {
-                    Name = this.LocationNameGenerator.NextContinentName(),
-                    HeightMap = this.HeightMapGenerator.Next(1000, 1000)
-                });
-            }
-
-            return world;
         }
 
     }

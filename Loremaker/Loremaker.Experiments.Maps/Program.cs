@@ -26,8 +26,9 @@ namespace Loremaker.Experiments.Maps
                     {
                         Margin = 2,
                         VarianceDropModifier = 0.4
-                    }
+                    }.UsingSize(255, 255)
                 );
+            
                 
 
             var world = worldGenerator.Next();
