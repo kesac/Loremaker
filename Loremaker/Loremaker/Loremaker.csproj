@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archigen" Version="0.9.3-alpha" />
+    <PackageReference Include="Archigen" Version="1.0.0" />
     <PackageReference Include="Markov" Version="2.0.0">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="Syllabore" Version="2.0.0-alpha4" />
+    <PackageReference Include="Syllabore" Version="2.0.0-alpha5" />
   </ItemGroup>
 
 </Project>
