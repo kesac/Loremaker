@@ -23,8 +23,7 @@ namespace Loremaker.Text
 
         public GibberishTextGenerator()
         {
-            this.SyllableGenerator = new FiniteSyllableSet()
-                .UsingSyllablePoolSize(8, 32, 4)
+            this.SyllableGenerator = new SyllableSet(8, 32, 4)
                 .WithVowels("ae").Weight(4)
                 .WithVowels("i").Weight(2)
                 .WithVowels("ou").Weight(1)

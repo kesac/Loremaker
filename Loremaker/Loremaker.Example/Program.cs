@@ -1,8 +1,11 @@
-﻿using Loremaker.Names;
+﻿using Archigen;
+using Loremaker.Maps;
+using Loremaker.Names;
 using Loremaker.Text;
 using Markov;
 using Syllabore;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -157,22 +160,66 @@ namespace Loremaker.Example
                 }
             }
 
+            Console.WriteLine();
+
             {
+                var g = new NameGenerator()
+                        .UsingProvider(new SyllableSet(4, 16, 4)
+                            .WithVowels("aeiou")
+                            .WithLeadingConsonants("bcdfghijklmnprstvwyz"))
+                        .UsingSyllableCount(3, 4);
+
                 var t = new MarkovTextGenerator()
                         .FromCorpus("sample.txt")
                         .FromCorpus("sample2.txt")
+                        .FromCorpus(@"G:\Transient\NLG-Training-Data\WordNet-3.0-glosstag\WordNet-3.0\glosstag\standoff\result.txt")
                         // .FromCorpus("shakespeare.txt")
                         // .UsingDepth(2)             // Default is 2
                         // .UsingDelimiter(' ')       // Default is a single space character ' '
-                        .BeginTextWith("The")      // Try to start all generated text with this substring
+                        .BeginTextWith("a")      // Try to start all generated text with this substring
                         // .EndTextWith("with")       // There are nuances to this
                         .LoadCorpus();                // If not called, corpuses will be implicitly loaded on first call to Next()
 
                 for(int i = 0; i < 10; i++)
                 {
-                    Console.WriteLine(t.Next());
+                    Console.WriteLine(g.Next().ToUpper());
+                    Console.WriteLine(" " + t.Next());
+                    Console.WriteLine();
                 }
 
+            }
+
+            Console.WriteLine();
+
+            {
+
+                var worldNames = new NameGenerator()
+                                .UsingProvider(x => x
+                                    .WithVowels("aei")
+                                    .WithLeadingConsonants("str"));
+                var continentNames = new NameGenerator();
+
+                var g = new Generator<World>()
+                        .ForProperty<string>(x => x.Name, worldNames)
+                        .ForProperty<string>(x => x.Description, new GibberishTextGenerator()
+                            .UsingSentenceLength(2))
+                        .ForListProperty<Continent>(x => x.Continents, new Generator<Continent>()
+                            .ForProperty<string>(x => x.Name, continentNames)
+                            .ForProperty<double[,]>(x => x.HeightMap, new HeightMapGenerator()))
+                        .UsingSize(2);
+
+                for(int i = 0; i < 3; i++)
+                {
+                    var world = g.Next();
+                    Console.WriteLine("World of " + world.Name + " (" + world.Description + ")");
+                    Console.WriteLine("Has continents:");
+
+                    for(int j = 0; j < world.Continents.Count; j++)
+                    {
+                        Console.WriteLine(world.Continents[j].Name);
+                    }
+                }
+                
             }
 
             Console.ReadLine();
