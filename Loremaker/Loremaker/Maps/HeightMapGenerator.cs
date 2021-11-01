@@ -32,6 +32,12 @@ namespace Loremaker.Maps
             this.VarianceDropModifier = 0.5;
         }
 
+        public HeightMapGenerator UsingVarianceDrop(double varianceDrop)
+        {
+            this.VarianceDropModifier = varianceDrop;
+            return this;
+        }
+
         public HeightMapGenerator UsingSize(int width, int height)
         {
             this.Width = width;
