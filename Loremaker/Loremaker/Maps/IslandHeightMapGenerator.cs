@@ -17,11 +17,6 @@ namespace Loremaker.Maps
         /// </summary>
         public int Margin { get; set; }
 
-        public IslandHeightMapGenerator()
-        {
-            this.Margin = 1;
-        }
-
         public IslandHeightMapGenerator(int margin)
         {
             this.Margin = margin;
