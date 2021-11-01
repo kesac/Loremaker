@@ -21,13 +21,9 @@ namespace Loremaker.Experiments.Maps
         {
             var worldGenerator = new WorldGenerator()
                 .UsingNameGenerator(new CustomNameGenerator())
-                .UsingHeightMapGenerator(
-                    new IslandHeightMapGenerator()
-                    {
-                        Margin = 2,
-                        VarianceDropModifier = 0.4
-                    }.UsingSize(255, 255)
-                );
+                .UsingHeightMapGenerator(new IslandHeightMapGenerator(2)
+                    .UsingVarianceDrop(0.4)
+                    .UsingSize(255, 255));
             
                 
 
