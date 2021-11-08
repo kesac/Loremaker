@@ -24,12 +24,13 @@ namespace Loremaker.Text
         public GibberishTextGenerator()
         {
             this.SyllableGenerator = new SyllableSet(8, 32, 4)
-                .WithVowels("ae").Weight(4)
-                .WithVowels("i").Weight(2)
-                .WithVowels("ou").Weight(1)
-                .WithLeadingConsonants("hlmnstr").Weight(4)
-                .WithLeadingConsonants("dpc").Weight(2)
-                .WithLeadingConsonants("bgv").Weight(1);
+                .InitializeWith(x => x
+                    .WithVowels("ae").Weight(4)
+                    .WithVowels("i").Weight(2)
+                    .WithVowels("ou").Weight(1)
+                    .WithLeadingConsonants("hlmnstr").Weight(4)
+                    .WithLeadingConsonants("dpc").Weight(2)
+                    .WithLeadingConsonants("bgv").Weight(1));
 
             this.SentenceLength = 1;
 
