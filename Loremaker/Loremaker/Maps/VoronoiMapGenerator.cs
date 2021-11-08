@@ -1,26 +1,23 @@
 ﻿using Archigen;
-using DelaunatorSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Loremaker.Maps
 {
     public class VoronoiMapGenerator : IGenerator<VoronoiMap>
     {
-        public IGenerator<IPoint[]> PointsGenerator { get; set; }
+        public IGenerator<MapPoint[]> PointsGenerator { get; set; }
 
-        public VoronoiMapGenerator(IGenerator<IPoint[]> generator)
+        public VoronoiMapGenerator(IGenerator<MapPoint[]> generator)
         {
             this.PointsGenerator = generator;
         }
 
         public VoronoiMap Next()
         {
-            var points = this.PointsGenerator.Next();
-            var d = new VoronoiMap(points);
-
-            return d;
+            return new VoronoiMap(this.PointsGenerator.Next());
         }
 
     }
