@@ -165,8 +165,9 @@ namespace Loremaker.Example
             {
                 var g = new NameGenerator()
                         .UsingProvider(new SyllableSet(4, 16, 4)
-                            .WithVowels("aeiou")
-                            .WithLeadingConsonants("bcdfghijklmnprstvwyz"))
+                            .InitializeWith(x => x
+                                .WithVowels("aeiou")
+                                .WithLeadingConsonants("bcdfghijklmnprstvwyz")))
                         .UsingSyllableCount(3, 4);
 
                 var t = new MarkovTextGenerator()
