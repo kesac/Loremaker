@@ -1,19 +1,133 @@
 ﻿using Archigen;
-using DelaunatorSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Loremaker.Maps
 {
     public class MapGenerator : Generator<Map>
     {
-        public MapGenerator(int width, int height)
+        private IGenerator<double[,]> HeightMapGenerator;
+        private IGenerator<VoronoiMap> VoronoiMapGenerator;
+
+        public MapGenerator(int width, int height, double landThreshold)
         {
-            this.ForProperty<double[,]>(x => x.HeightMap, new IslandHeightMapGenerator(3).UsingVarianceDrop(0.4).UsingSize(width, height));
-            this.ForProperty<VoronoiMap>(x => x.VoronoiMap, new VoronoiMapGenerator(new PointsGenerator(width, height, 20)));
+            var points = new MapPointsGenerator(width, height, 25);
+            this.VoronoiMapGenerator = new VoronoiMapGenerator(points);
+            this.HeightMapGenerator = new IslandHeightMapGenerator(3)
+                                        .UsingVarianceDrop(0.4)
+                                        .UsingSize(width, height);
+
             this.ForProperty<int>(x => x.Width, width);
             this.ForProperty<int>(x => x.Height, height);
+            this.ForProperty<double>(x => x.LandThreshold, landThreshold);
+
+            this.ForEach(x =>
+            {
+                this.PopulateMap(x);
+                this.PopulateMapAttributes(x);
+            });
         }
+
+        private void PopulateMap(Map map)
+        {
+            var pointRelationships = new Dictionary<(int, int), List<MapCell>>();
+
+            // Construct voronoi map which is a 2D space
+            // divided into discrete polygons or cells
+            var vmap = this.VoronoiMapGenerator.Next();
+
+            // Construct a height map which will be used
+            // to assign elevation to each of the map cells
+            var hmap = this.HeightMapGenerator.Next();
+
+            // Transform each voronoi cell into preferred structure
+            // to make it easier to manipulate and draw
+            foreach (var vcell in vmap.GetVoronoiCells())
+            {
+                var mcell = new MapCell();
+                mcell.CellId = vcell.Index;
+                mcell.Shape = vcell.Points.ToMapPoints();
+                mcell.Center = mcell.Shape.Average();
+                mcell.Elevation = hmap[mcell.Center.X, mcell.Center.Y];
+
+                map.Cells.Add(mcell.CellId, mcell); // Using Add() purposely so it throws exception if same ID used twice
+
+                // Build a lookup table between vornoi points to
+                // map cells so we can figure out which cells are
+                // adjacent to each other later. The number
+                // of points per shape is usually less than 10.
+                for (int i = 0; i < mcell.Shape.Count; i++)
+                {
+                    var mp = mcell.Shape[i];
+                    var key = (mp.X, mp.Y);
+
+                    if (pointRelationships.ContainsKey(key))
+                    {
+                        pointRelationships[key].Add(mcell);
+                    }
+                    else
+                    {
+                        pointRelationships[key] = new List<MapCell>() { mcell };
+                    }
+                }
+            }
+
+            // Finally, use lookup table to link adjacent cells
+            // together
+            foreach (var members in pointRelationships.Values)
+            {
+                // We expect only 1-3 cells per members list
+                for (int i = 0; i < members.Count - 1; i++)
+                {
+                    for (int j = 1; j < members.Count; j++)
+                    {
+                        var a = members[j].CellId;
+                        var b = members[i].CellId;
+
+                        if (!members[i].AdjacentCellIds.Contains(a))
+                        {
+                            members[i].AdjacentCellIds.Add(a);
+                        }
+
+                        if (!members[j].AdjacentCellIds.Contains(b))
+                        {
+                            members[j].AdjacentCellIds.Add(b);
+                        }
+                    }
+                }
+            }
+        }
+    
+        private void PopulateMapAttributes(Map map)
+        {
+            foreach(var cell in map.Cells.Values)
+            {
+                if(cell.Elevation < map.LandThreshold)
+                {
+                    cell.Attributes.Add(MapAttribute.Water);
+                }
+                else
+                {
+                    cell.Attributes.Add(MapAttribute.Land);
+                }
+            }
+
+            //foreach(var landCell in map.Cells.Values.Where(x => x.IsLand))
+            foreach (var landCell in map.Cells.Values)
+            {
+
+                bool isCoast = landCell.IsLand && landCell.AdjacentCellIds.Any(id => map.Cells[id].IsWater);
+
+                if(isCoast)
+                {
+                    landCell.Attributes.Add(MapAttribute.Coast);
+                }
+
+            }
+
+        }
+    
     }
 }
