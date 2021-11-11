@@ -11,23 +11,35 @@ namespace Loremaker.Maps
         private IGenerator<double[,]> HeightMapGenerator;
         private IGenerator<VoronoiMap> VoronoiMapGenerator;
 
+        public MapGenerator() : this(1000, 1000, 0.30) { }
+
         public MapGenerator(int width, int height, double landThreshold)
         {
             var points = new MapPointsGenerator(width, height, 25);
             this.VoronoiMapGenerator = new VoronoiMapGenerator(points);
-            this.HeightMapGenerator = new IslandHeightMapGenerator(3)
-                                        .UsingVarianceDrop(0.4)
-                                        .UsingSize(width, height);
+            this.HeightMapGenerator = new IslandHeightMapGenerator(width, height);
 
-            this.ForProperty<int>(x => x.Width, width);
-            this.ForProperty<int>(x => x.Height, height);
-            this.ForProperty<double>(x => x.LandThreshold, landThreshold);
+            this.UsingDimension(width, height);
+            this.UsingLandThreshold(landThreshold);
 
             this.ForEach(x =>
             {
                 this.PopulateMap(x);
                 this.PopulateMapAttributes(x);
             });
+        }
+
+        public MapGenerator UsingDimension(int width, int height)
+        {
+            this.ForProperty<int>(x => x.Width, width);
+            this.ForProperty<int>(x => x.Height, height);
+            return this;
+        }
+
+        public MapGenerator UsingLandThreshold(double threshold)
+        {
+            this.ForProperty<double>(x => x.LandThreshold, threshold);
+            return this;
         }
 
         private void PopulateMap(Map map)
@@ -41,6 +53,7 @@ namespace Loremaker.Maps
             // Construct a height map which will be used
             // to assign elevation to each of the map cells
             var hmap = this.HeightMapGenerator.Next();
+            map.HeightMap = hmap;
 
             // Transform each voronoi cell into preferred structure
             // to make it easier to manipulate and draw

@@ -10,6 +10,7 @@ namespace Loremaker.Maps
         public int Height { get; set; }
         public double LandThreshold { get; set; }
         public Dictionary<int, MapCell> Cells { get; set; }
+        public double[,] HeightMap { get; set; }
 
         public Map()
         {
