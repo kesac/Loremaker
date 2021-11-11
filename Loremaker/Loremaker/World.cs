@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Loremaker.Maps;
+using System;
 using System.Collections.Generic;
 
 namespace Loremaker
@@ -9,11 +10,13 @@ namespace Loremaker
 
         public string Description { get; set; }
 
-        public List<Continent> Continents { get; set; }
+        public Map Map { get; set; }
+
+        public List<Landmass> Continents { get; set; }
 
         public World()
         {
-            this.Continents = new List<Continent>();
+            this.Continents = new List<Landmass>();
         }
 
     }
