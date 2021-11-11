@@ -1,5 +1,4 @@
-﻿using Archigen;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,7 +9,7 @@ namespace Loremaker.Maps
     /// </summary>
     public class HeightMapGenerator : IHeightMapGenerator
     {
-        private Random Random { get; set; }
+        protected Random Random { get; set; }
         public bool AllowSeeding { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -32,6 +31,9 @@ namespace Loremaker.Maps
             this.VarianceDropModifier = 0.5;
         }
 
+        /// <summary>
+        /// The higher the variance, the more chaotic the output.
+        /// </summary>
         public HeightMapGenerator UsingVarianceDrop(double varianceDrop)
         {
             this.VarianceDropModifier = varianceDrop;
@@ -62,7 +64,7 @@ namespace Loremaker.Maps
             // In order to generate maps of any dimension, we generate a 2^n+1 map that
             // is larger than the desired dimensions than remove the "extra" parts.
 
-            if(width < height)
+            if(width > height)
             {
                 double exponentForWidth = Math.Log(width) / Math.Log(2);
                 var map = this.GenerateHeightMap(Convert.ToInt32(Math.Pow(2, Math.Ceiling(exponentForWidth)) + 1));
@@ -190,10 +192,12 @@ namespace Loremaker.Maps
 
             return average / count;
         }
+
         private double GetRandomVariance(double variance)
         {
             return this.Random.NextDouble() * 2 * variance - variance;
         }
+
         private void EnforceBounds(double[,] map, int x, int y)
         {
             if (map[x, y] < 0)
