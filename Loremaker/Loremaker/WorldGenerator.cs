@@ -13,54 +13,50 @@ namespace Loremaker
 
         public IGenerator<string> LocationNameGenerator { get; private set; }
         public IGenerator<string> DescriptionGenerator { get; private set; }
-        public HeightMapGenerator HeightMapGenerator { get; private set; }
+        public MapGenerator MapGenerator { get; private set; }
+        public int WorldMapWidth { get; private set; }
+        public int WorldMapHeight { get; private set; }
+        public double WorldMapLandThreshold { get; set; }
 
-        public int HeightMapWidth { get; set; }
-        public int HeightMapHeight { get; set; }
-
-        public int MinimumContinents { get; private set; }
-        public int MaximumContinents { get; private set; }
-
-        public WorldGenerator()
+        public WorldGenerator(int width = 1000, int height = 1000, double landThreshold = 0.30)
         {
             this.LocationNameGenerator = new DefaultNameGenerator();
             this.DescriptionGenerator = new GibberishTextGenerator().UsingSentenceLength(2);
-            this.HeightMapGenerator = new HeightMapGenerator();
+            
+            this.WorldMapWidth = width;
+            this.WorldMapHeight = height;
+            this.WorldMapLandThreshold = landThreshold;
 
-            this.HeightMapWidth = 1001;
-            this.HeightMapHeight = 1001;
+            this.MapGenerator = new MapGenerator(width, height, 0.30);
 
-            this.RefreshWorldsProperty();
-            this.RefreshContinentsProperty();
+            this.RefreshProperties();
         }
 
-        private void RefreshWorldsProperty()
+        private void RefreshProperties()
         {
-            this.ForProperty<string>(x => x.Name, this.LocationNameGenerator)
-                .ForProperty<string>(x => x.Description, this.DescriptionGenerator);
-        }
-
-        private void RefreshContinentsProperty()
-        {
-            this.ForListProperty<Continent>(x => x.Continents, new Generator<Continent>()
-                    .ForProperty<string>(x => x.Name, this.LocationNameGenerator)
-                    .ForProperty<double[,]>(x => x.HeightMap, this.HeightMapGenerator
-                        .UsingSize(this.HeightMapWidth, this.HeightMapHeight)))
-                .UsingSize(5);
+            this.ForProperty<Map>(x => x.Map, this.MapGenerator);
+            this.ForProperty<string>(x => x.Name, this.LocationNameGenerator);
+            this.ForProperty<string>(x => x.Description, this.DescriptionGenerator);
+            this.ForEach(x =>
+            {
+                // TODO: Populate List<LandMass> Continents based on what's in Map
+            });
         }
 
         public WorldGenerator UsingNameGenerator(IGenerator<string> generator)
         {
             this.LocationNameGenerator = generator;
-            this.RefreshWorldsProperty();
-            this.RefreshContinentsProperty();
+            this.RefreshProperties();
             return this;
         }
 
-        public WorldGenerator UsingHeightMapGenerator(HeightMapGenerator generator)
+        public WorldGenerator UsingMapGenerator(MapGenerator generator)
         {
-            this.HeightMapGenerator = generator;
-            this.RefreshContinentsProperty();
+            this.MapGenerator = generator
+                                .UsingDimension(this.WorldMapWidth, this.WorldMapHeight)
+                                .UsingLandThreshold(this.WorldMapLandThreshold);
+
+            this.RefreshProperties();
             return this;
         }
 
