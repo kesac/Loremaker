@@ -17,7 +17,7 @@ namespace Loremaker.Example
         public static void Main(string[] args)
         {
             {
-                var generator = new WorldGenerator();
+                var generator = new WorldGenerator(1000, 1000);
                 var world = generator.Next();
             }
             {
@@ -202,10 +202,11 @@ namespace Loremaker.Example
                         .ForProperty<string>(x => x.Name, worldNames)
                         .ForProperty<string>(x => x.Description, new GibberishTextGenerator()
                             .UsingSentenceLength(2))
-                        .ForListProperty<Continent>(x => x.Continents, new Generator<Continent>()
-                            .ForProperty<string>(x => x.Name, continentNames)
-                            .ForProperty<double[,]>(x => x.HeightMap, new HeightMapGenerator()))
-                        .UsingSize(2);
+                        .ForProperty<Map>(x => x.Map, new MapGenerator())
+                        .ForEach(x =>
+                        {
+                            // To do: populate continents
+                        });
 
                 for(int i = 0; i < 3; i++)
                 {

@@ -21,9 +21,7 @@ namespace Loremaker.Experiments.Maps
         {
             var worldGenerator = new WorldGenerator()
                 .UsingNameGenerator(new CustomNameGenerator())
-                .UsingHeightMapGenerator(new IslandHeightMapGenerator(2)
-                    .UsingVarianceDrop(0.4)
-                    .UsingSize(255, 255));
+                .UsingMapGenerator(new MapGenerator(255, 255, 0.4));
             
                 
 
@@ -38,7 +36,7 @@ namespace Loremaker.Experiments.Maps
 
             for (int i = 0; i < world.Continents.Count; i++)
             {
-                images[i] = GenerateContinentImage(world.Continents[i]);
+                // images[i] = GenerateContinentImage(world.Continents[i]);
             }
 
             using (var masterImage = new Image<Rgba32>(images.Sum(x => x.Width), images.Max(x => x.Height)))
@@ -60,16 +58,17 @@ namespace Loremaker.Experiments.Maps
             }
         }
 
-        private static Image GenerateContinentImage(Continent continent)
+        /*
+        private static Image GenerateContinentImage(Landmass continent)
         {
-            var map = continent.HeightMap;
-            var image = new Image<Rgba32>(map.GetLength(0), map.GetLength(1));
+            var hmap = continent.Map.HeightMap;
+            var image = new Image<Rgba32>(hmap.GetLength(0), hmap.GetLength(1));
             
-            for (int i = 0; i < map.GetLength(0); i++)
+            for (int i = 0; i < hmap.GetLength(0); i++)
             {
-                for (int j = 0; j < map.GetLength(1); j++)
+                for (int j = 0; j < hmap.GetLength(1); j++)
                 {
-                    var mapval = map[i, j];
+                    var mapval = hmap[i, j];
                     var color = Convert.ToByte(Math.Ceiling(mapval * 255));
                     image[i, j] = new Rgba32() { R = color, G = color, B = color, A = 255 };
                 }
@@ -79,11 +78,12 @@ namespace Loremaker.Experiments.Maps
             var label = "Continent of " + continent.Name;
             var dimension = TextMeasurer.Measure(label, new RendererOptions(DefaultFont));
 
-            image.Mutate(x => x.DrawText(label, DefaultFont, Color.White, new PointF(map.GetLength(0) / 2 - dimension.Width / 2, map.GetLength(1) / 2)));
+            image.Mutate(x => x.DrawText(label, DefaultFont, Color.White, new PointF(hmap.GetLength(0) / 2 - dimension.Width / 2, hmap.GetLength(1) / 2)));
 
             return image;
             
         }
+        */
 
 
     }

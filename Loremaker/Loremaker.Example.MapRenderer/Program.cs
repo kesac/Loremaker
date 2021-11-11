@@ -1,5 +1,4 @@
-﻿using DelaunatorSharp;
-using Loremaker.Maps;
+﻿using Loremaker.Maps;
 using SixLabors;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -10,101 +9,33 @@ using System.IO;
 using SixLabors.ImageSharp.Drawing.Processing.Processors.Drawing;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
+using SixLabors.Fonts;
 
 namespace Loremaker.Example.MapRenderer
 {
 
-    public static class MapRendererExtensions
-    {
-        public static PointF ToPointF(this IPoint point)
-        {
-            return new PointF((float)point.X, (float)point.Y);
-        }
-
-        public static PointF[] ToPointFArray(this IPoint[] points)
-        {
-            return points.Select(x => x.ToPointF()).ToArray();
-        }
-    }
-
     public class Program
     {
+
+        private static Random Random = new Random();
+
         public static void Main(string[] args)
         {
-            var defaultGenerator = new HeightMapGenerator();
-            defaultGenerator.AllowSeeding = false;
-            // Generate(defaultGenerator, "Default", 1);
-
-            var constrainedGenerator = new ConstrainedHeightMapGenerator();
-            constrainedGenerator.AllowSeeding = false;
-            constrainedGenerator.MaximumAttemps = 1000;
-            constrainedGenerator.HeightThreshold = 0.25;
-            constrainedGenerator.DesiredMinimumPercentageBelowThreshold = 0.5;
-            // Generate(constrainedGenerator, "Constrained", 1);
-
-            var islandGenerator = new IslandHeightMapGenerator(2).UsingVarianceDrop(0.4);
-            // Generate(islandGenerator, "Island", 1);
-
-
-            var mapGenerator = new MapGenerator(1000, 1000, 0.20);
-            var map = mapGenerator.Next();
-            DrawCellmap(map);
-        }
-
-        private static void Generate(IHeightMapGenerator generator, string fileprefix, int runs)
-        {
-            for (int run = 0; run < runs; run++)
-            {
-                var start = DateTime.Now;
-                var map = generator.Next(1000, 1000);
-                var imageName = fileprefix + "-test-" + run + ".png";
-
-                using (var image = new Image<Rgba32>(map.GetLength(0), map.GetLength(1)))
-                {
-                    for (int i = 0; i < map.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < map.GetLength(1); j++)
-                        {
-                            var mapval = map[i, j];
-                            var color = Convert.ToByte(Math.Ceiling(mapval * 255));
-                            image[i, j] = new Rgba32() { R = color, G = color, B = color, A = 255 };
-                        }
-                    }
-
-                    using (var filestream = new FileStream(imageName, FileMode.Create))
-                    {
-                        image.SaveAsPng(filestream);
-                    }
-                }
-
-                Console.WriteLine("Generated {0} in {1} seconds", imageName, (DateTime.Now - start).TotalSeconds);
-            }
-        }
-
-        private static Color GetColor(MapCell cell, double landThreshold)
-        {
-            var result = new Rgba32() { A = 255 };
-            var elevation = cell.Elevation;
-
-            if (cell.IsWater)
-            {
-                result.R = 0;
-                result.G = (byte)((150 - 30) * elevation / landThreshold + 30);
-                result.B = (byte)(elevation < (landThreshold / 2) ? ((255 - 150) * elevation / (landThreshold / 2) + 150) : 255);
-            }
-            else
-            {
-                result.R = 30;
-                result.G = (byte)((255 - 155) * elevation / (1 - landThreshold) + 155);
-                result.B = 0;
-            }
-
-            return result;
-        }
-
-        private static void DrawCellmap(Map map)
-        {
             var start = DateTime.Now;
+
+            var worlds = new WorldGenerator(1000, 2000);
+
+            DrawWorld(worlds.Next());
+
+            Console.WriteLine("Generated in {0} seconds", (DateTime.Now - start).TotalSeconds);
+
+        }
+
+        private static void DrawWorld(World world)
+        {
+
+            var map = world.Map;
             var output = "cellmap.png";
 
             var e = map.Cells.Values.ElementAt(10);
@@ -159,7 +90,40 @@ namespace Loremaker.Example.MapRenderer
                 }
             }
 
-            Console.WriteLine("Generated {0} in {1} seconds", output, (DateTime.Now - start).TotalSeconds);
+            
+            
+            try
+            {
+                var process = new ProcessStartInfo(output) { UseShellExecute = true, Verb = "open" };
+                Process.Start(process);
+            }
+            catch(Exception)
+            {
+
+            }
         }
+
+        private static Color GetColor(MapCell cell, double landThreshold)
+        {
+            var result = new Rgba32() { A = 255 };
+            var elevation = cell.Elevation;
+
+            if (cell.IsWater)
+            {
+                result.R = 0;
+                result.G = (byte)((150 - 30) * (elevation / landThreshold) + 30);
+                result.B = (byte)(elevation < (landThreshold / 2) ? ((255 - 150) * elevation / (landThreshold / 2) + 150) : 255);
+            }
+            else
+            {
+                result.R = 30;
+                result.G = (byte)Math.Min(255, ((255 - 155) * elevation / (1 - landThreshold) + 155));
+                result.B = 0;
+            }
+
+            return result;
+        }
+
+
     }
 }
