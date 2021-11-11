@@ -5,17 +5,17 @@ using System.Text;
 namespace Loremaker
 {
 
-    public enum SettlementType
+    public enum PopulationCenterType
     {
         Village, 
         Town, 
         City
     }
 
-    public class Settlement
+    public class PopulationCenter
     {
         public string Name { get; set; }
-        public SettlementType Type { get; set; }
+        public PopulationCenterType Type { get; set; }
     }
 
 }
