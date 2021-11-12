@@ -21,10 +21,7 @@ namespace Loremaker.Names
             this.Random = new Random();
 
             this.GeneralNames = new NameGenerator()
-                .UsingProvider(p => p
-                    .WithVowels("aeio")
-                    .WithLeadingConsonants("strlpn")
-                    .WithTrailingConsonantSequences("rt", "py"))
+                .UsingProvider(new DefaultSyllableProvider())
                 .UsingTransformer(m => m
                     .Select(1).Chance(0.5)
                     .WithTransform(x => x.AppendSyllable("gard"))
