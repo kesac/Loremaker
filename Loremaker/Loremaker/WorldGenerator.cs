@@ -40,11 +40,10 @@ namespace Loremaker
             this.ForEach(x =>
             {
                 var scanner = new MapScanner(x.Map);
-                x.Landmasses = scanner.FindLandmasses();
+                x.Map.Landmasses = scanner.FindLandmasses();
 
-                foreach(var c in x.Landmasses)
+                foreach(var c in x.Map.Landmasses)
                 {
-                    c.Parent = x;
                     c.Name = this.LocationNameGenerator.Next();
                 }
 
