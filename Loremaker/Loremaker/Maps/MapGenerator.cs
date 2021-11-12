@@ -60,12 +60,12 @@ namespace Loremaker.Maps
             foreach (var vcell in vmap.GetVoronoiCells())
             {
                 var mcell = new MapCell();
-                mcell.CellId = vcell.Index;
+                mcell.Id = (uint)vcell.Index;
                 mcell.Shape = vcell.Points.ToMapPoints();
                 mcell.Center = mcell.Shape.Average();
                 mcell.Elevation = hmap[mcell.Center.X, mcell.Center.Y];
 
-                map.Cells.Add(mcell.CellId, mcell); // Using Add() purposely so it throws exception if same ID used twice
+                map.Cells.Add(mcell.Id, mcell); // Using Add() purposely so it throws exception if same ID used twice
 
                 // Build a lookup table between vornoi points to
                 // map cells so we can figure out which cells are
@@ -96,17 +96,19 @@ namespace Loremaker.Maps
                 {
                     for (int j = 1; j < members.Count; j++)
                     {
-                        var a = members[j].CellId;
-                        var b = members[i].CellId;
+                        var a = members[j];
+                        var b = members[i];
 
-                        if (!members[i].AdjacentCellIds.Contains(a))
+                        if (!members[i].AdjacentMapCellIds.Contains(a.Id))
                         {
-                            members[i].AdjacentCellIds.Add(a);
+                            members[i].AdjacentMapCellIds.Add(a.Id);
+                            members[i].AdjacentMapCells.Add(a);
                         }
 
-                        if (!members[j].AdjacentCellIds.Contains(b))
+                        if (!members[j].AdjacentMapCellIds.Contains(b.Id))
                         {
-                            members[j].AdjacentCellIds.Add(b);
+                            members[j].AdjacentMapCellIds.Add(b.Id);
+                            members[j].AdjacentMapCells.Add(b);
                         }
                     }
                 }
@@ -131,7 +133,7 @@ namespace Loremaker.Maps
             foreach (var landCell in map.Cells.Values)
             {
 
-                bool isCoast = landCell.IsLand && landCell.AdjacentCellIds.Any(id => map.Cells[id].IsWater);
+                bool isCoast = landCell.IsLand && landCell.AdjacentMapCellIds.Any(id => map.Cells[id].IsWater);
 
                 if(isCoast)
                 {

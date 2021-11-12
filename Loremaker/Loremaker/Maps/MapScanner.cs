@@ -29,7 +29,7 @@ namespace Loremaker.Maps
                 var scanned = new List<MapCell>() { root };
 
                 var adjacencies = new List<MapCell>();
-                adjacencies.AddRange(root.AdjacentCellIds
+                adjacencies.AddRange(root.AdjacentMapCellIds
                             .Select(x => this.Map.Cells[x])
                             .Where(x => x.IsLand));
 
@@ -40,14 +40,14 @@ namespace Loremaker.Maps
                     adjacencies.Remove(landcell);
                     unprocessed.Remove(landcell);
 
-                    adjacencies.AddRange(landcell.AdjacentCellIds
+                    adjacencies.AddRange(landcell.AdjacentMapCellIds
                                 .Select(x => this.Map.Cells[x])
                                 .Where(x => x.IsLand && !scanned.Contains(x)));
                 }
 
                 scanned.AddRange(adjacencies);
 
-                var landmass = new Landmass() { MapCells = scanned };
+                var landmass = new Landmass() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList() };
 
                 landmass.Center = new MapPoint()
                 {
@@ -58,6 +58,12 @@ namespace Loremaker.Maps
                 result.Add(landmass);
             }
 
+            var sorted = result.OrderBy(x => x.MapCells.Count).ToList();
+            for(int i = 0; i < sorted.Count(); i++)
+            {
+                sorted[i].Id = (uint)i;
+            }
+            
             return result;
 
         }
