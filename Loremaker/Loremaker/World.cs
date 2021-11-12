@@ -12,11 +12,11 @@ namespace Loremaker
 
         public Map Map { get; set; }
 
-        public List<Landmass> Continents { get; set; }
+        public List<Landmass> Landmasses { get; set; }
 
         public World()
         {
-            this.Continents = new List<Landmass>();
+            this.Landmasses = new List<Landmass>();
         }
 
     }

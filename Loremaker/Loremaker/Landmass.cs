@@ -9,6 +9,7 @@ namespace Loremaker
     {
         public virtual World Parent { get; set; }
         public string Name { get; set; }
+        public MapPoint Center { get; set; }
         public List<MapCell> MapCells { get; set; }
 
         public Landmass()

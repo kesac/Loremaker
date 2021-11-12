@@ -39,7 +39,15 @@ namespace Loremaker
             this.ForProperty<string>(x => x.Description, this.DescriptionGenerator);
             this.ForEach(x =>
             {
-                // TODO: Populate List<LandMass> Continents based on what's in Map
+                var scanner = new MapScanner(x.Map);
+                x.Landmasses = scanner.FindLandmasses();
+
+                foreach(var c in x.Landmasses)
+                {
+                    c.Parent = x;
+                    c.Name = this.LocationNameGenerator.Next();
+                }
+
             });
         }
 
