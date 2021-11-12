@@ -23,12 +23,12 @@ namespace Loremaker.Maps
             this.Margin = margin;
         }
 
-        private double GetRandomSeaElevation()
+        private float GetRandomSeaElevation()
         {
-            return 0.15 + (0.02 * Random.NextDouble());
+            return 0.15f + (0.02f * (float)Random.NextDouble());
         }
 
-        protected override void SeedMap(double[,] map)
+        protected override void SeedMap(float[][] map)
         {
             
             var width = this.Width;
@@ -38,11 +38,11 @@ namespace Loremaker.Maps
             {
                 for (int m = 0; m < this.Margin; m++)
                 {
-                    map[i, 0 + m] = GetRandomSeaElevation();
-                    map[i, height - 1 - m] = GetRandomSeaElevation();
+                    map[i][0 + m] = GetRandomSeaElevation();
+                    map[i][height - 1 - m] = GetRandomSeaElevation();
 
-                    map[0 + m, i] = GetRandomSeaElevation();
-                    map[width - 1 - m, i] = GetRandomSeaElevation();
+                    map[0 + m][i] = GetRandomSeaElevation();
+                    map[width - 1 - m][i] = GetRandomSeaElevation();
                 }
             }
 
@@ -57,7 +57,7 @@ namespace Loremaker.Maps
                 {
                     for(int h = y; h < 10 && h < height; h++)
                     {
-                        map[j, h] = GetRandomSeaElevation();
+                        map[j][h] = GetRandomSeaElevation();
                     }
                 }
             }

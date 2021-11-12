@@ -20,7 +20,7 @@ namespace Loremaker.Maps
         /// be between 0 and 1 inclusive. Values closer to 0 make generated
         /// maps smoother. Values closer to 1 make generated maps bumpier.
         /// </summary>
-        public double VarianceDropModifier { get; set; }
+        public float VarianceDropModifier { get; set; }
 
         public HeightMapGenerator()
         {
@@ -28,13 +28,13 @@ namespace Loremaker.Maps
             this.AllowSeeding = true;
             this.Width = 1001;
             this.Height = 1001;
-            this.VarianceDropModifier = 0.5;
+            this.VarianceDropModifier = 0.5f;
         }
 
         /// <summary>
         /// The higher the variance, the more chaotic the output.
         /// </summary>
-        public HeightMapGenerator UsingVarianceDrop(double varianceDrop)
+        public HeightMapGenerator UsingVarianceDrop(float varianceDrop)
         {
             this.VarianceDropModifier = varianceDrop;
             return this;
@@ -47,12 +47,12 @@ namespace Loremaker.Maps
             return this;
         }
 
-        public virtual double[,] Next()
+        public virtual float[][] Next()
         {
             return this.Next(this.Width, this.Height);
         }
 
-        public virtual double[,] Next(int width, int height)
+        public virtual float[][] Next(int width, int height)
         {
 
             if(this.VarianceDropModifier < 0 || this.VarianceDropModifier > 1)
@@ -80,23 +80,33 @@ namespace Loremaker.Maps
 
         }
 
-        private double[,] ShrinkArray(double[,] original, int targetWidth, int targetHeight)
+        private float[][] ShrinkArray(float[][] original, int targetWidth, int targetHeight)
         {
-            var result = new double[targetWidth, targetHeight];
+            var result = new float[targetWidth][];
+
+            for(int i = 0; i < result.GetLength(0); i++)
+            {
+                result[i] = new float[targetHeight];
+            }
+
             for (int i = 0; i < targetWidth; i++)
             {
                 for(int j = 0; j < targetHeight; j++)
                 {
-                    result[i, j] = original[i, j];
+                    result[i][j] = original[i][j];
                 }
             }
             return result;
         }
 
         // This implementation is based off 'hmapgen' (https://github.com/kesac/hmapgen).
-        private double[,] GenerateHeightMap(int mapsize)
+        private float[][] GenerateHeightMap(int mapsize)
         {
-            double[,] map = new double[mapsize,mapsize];
+            float[][] map = new float[mapsize][];
+            for(int i = 0; i < map.GetLength(0); i++)
+            {
+                map[i] = new float[mapsize];
+            }
 
             if (this.AllowSeeding)
             {
@@ -104,7 +114,7 @@ namespace Loremaker.Maps
             }
 
             int step = mapsize - 1;
-            double variance = 1;
+            float variance = 1;
 
             while (step > 1)
             {
@@ -114,10 +124,10 @@ namespace Loremaker.Maps
                 {
                     for (int j = 0; j < mapsize - 1; j += step)
                     {
-                        if (map[i + step / 2, j + step / 2] == 0)  // check if not pre-seeded
+                        if (map[i + step / 2][j + step / 2] == 0)  // check if not pre-seeded
                         {
-                            double average = (map[i, j] + map[i + step, j] + map[i, j + step] + map[i + step, j + step]) / 4;
-                            map[i + step / 2, j + step / 2] = average + this.GetRandomVariance(variance);
+                            float average = (map[i][j] + map[i + step][j] + map[i][j + step] + map[i + step][j + step]) / 4;
+                            map[i + step / 2][j + step / 2] = average + this.GetRandomVariance(variance);
                             this.EnforceBounds(map, i + step / 2, j + step / 2);
                         }
                     }
@@ -142,71 +152,71 @@ namespace Loremaker.Maps
             return map;
         }
 
-        protected virtual void SeedMap(double[,] map)
+        protected virtual void SeedMap(float[][] map)
         {
-            map[0, 0] = this.Random.NextDouble();
-            map[0, map.GetLength(1) - 1] = this.Random.NextDouble();
-            map[map.GetLength(0) - 1, 0] = this.Random.NextDouble();
-            map[map.GetLength(0) - 1, map.GetLength(1) - 1] = this.Random.NextDouble();
+            map[0][0] = (float)this.Random.NextDouble();
+            map[0][map[0].Length - 1] = (float)this.Random.NextDouble();
+            map[map.GetLength(0) - 1][0] = (float)this.Random.NextDouble();
+            map[map.GetLength(0) - 1][map[0].Length - 1] = (float)this.Random.NextDouble();
         }
 
-        private void CalculateDiamondStep(double[,] map, int x, int y, int step, double variance)
+        private void CalculateDiamondStep(float[][] map, int x, int y, int step, float variance)
         {
-            if (map[x, y] == 0)
+            if (map[x][y] == 0)
             {
-                map[x, y] = this.GetDiamondStepAverage(map, x, y, step) + this.GetRandomVariance(variance);
+                map[x][y] = this.GetDiamondStepAverage(map, x, y, step) + this.GetRandomVariance(variance);
                 this.EnforceBounds(map, x, y);
             }
         }
 
 
-        private double GetDiamondStepAverage(double[,] map, int x, int y, int step)
+        private float GetDiamondStepAverage(float[][] map, int x, int y, int step)
         {
 
             int count = 0;
-            double average = 0;
+            float average = 0;
 
             if (x - step / 2 >= 0)
             {
                 count++;
-                average += map[x - step / 2, y];
+                average += map[x - step / 2][y];
             }
 
-            if (x + step / 2 < map.GetLength(0))
+            if (x + step / 2 < map.Length)
             {
                 count++;
-                average += map[x + step / 2, y];
+                average += map[x + step / 2][y];
             }
 
             if (y - step / 2 >= 0)
             {
                 count++;
-                average += map[x, y - step / 2];
+                average += map[x][y - step / 2];
             }
 
-            if (y + step / 2 < map.GetLength(1))
+            if (y + step / 2 < map[0].Length)
             {
                 count++;
-                average += map[x, y + step / 2];
+                average += map[x][y + step / 2];
             }
 
             return average / count;
         }
 
-        private double GetRandomVariance(double variance)
+        private float GetRandomVariance(float variance)
         {
-            return this.Random.NextDouble() * 2 * variance - variance;
+            return (float)this.Random.NextDouble() * 2 * variance - variance;
         }
 
-        private void EnforceBounds(double[,] map, int x, int y)
+        private void EnforceBounds(float[][] map, int x, int y)
         {
-            if (map[x, y] < 0)
+            if (map[x][y] < 0)
             {
-                map[x, y] = 0;
+                map[x][y] = 0;
             }
-            else if (map[x, y] > 1)
+            else if (map[x][y] > 1)
             {
-                map[x, y] = 1;
+                map[x][y] = 1;
             }
         }
 

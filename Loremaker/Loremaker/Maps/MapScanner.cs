@@ -21,7 +21,7 @@ namespace Loremaker.Maps
             var result = new List<Landmass>();
 
             var unprocessed = new List<MapCell>();
-            unprocessed.AddRange(this.Map.Cells.Values.Where(x => x.IsLand));
+            unprocessed.AddRange(this.Map.MapCells.Where(x => x.IsLand));
 
             while(unprocessed.Count > 0)
             {
@@ -29,9 +29,7 @@ namespace Loremaker.Maps
                 var scanned = new List<MapCell>() { root };
 
                 var adjacencies = new List<MapCell>();
-                adjacencies.AddRange(root.AdjacentMapCellIds
-                            .Select(x => this.Map.Cells[x])
-                            .Where(x => x.IsLand));
+                adjacencies.AddRange(root.AdjacentMapCells.Where(x => x.IsLand));
 
                 while(adjacencies.Count > 0)
                 {
@@ -40,28 +38,19 @@ namespace Loremaker.Maps
                     adjacencies.Remove(landcell);
                     unprocessed.Remove(landcell);
 
-                    adjacencies.AddRange(landcell.AdjacentMapCellIds
-                                .Select(x => this.Map.Cells[x])
-                                .Where(x => x.IsLand && !scanned.Contains(x)));
+                    adjacencies.AddRange(landcell.AdjacentMapCells.Where(x => x.IsLand && !scanned.Contains(x)));
                 }
 
                 scanned.AddRange(adjacencies);
 
                 var landmass = new Landmass() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList() };
 
-                landmass.Center = new MapPoint()
-                {
-                    X = (int)landmass.MapCells.Average(x => x.Center.X),
-                    Y = (int)landmass.MapCells.Average(x => x.Center.Y)
-                };
+                landmass.Center = new MapPoint(
+                    (int)landmass.MapCells.Average(x => x.Center.X),
+                    (int)landmass.MapCells.Average(x => x.Center.Y)
+                );
 
                 result.Add(landmass);
-            }
-
-            var sorted = result.OrderBy(x => x.MapCells.Count).ToList();
-            for(int i = 0; i < sorted.Count(); i++)
-            {
-                sorted[i].Id = (uint)i;
             }
             
             return result;

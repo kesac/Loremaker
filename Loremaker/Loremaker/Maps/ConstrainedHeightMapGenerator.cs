@@ -21,7 +21,7 @@ namespace Loremaker.Maps
             this.MaximumAttemps = 100;
         }
 
-        public override double[,] Next(int width, int height)
+        public override float[][] Next(int width, int height)
         {
             int attempts = 0;
 
@@ -34,7 +34,7 @@ namespace Loremaker.Maps
                 {
                     for(int j = 0; j < height; j++)
                     {
-                        if(map[i,j] < this.HeightThreshold)
+                        if(map[i][j] < this.HeightThreshold)
                         {
                             totalBelowThreshold++;
                         }

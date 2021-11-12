@@ -36,14 +36,18 @@ namespace Loremaker.Maps
 
         public MapPoint[] Next()
         {
-            List<MapPoint> points = new List<MapPoint>();
+            var points = new List<MapPoint>();
+
             for(int x = this.Spacing; x <= this.Width - this.Spacing; x += this.Spacing)
             {
                 for(int y = this.Spacing; y <= this.Height - this.Spacing; y += this.Spacing)
                 {
-                    points.Add(new MapPoint(
+                    var point = new MapPoint(
                         x + Chance.Between(-this.ShiftingMaxDistance, this.ShiftingMaxDistance),
-                        y + Chance.Between(-this.ShiftingMaxDistance, this.ShiftingMaxDistance)));
+                        y + Chance.Between(-this.ShiftingMaxDistance, this.ShiftingMaxDistance)
+                    );
+
+                    points.Add(point);
                 }
             }
 

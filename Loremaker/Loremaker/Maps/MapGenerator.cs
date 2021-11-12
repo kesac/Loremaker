@@ -8,12 +8,12 @@ namespace Loremaker.Maps
 {
     public class MapGenerator : Generator<Map>
     {
-        private IGenerator<double[,]> HeightMapGenerator;
+        private IGenerator<float[][]> HeightMapGenerator;
         private IGenerator<VoronoiMap> VoronoiMapGenerator;
 
-        public MapGenerator() : this(1000, 1000, 0.30) { }
+        public MapGenerator() : this(1000, 1000, 0.30f) { }
 
-        public MapGenerator(int width, int height, double landThreshold)
+        public MapGenerator(int width, int height, float landThreshold)
         {
             var points = new MapPointsGenerator(width, height, 25);
             this.VoronoiMapGenerator = new VoronoiMapGenerator(points);
@@ -24,8 +24,8 @@ namespace Loremaker.Maps
 
             this.ForEach(x =>
             {
-                this.PopulateMap(x);
-                this.PopulateMapAttributes(x);
+                this.DefineMap(x);
+                this.DefineMapAttributes(x);
             });
         }
 
@@ -36,15 +36,16 @@ namespace Loremaker.Maps
             return this;
         }
 
-        public MapGenerator UsingLandThreshold(double threshold)
+        public MapGenerator UsingLandThreshold(float threshold)
         {
-            this.ForProperty<double>(x => x.LandThreshold, threshold);
+            this.ForProperty<float>(x => x.LandThreshold, threshold);
             return this;
         }
 
-        private void PopulateMap(Map map)
+        private void DefineMap(Map map)
         {
-            var pointRelationships = new Dictionary<(int, int), List<MapCell>>();
+            var points = new Dictionary<(int, int), MapPoint>();
+            var pointRelationships = new Dictionary<uint, List<MapCell>>();
 
             // Construct voronoi map which is a 2D space
             // divided into discrete polygons or cells
@@ -53,7 +54,9 @@ namespace Loremaker.Maps
             // Construct a height map which will be used
             // to assign elevation to each of the map cells
             var hmap = this.HeightMapGenerator.Next();
-            map.HeightMap = hmap;
+            // map.HeightMap = hmap;
+
+            uint pointCounter = 0;
 
             // Transform each voronoi cell into preferred structure
             // to make it easier to manipulate and draw
@@ -61,29 +64,48 @@ namespace Loremaker.Maps
             {
                 var mcell = new MapCell();
                 mcell.Id = (uint)vcell.Index;
-                mcell.Shape = vcell.Points.ToMapPoints();
-                mcell.Center = mcell.Shape.Average();
-                mcell.Elevation = hmap[mcell.Center.X, mcell.Center.Y];
 
-                map.Cells.Add(mcell.Id, mcell); // Using Add() purposely so it throws exception if same ID used twice
-
-                // Build a lookup table between vornoi points to
-                // map cells so we can figure out which cells are
-                // adjacent to each other later. The number
-                // of points per shape is usually less than 10.
-                for (int i = 0; i < mcell.Shape.Count; i++)
+                // mcell.Shape = vcell.Points.ToMapPoints();
+                foreach(var ipoint in vcell.Points)
                 {
-                    var mp = mcell.Shape[i];
-                    var key = (mp.X, mp.Y);
+                    var mpoint = new MapPoint((int)ipoint.X, (int)ipoint.Y);
+                    var key = (mpoint.X, mpoint.Y);
 
-                    if (pointRelationships.ContainsKey(key))
+                    if (points.ContainsKey(key))
                     {
-                        pointRelationships[key].Add(mcell);
+                        mpoint = points[key];
                     }
                     else
                     {
-                        pointRelationships[key] = new List<MapCell>() { mcell };
+                        mpoint.Id = pointCounter++;
+                        points[key] = mpoint;
+                        pointRelationships[mpoint.Id] = new List<MapCell>();
+
+                        map.MapPoints.Add(mpoint);
+                        map.MapPointsById[mpoint.Id] = mpoint;
+
                     }
+
+                    mcell.MapPoints.Add(mpoint);
+                    mcell.MapPointIds.Add(mpoint.Id);
+
+                }
+
+                mcell.Center = mcell.MapPoints.Average();
+                mcell.Elevation = hmap[mcell.Center.X][mcell.Center.Y];
+                mcell.Elevation = Math.Round(mcell.Elevation, 4); // To make the number shorter when serialized
+
+                map.MapCellsById.Add(mcell.Id, mcell); // Using Add() purposely on dictionary so it throws exception if same ID used twice
+                map.MapCells.Add(mcell);
+
+                // Build a lookup table between voronoi points to
+                // map cells so we can figure out which cells are
+                // adjacent to each other later. The number
+                // of points per shape is usually less than 10.
+                for (int i = 0; i < mcell.MapPoints.Count; i++)
+                {
+                    var mp = mcell.MapPoints[i];
+                    pointRelationships[mp.Id].Add(mcell);
                 }
             }
 
@@ -115,9 +137,9 @@ namespace Loremaker.Maps
             }
         }
     
-        private void PopulateMapAttributes(Map map)
+        private void DefineMapAttributes(Map map)
         {
-            foreach(var cell in map.Cells.Values)
+            foreach(var cell in map.MapCellsById.Values)
             {
                 if(cell.Elevation < map.LandThreshold)
                 {
@@ -130,10 +152,10 @@ namespace Loremaker.Maps
             }
 
             //foreach(var landCell in map.Cells.Values.Where(x => x.IsLand))
-            foreach (var landCell in map.Cells.Values)
+            foreach (var landCell in map.MapCellsById.Values)
             {
 
-                bool isCoast = landCell.IsLand && landCell.AdjacentMapCellIds.Any(id => map.Cells[id].IsWater);
+                bool isCoast = landCell.IsLand && landCell.AdjacentMapCellIds.Any(id => map.MapCellsById[id].IsWater);
 
                 if(isCoast)
                 {

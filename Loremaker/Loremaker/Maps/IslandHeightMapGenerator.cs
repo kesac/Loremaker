@@ -6,9 +6,9 @@ namespace Loremaker.Maps
 {
     public class IslandHeightMapGenerator : HeightMapGenerator
     {
-        public double RadiusBuffer { get; set; }
-        public double DropOffPercentage { get; set; }
-        public double DropOffPercentageVariance { get; set; }
+        public int RadiusBuffer { get; set; }
+        public float DropOffPercentage { get; set; }
+        public float DropOffPercentageVariance { get; set; }
         public int Margin { get; set; }
 
         public IslandHeightMapGenerator(int width, int height) : this()
@@ -20,35 +20,35 @@ namespace Loremaker.Maps
         public IslandHeightMapGenerator()
         {
             this.RadiusBuffer = 300;
-            this.VarianceDropModifier = 0.55;
-            this.DropOffPercentage = 0.15;
-            this.DropOffPercentageVariance = 0.02;
+            this.VarianceDropModifier = 0.55f;
+            this.DropOffPercentage = 0.15f;
+            this.DropOffPercentageVariance = 0.02f;
             this.Margin = 0;
         }
 
-        private double GetDropOffPercentage()
+        private float GetDropOffPercentage()
         {
-            return this.DropOffPercentage + ((this.DropOffPercentageVariance*2) * Random.NextDouble()) - this.DropOffPercentageVariance;
+            return this.DropOffPercentage + ((this.DropOffPercentageVariance*2) * (float)Random.NextDouble()) - this.DropOffPercentageVariance;
         }
 
-        protected override void SeedMap(double[,] map)
+        protected override void SeedMap(float[][] map)
         {
-            map[0, 0] = 0.01;
-            map[0, map.GetLength(1) - 1] = 0.01;
-            map[map.GetLength(0) - 1, 0] = 0.01;
-            map[map.GetLength(0) - 1, map.GetLength(1) - 1] = 0.01;
+            map[0][0] = 0.01f;
+            map[0][map[0].Length - 1] = 0.01f;
+            map[map.Length - 1][0] = 0.01f;
+            map[map.Length - 1][map[0].Length - 1] = 0.01f;
         }
 
-        public override double[,] Next()
+        public override float[][] Next()
         {
             return this.Next(this.Width, this.Height);
         }
 
-        public override double[,] Next(int width, int height)
+        public override float[][] Next(int width, int height)
         {
             var result = base.Next(width, height);
 
-            var outerRadius = (double)(width / 2) - this.Margin;
+            var outerRadius = (float)(width / 2) - this.Margin;
             var innerRadius = outerRadius - this.RadiusBuffer;
             
             for (int x = 0; x < width; x++)
@@ -62,12 +62,12 @@ namespace Loremaker.Maps
 
                     if (distance > outerRadius + variance)
                     {
-                        result[x, y] = result[x, y] * GetDropOffPercentage();
+                        result[x][y] = result[x][y] * GetDropOffPercentage();
                     }
                     else if (distance > innerRadius + variance)
                     {
                         var gradient = 1 - ((distance - innerRadius) / this.RadiusBuffer);
-                        result[x, y] = Math.Max(result[x, y] * gradient, result[x, y] * GetDropOffPercentage());
+                        result[x][y] = Math.Max(result[x][y] * gradient, result[x][y] * GetDropOffPercentage());
                     }
 
                 }
@@ -76,9 +76,9 @@ namespace Loremaker.Maps
             return result;
         }
 
-        private double DistanceFromCenter(int x, int y, int width, int height)
+        private float DistanceFromCenter(int x, int y, int width, int height)
         {
-            return Math.Sqrt(Math.Pow(x - width/2, 2) + Math.Pow(y - height / 2, 2));
+            return (float)Math.Sqrt(Math.Pow(x - width/2, 2) + Math.Pow(y - height / 2, 2));
         }
 
     }
