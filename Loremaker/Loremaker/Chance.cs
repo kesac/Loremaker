@@ -18,5 +18,17 @@ namespace Loremaker
             return Chance.Random.Next(max - min + 1) + min;
         }
 
+        public static T RemoveRandom<T>(this List<T> list)
+        {
+            var result = list[Chance.Random.Next(list.Count)];
+
+            if(!list.Remove(result))
+            {
+                throw new InvalidOperationException("Object does not exist in specified list");
+            }
+
+            return result;
+        }
+
     }
 }
