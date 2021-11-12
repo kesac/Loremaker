@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Loremaker
 {
@@ -16,23 +16,27 @@ namespace Loremaker
     {
         public uint Id { get; set; }
         public MapPoint Center { get; set; }
-        public List<MapPoint> Shape { get; set; }
+        public List<uint> MapPointIds { get; set; }
+        [JsonIgnore]
+        public List<MapPoint> MapPoints { get; set; }
+
         public List<uint> AdjacentMapCellIds { get; set; }
-        [IgnoreDataMember]
+        [JsonIgnore]
         public virtual List<MapCell> AdjacentMapCells { get; set; }
         public HashSet<MapAttribute> Attributes { get; set; }
         public double Elevation { get; set; }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public bool IsWater => this.Attributes.Contains(MapAttribute.Water);
-        [IgnoreDataMember]
+        [JsonIgnore]
         public bool IsLand => this.Attributes.Contains(MapAttribute.Land);
-        [IgnoreDataMember]
+        [JsonIgnore]
         public bool IsCoast => this.Attributes.Contains(MapAttribute.Coast);
 
         public MapCell()
         {
-            this.Shape = new List<MapPoint>();
+            this.MapPointIds = new List<uint>();
+            this.MapPoints = new List<MapPoint>();
             this.AdjacentMapCellIds = new List<uint>();
             this.AdjacentMapCells = new List<MapCell>();
             this.Attributes = new HashSet<MapAttribute>();

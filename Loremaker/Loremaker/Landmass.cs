@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Loremaker
 {
@@ -12,7 +13,7 @@ namespace Loremaker
         public string Name { get; set; }
         public MapPoint Center { get; set; }
         public List<uint> MapCellIds { get; set; }
-        [IgnoreDataMember]
+        [JsonIgnore]
         public virtual List<MapCell> MapCells { get; set; }
 
         public Landmass()

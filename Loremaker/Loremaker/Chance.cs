@@ -18,6 +18,11 @@ namespace Loremaker
             return Chance.Random.Next(max - min + 1) + min;
         }
 
+        public static T FindRandom<T>(this List<T> list)
+        {
+            return list[Chance.Random.Next(list.Count)];
+        }
+
         public static T RemoveRandom<T>(this List<T> list)
         {
             var result = list[Chance.Random.Next(list.Count)];

@@ -16,9 +16,9 @@ namespace Loremaker
         public MapGenerator MapGenerator { get; private set; }
         public int WorldMapWidth { get; private set; }
         public int WorldMapHeight { get; private set; }
-        public double WorldMapLandThreshold { get; set; }
+        public float WorldMapLandThreshold { get; set; }
 
-        public WorldGenerator(int width = 1000, int height = 1000, double landThreshold = 0.30)
+        public WorldGenerator(int width = 1000, int height = 1000, float landThreshold = 0.30f)
         {
             this.LocationNameGenerator = new DefaultNameGenerator();
             this.DescriptionGenerator = new GibberishTextGenerator().UsingSentenceLength(2);
@@ -27,7 +27,7 @@ namespace Loremaker
             this.WorldMapHeight = height;
             this.WorldMapLandThreshold = landThreshold;
 
-            this.MapGenerator = new MapGenerator(width, height, 0.30);
+            this.MapGenerator = new MapGenerator(width, height, 0.30f);
 
             this.RefreshProperties();
         }
@@ -46,6 +46,9 @@ namespace Loremaker
                 {
                     c.Name = this.LocationNameGenerator.Next();
                 }
+
+                var pcg = new PopulationCenterGenerator(x.Map.Landmasses, this.LocationNameGenerator);
+                x.PopulationCenters.AddRange(pcg.Next());
 
             });
         }

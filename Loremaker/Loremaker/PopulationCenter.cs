@@ -1,8 +1,8 @@
 ﻿using Loremaker.Maps;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Loremaker
 {
@@ -19,7 +19,7 @@ namespace Loremaker
     {
         public uint Id { get; set; }
         public uint MapCellId { get; set; }
-        [IgnoreDataMember]
+        [JsonIgnore]
         public virtual MapCell MapCell { get; set; }
         public string Name { get; set; }
         public PopulationCenterType Type { get; set; }
