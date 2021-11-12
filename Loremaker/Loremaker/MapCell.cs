@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
-namespace Loremaker.Maps
+namespace Loremaker
 {
     public enum MapAttribute
     {
@@ -11,23 +12,29 @@ namespace Loremaker.Maps
         Coast
     }
 
-    public class MapCell
+    public class MapCell : Identifiable
     {
-        public int CellId { get; set; }
+        public uint Id { get; set; }
         public MapPoint Center { get; set; }
         public List<MapPoint> Shape { get; set; }
-        public List<int> AdjacentCellIds { get; set; }
+        public List<uint> AdjacentMapCellIds { get; set; }
+        [IgnoreDataMember]
+        public virtual List<MapCell> AdjacentMapCells { get; set; }
         public HashSet<MapAttribute> Attributes { get; set; }
         public double Elevation { get; set; }
 
+        [IgnoreDataMember]
         public bool IsWater => this.Attributes.Contains(MapAttribute.Water);
+        [IgnoreDataMember]
         public bool IsLand => this.Attributes.Contains(MapAttribute.Land);
+        [IgnoreDataMember]
         public bool IsCoast => this.Attributes.Contains(MapAttribute.Coast);
 
         public MapCell()
         {
             this.Shape = new List<MapPoint>();
-            this.AdjacentCellIds = new List<int>();
+            this.AdjacentMapCellIds = new List<uint>();
+            this.AdjacentMapCells = new List<MapCell>();
             this.Attributes = new HashSet<MapAttribute>();
             this.Center = new MapPoint(0, 0);
         }
