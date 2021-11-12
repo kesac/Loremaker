@@ -14,8 +14,4 @@
     <PackageReference Include="Syllabore" Version="2.0.0-alpha6" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetDir)..\*.nupkg&quot; &quot;G:\Transient\Packages\*.nupkg&quot;" />
-  </Target>
-
 </Project>
