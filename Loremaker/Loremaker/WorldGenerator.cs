@@ -45,10 +45,14 @@ namespace Loremaker
                 foreach(var c in x.Map.Landmasses)
                 {
                     c.Name = this.LocationNameGenerator.Next();
+                    x.Map.LandmassesById[c.Id] = c;
                 }
 
                 var pcg = new PopulationCenterGenerator(x.Map.Landmasses, this.LocationNameGenerator);
                 x.PopulationCenters.AddRange(pcg.Next());
+
+                var tg = new TerritoryGenerator(x);
+                x.Territories.AddRange(tg.Next());
 
             });
         }

@@ -11,10 +11,12 @@ namespace Loremaker
         public string Description { get; set; }
         public Map Map { get; set; }
         public List<PopulationCenter> PopulationCenters { get; set; }
+        public List<Territory> Territories { get; set; }
 
         public World()
         {
             this.PopulationCenters = new List<PopulationCenter>();
+            this.Territories = new List<Territory>();
         }
 
     }

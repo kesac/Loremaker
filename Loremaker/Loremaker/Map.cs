@@ -17,6 +17,8 @@ namespace Loremaker
         [JsonIgnore]
         public Dictionary<uint, MapCell> MapCellsById { get; set; }
         public List<Landmass> Landmasses { get; set; }
+        [JsonIgnore]
+        public Dictionary<uint, Landmass> LandmassesById { get; set; }
 
         public Map()
         {
@@ -25,6 +27,7 @@ namespace Loremaker
             this.MapCells = new List<MapCell>();
             this.MapCellsById = new Dictionary<uint, MapCell>();
             this.Landmasses = new List<Landmass>();
+            this.LandmassesById = new Dictionary<uint, Landmass>();
         }
 
     }
