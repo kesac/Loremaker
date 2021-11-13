@@ -16,6 +16,13 @@ namespace Loremaker
         [JsonIgnore]
         public virtual List<MapCell> MapCells { get; set; }
 
+        [JsonIgnore]
+        public int Size { get
+            {
+                return this.MapCellIds.Count;
+            }
+        }
+
         public Landmass()
         {
             this.MapCellIds = new List<uint>();
