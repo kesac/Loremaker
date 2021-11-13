@@ -22,10 +22,6 @@ namespace Loremaker.Names
 
             this.GeneralNames = new NameGenerator()
                 .UsingProvider(new DefaultSyllableProvider())
-                .UsingTransformer(m => m
-                    .Select(1).Chance(0.5)
-                    .WithTransform(x => x.AppendSyllable("gard"))
-                    .WithTransform(x => x.InsertSyllable(0, "gran")))
                 .UsingFilter(v => v
                     .DoNotAllowPattern(@"(\w)\1\1"))
                 .UsingSyllableCount(2,3);
