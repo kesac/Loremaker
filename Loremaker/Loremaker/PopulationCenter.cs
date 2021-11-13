@@ -21,6 +21,9 @@ namespace Loremaker
         public uint MapCellId { get; set; }
         [JsonIgnore]
         public virtual MapCell MapCell { get; set; }
+        public uint LandmassId { get; set; }
+        [JsonIgnore]
+        public virtual Landmass Landmass { get; set; }
         public string Name { get; set; }
         public PopulationCenterType Type { get; set; }
     }
