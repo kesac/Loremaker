@@ -9,16 +9,13 @@ namespace Loremaker.Maps
     public class MapGenerator : Generator<Map>
     {
         private IGenerator<float[][]> HeightMapGenerator;
+        private IGenerator<MapPoint[]> PointsGenerator;
         private IGenerator<VoronoiMap> VoronoiMapGenerator;
 
         public MapGenerator() : this(1000, 1000, 0.30f) { }
 
         public MapGenerator(int width, int height, float landThreshold)
         {
-            var points = new MapPointsGenerator(width, height, 25);
-            this.VoronoiMapGenerator = new VoronoiMapGenerator(points);
-            this.HeightMapGenerator = new IslandHeightMapGenerator(width, height);
-
             this.UsingDimension(width, height);
             this.UsingLandThreshold(landThreshold);
 
@@ -33,6 +30,11 @@ namespace Loremaker.Maps
         {
             this.ForProperty<int>(x => x.Width, width);
             this.ForProperty<int>(x => x.Height, height);
+
+            this.PointsGenerator = new MapPointsGenerator(width, height, 25);
+            this.VoronoiMapGenerator = new VoronoiMapGenerator(this.PointsGenerator);
+            this.HeightMapGenerator = new IslandHeightMapGenerator(width, height);
+
             return this;
         }
 
