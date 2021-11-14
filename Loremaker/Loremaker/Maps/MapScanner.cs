@@ -21,7 +21,9 @@ namespace Loremaker.Maps
             var result = new List<Landmass>();
 
             var unprocessed = new List<MapCell>();
-            unprocessed.AddRange(this.Map.MapCells.Where(x => x.IsLand));
+            unprocessed.AddRange(this.Map.MapCells.Values.Where(x => x.IsLand));
+
+            uint landmassId = 0;
 
             while(unprocessed.Count > 0)
             {
@@ -43,7 +45,7 @@ namespace Loremaker.Maps
 
                 scanned.AddRange(adjacencies);
 
-                var landmass = new Landmass() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList() };
+                var landmass = new Landmass() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList(), Id = landmassId++ };
 
                 landmass.Center = new MapPoint(
                     (int)landmass.MapCells.Average(x => x.Center.X),

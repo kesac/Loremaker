@@ -83,8 +83,9 @@ namespace Loremaker.Maps
                         points[key] = mpoint;
                         pointRelationships[mpoint.Id] = new List<MapCell>();
 
-                        map.MapPoints.Add(mpoint);
-                        map.MapPointsById[mpoint.Id] = mpoint;
+                        // map.MapPoints.Add(mpoint);
+                        // map.MapPointsById[mpoint.Id] = mpoint;
+                        map.MapPoints.Add(mpoint.Id, mpoint);
 
                     }
 
@@ -95,10 +96,10 @@ namespace Loremaker.Maps
 
                 mcell.Center = mcell.MapPoints.Average();
                 mcell.Elevation = hmap[mcell.Center.X][mcell.Center.Y];
-                mcell.Elevation = Math.Round(mcell.Elevation, 4); // To make the number shorter when serialized
+                mcell.Elevation = (float)Math.Round(mcell.Elevation, 4); // To make the number shorter when serialized
 
-                map.MapCellsById.Add(mcell.Id, mcell); // Using Add() purposely on dictionary so it throws exception if same ID used twice
-                map.MapCells.Add(mcell);
+                map.MapCells.Add(mcell.Id, mcell); // Using Add() purposely on dictionary so it throws exception if same ID used twice
+                // map.MapCells.Add(mcell);
 
                 // Build a lookup table between voronoi points to
                 // map cells so we can figure out which cells are
@@ -141,7 +142,7 @@ namespace Loremaker.Maps
     
         private void DefineMapAttributes(Map map)
         {
-            foreach(var cell in map.MapCellsById.Values)
+            foreach(var cell in map.MapCells.Values)
             {
                 if(cell.Elevation < map.LandThreshold)
                 {
@@ -154,10 +155,10 @@ namespace Loremaker.Maps
             }
 
             //foreach(var landCell in map.Cells.Values.Where(x => x.IsLand))
-            foreach (var landCell in map.MapCellsById.Values)
+            foreach (var landCell in map.MapCells.Values)
             {
 
-                bool isCoast = landCell.IsLand && landCell.AdjacentMapCellIds.Any(id => map.MapCellsById[id].IsWater);
+                bool isCoast = landCell.IsLand && landCell.AdjacentMapCellIds.Any(id => map.MapCells[id].IsWater);
 
                 if(isCoast)
                 {

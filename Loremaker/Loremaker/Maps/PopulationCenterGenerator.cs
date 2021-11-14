@@ -24,7 +24,6 @@ namespace Loremaker.Maps
 
             var offlimits = new List<uint>();
             var maxTries = 100;
-            uint count = 0;
 
             foreach (var landmass in this.Landmasses.Where(x => landmassCondition(x)))
             {
@@ -44,15 +43,14 @@ namespace Loremaker.Maps
 
                     if (tries >= maxTries) continue;
 
+                    // ID of PopulationCenters are done inside Next()
                     var pc = new PopulationCenter()
                     {
                         MapCell = homecell,
                         MapCellId = homecell.Id,
                         Name = this.NameGenerator.Next(),
                         Type = PopulationCenterType.Town,
-                        Landmass = landmass,
-                        LandmassId = landmass.Id,
-                        Id = count++
+                        Landmass = landmass, // backreference
                     };
 
                     offlimits.Add(homecell.Id);
@@ -80,6 +78,18 @@ namespace Loremaker.Maps
                     landmass => landmass.Size > 10,
                     landmass => (int)Math.Max(0, landmass.Size/150),
                     mapcell => mapcell.IsLand && !mapcell.IsCoast);
+
+            uint id = 0;
+
+            foreach(var p in coastalPopulations)
+            {
+                p.Id = id++;
+            }
+
+            foreach(var p in landlockedPopulations)
+            {
+                p.Id = id++;
+            }
 
             result.AddRange(coastalPopulations);
             result.AddRange(landlockedPopulations);

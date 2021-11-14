@@ -21,8 +21,8 @@ namespace Loremaker.Maps
         {
             
             var unclaimedLand = new List<MapCell>();
-            var populatedLandmasses = this.World.PopulationCenters.Select(x => x.Landmass).Distinct();
-            unclaimedLand.AddRange(this.World.Map.MapCells.Where(x => populatedLandmasses.SelectMany(y => y.MapCellIds).Contains(x.Id)));
+            var populatedLandmasses = this.World.PopulationCenters.Values.Select(x => x.Landmass).Distinct();
+            unclaimedLand.AddRange(this.World.Map.MapCells.Values.Where(x => populatedLandmasses.SelectMany(y => y.MapCellIds).Contains(x.Id)));
 
             var roots = GetRootPopulationCenters(populatedLandmasses.ToList());
             var territories = new Dictionary<uint, Territory>();
@@ -101,7 +101,8 @@ namespace Loremaker.Maps
 
             foreach(var landmass in landmasses)
             {
-                var populationsByLandmass = this.World.PopulationCenters.Where(x => x.LandmassId == landmass.Id);
+                //var populationsByLandmass = this.World.PopulationCenters.Values.Where(x => x.LandmassId == landmass.Id);
+                var populationsByLandmass = this.World.PopulationCenters.Values.Where(x => x.Landmass.Id == landmass.Id);
 
                 var count = populationsByLandmass.Count();
 
