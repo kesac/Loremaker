@@ -11,13 +11,13 @@ namespace Loremaker
     {
         public uint Id { get; set; }
         public string Name { get; set; }
-        public List<uint> MapCellIds { get; set; }
+        public HashSet<uint> MapCellIds { get; set; }
         [JsonIgnore]
         public virtual List<MapCell> MapCells { get; set; }
 
         public Territory()
         {
-            this.MapCellIds = new List<uint>();
+            this.MapCellIds = new HashSet<uint>();
             this.MapCells = new List<MapCell>();
         }
 
