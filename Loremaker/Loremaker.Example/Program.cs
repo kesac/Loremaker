@@ -17,7 +17,7 @@ namespace Loremaker.Example
         public static void Main(string[] args)
         {
             {
-                var generator = new WorldGenerator(1000, 1000);
+                var generator = new WorldGenerator();
                 var world = generator.Next();
             }
             {
@@ -214,9 +214,9 @@ namespace Loremaker.Example
                     Console.WriteLine("World of " + world.Name + " (" + world.Description + ")");
                     Console.WriteLine("Has continents:");
 
-                    for(int j = 0; j < world.Map.Landmasses.Count; j++)
+                    for(int j = 0; j < world.Landmasses.Count; j++)
                     {
-                        Console.WriteLine(world.Map.Landmasses[j].Name);
+                        //Console.WriteLine(world.Landmasses[j].Name);
                     }
                 }
                 

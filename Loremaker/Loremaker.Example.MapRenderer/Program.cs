@@ -32,7 +32,7 @@ namespace Loremaker.Example.MapRenderer
         {
             var start = DateTime.Now;
 
-            var forceNew = true;
+            var forceNew = false;
 
             if(!File.Exists(FilePath) || forceNew)
             {
@@ -81,7 +81,7 @@ namespace Loremaker.Example.MapRenderer
             var map = world.Map;
             var output = "cellmap.png";
 
-            var e = map.MapCellsById.Values.ElementAt(10);
+            var e = map.MapCells.Values.ElementAt(10);
 
             var highlight = new List<uint>() { e.Id };
             highlight.AddRange(e.AdjacentMapCellIds);
@@ -91,7 +91,7 @@ namespace Loremaker.Example.MapRenderer
 
                 // Draw edges first to ensure any pixel gaps between polygons
                 // will be filled in
-                foreach (var cell in map.MapCells)
+                foreach (var cell in map.MapCells.Values)
                 {
                     if (cell.MapPoints.Count > 2)
                     {
@@ -104,7 +104,7 @@ namespace Loremaker.Example.MapRenderer
                 }
 
                 // Now draw map cell polygons
-                foreach (var cell in map.MapCells)
+                foreach (var cell in map.MapCells.Values)
                 {
                     if (cell.MapPoints.Count > 2)
                     {
@@ -117,7 +117,7 @@ namespace Loremaker.Example.MapRenderer
                 }
 
                 // Regions
-                foreach (var territory in world.Territories)
+                foreach (var territory in world.Territories.Values)
                 {
                     var color = SolidColors.GetRandom();
 
@@ -137,7 +137,7 @@ namespace Loremaker.Example.MapRenderer
 
                 // Now draw population centers
 
-                foreach (var pop in world.PopulationCenters)
+                foreach (var pop in world.PopulationCenters.Values)
                 {
                     image.Mutate(x => x
                         .DrawLines(new Pen(Color.LightGray, 10f), new PointF(pop.MapCell.Center.X, pop.MapCell.Center.Y), new PointF(pop.MapCell.Center.X, pop.MapCell.Center.Y))
@@ -156,7 +156,7 @@ namespace Loremaker.Example.MapRenderer
                 var drawingOptions = new DrawingOptions() { TextOptions = textOptions };
 
                 
-                foreach (var landmass in world.Map.Landmasses.Where(x => x.MapCells.Count > 2))
+                foreach (var landmass in world.Landmasses.Values.Where(x => x.MapCells.Count > 2))
                 {
                     if(landmass.MapCells.Count > 100)
                     {

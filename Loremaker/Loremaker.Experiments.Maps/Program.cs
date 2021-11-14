@@ -32,9 +32,9 @@ namespace Loremaker.Experiments.Maps
 
         private static void RenderWorld(World world, string filename)
         {
-            var images = new Image[world.Map.Landmasses.Count];
+            var images = new Image[world.Landmasses.Count];
 
-            for (int i = 0; i < world.Map.Landmasses.Count; i++)
+            for (int i = 0; i < world.Landmasses.Count; i++)
             {
                 // images[i] = GenerateContinentImage(world.Continents[i]);
             }
