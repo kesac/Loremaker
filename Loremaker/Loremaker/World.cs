@@ -1,5 +1,4 @@
-﻿using Loremaker.Maps;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,13 +12,38 @@ namespace Loremaker
         public string Name { get; set; }
         public string Description { get; set; }
         public Map Map { get; set; }
-        public List<PopulationCenter> PopulationCenters { get; set; }
-        public List<Territory> Territories { get; set; }
+        public Dictionary<uint, Landmass> Landmasses { get; set; }
+        public Dictionary<uint, PopulationCenter> PopulationCenters { get; set; }
+        public Dictionary<uint, Territory> Territories { get; set; }
 
         public World()
         {
-            this.PopulationCenters = new List<PopulationCenter>();
-            this.Territories = new List<Territory>();
+            this.Landmasses = new Dictionary<uint, Landmass>();
+            this.PopulationCenters = new Dictionary<uint, PopulationCenter>();
+            this.Territories = new Dictionary<uint, Territory>();
+        }
+
+        private MapCell FindMapCell(PopulationCenter p)
+        {
+            return this.Map.MapCells[p.MapCellId];
+        }
+
+        private Landmass FindLandmass(PopulationCenter p)
+        {
+            foreach(var landmass in Landmasses.Values)
+            {
+                if(landmass.MapCellIds.Contains(p.MapCellId))
+                {
+                    return landmass;
+                }
+            }
+
+            return null;
+        }
+
+        private Territory FindTerritory(PopulationCenter p)
+        {
+            throw new NotImplementedException();
         }
 
         public static void Serialize(World world, string filepath)
@@ -34,48 +58,34 @@ namespace Loremaker
             var world = JsonSerializer.Deserialize<World>(json);
 
             // Restore back references
-
-            foreach (var point in world.Map.MapPoints)
+            foreach (var cell in world.Map.MapCells.Values)
             {
-                world.Map.MapPointsById[point.Id] = point;
-            }
-
-            foreach (var cell in world.Map.MapCells)
-            {
-                world.Map.MapCellsById[cell.Id] = cell;
-                var points = cell.MapPointIds.Select(id => world.Map.MapPointsById[id]);
+                var points = cell.MapPointIds.Select(id => world.Map.MapPoints[id]);
                 cell.MapPoints.AddRange(points);
-            }
 
-            // This next loop cannot run until MapCellsById is fully populated
-            // in the previous loop
-            foreach (var cell in world.Map.MapCellsById.Values)
-            {
-                var cells = cell.AdjacentMapCellIds.Select(id => world.Map.MapCellsById[id]);
+                var cells = cell.AdjacentMapCellIds.Select(id => world.Map.MapCells[id]);
                 cell.AdjacentMapCells.AddRange(cells);
             }
 
-            // More backreferences
-
-            foreach (var landmass in world.Map.Landmasses)
+            foreach (var landmass in world.Landmasses.Values)
             {
-                var cells = landmass.MapCellIds.Select(id => world.Map.MapCellsById[id]);
+                var cells = landmass.MapCellIds.Select(id => world.Map.MapCells[id]);
                 landmass.MapCells.AddRange(cells);
-
-                world.Map.LandmassesById[landmass.Id] = landmass;
             }
 
-            foreach (var pop in world.PopulationCenters)
+            foreach (var pop in world.PopulationCenters.Values)
             {
-                pop.MapCell = world.Map.MapCellsById[pop.MapCellId];
-                pop.Landmass = world.Map.LandmassesById[pop.LandmassId];
+                pop.MapCell = world.FindMapCell(pop);
+                pop.Landmass = world.FindLandmass(pop);
+                // pop.Territory = world.FindTerritory(pop);
             }
 
-            foreach (var territory in world.Territories)
+            foreach (var territory in world.Territories.Values)
             {
-                var cells = territory.MapCellIds.Select(id => world.Map.MapCellsById[id]);
+                var cells = territory.MapCellIds.Select(id => world.Map.MapCells[id]);
                 territory.MapCells.AddRange(cells);
             }
+            
 
             return world;
         }
