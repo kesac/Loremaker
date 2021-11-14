@@ -20,8 +20,7 @@ namespace Loremaker
         public uint Id { get; set; }
         public uint MapCellId { get; set; }
         [JsonIgnore]
-        public virtual MapCell MapCell { get; set; }
-        public uint LandmassId { get; set; }
+        public virtual MapCell MapCell { get; set; }        
         [JsonIgnore]
         public virtual Landmass Landmass { get; set; }
         public string Name { get; set; }
