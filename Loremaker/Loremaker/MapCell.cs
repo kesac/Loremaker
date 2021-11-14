@@ -16,15 +16,15 @@ namespace Loremaker
     {
         public uint Id { get; set; }
         public MapPoint Center { get; set; }
-        public List<uint> MapPointIds { get; set; }
+        public List<uint> MapPointIds { get; set; } // The order that points were added must be preserved
         [JsonIgnore]
         public List<MapPoint> MapPoints { get; set; }
 
-        public List<uint> AdjacentMapCellIds { get; set; }
+        public HashSet<uint> AdjacentMapCellIds { get; set; }
         [JsonIgnore]
         public virtual List<MapCell> AdjacentMapCells { get; set; }
         public HashSet<MapAttribute> Attributes { get; set; }
-        public double Elevation { get; set; }
+        public float Elevation { get; set; }
 
         [JsonIgnore]
         public bool IsWater => this.Attributes.Contains(MapAttribute.Water);
@@ -37,7 +37,7 @@ namespace Loremaker
         {
             this.MapPointIds = new List<uint>();
             this.MapPoints = new List<MapPoint>();
-            this.AdjacentMapCellIds = new List<uint>();
+            this.AdjacentMapCellIds = new HashSet<uint>();
             this.AdjacentMapCells = new List<MapCell>();
             this.Attributes = new HashSet<MapAttribute>();
             this.Center = new MapPoint(0, 0);
