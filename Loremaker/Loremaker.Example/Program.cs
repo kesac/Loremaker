@@ -214,9 +214,9 @@ namespace Loremaker.Example
                     Console.WriteLine("World of " + world.Name + " (" + world.Description + ")");
                     Console.WriteLine("Has continents:");
 
-                    for(int j = 0; j < world.Continents.Count; j++)
+                    for(int j = 0; j < world.Map.Landmasses.Count; j++)
                     {
-                        Console.WriteLine(world.Continents[j].Name);
+                        Console.WriteLine(world.Map.Landmasses[j].Name);
                     }
                 }
                 

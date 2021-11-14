@@ -21,7 +21,7 @@ namespace Loremaker.Experiments.Maps
         {
             var worldGenerator = new WorldGenerator()
                 .UsingNameGenerator(new CustomNameGenerator())
-                .UsingMapGenerator(new MapGenerator(255, 255, 0.4));
+                .UsingMapGenerator(new MapGenerator(255, 255, 0.4f));
             
                 
 
@@ -32,9 +32,9 @@ namespace Loremaker.Experiments.Maps
 
         private static void RenderWorld(World world, string filename)
         {
-            var images = new Image[world.Continents.Count];
+            var images = new Image[world.Map.Landmasses.Count];
 
-            for (int i = 0; i < world.Continents.Count; i++)
+            for (int i = 0; i < world.Map.Landmasses.Count; i++)
             {
                 // images[i] = GenerateContinentImage(world.Continents[i]);
             }

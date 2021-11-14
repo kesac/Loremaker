@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using SixLabors.Fonts;
 using System.Text.Json;
+using Loremaker.Text;
 
 namespace Loremaker.Example.MapRenderer
 {
@@ -31,9 +32,24 @@ namespace Loremaker.Example.MapRenderer
         {
             var start = DateTime.Now;
 
-            if(!File.Exists(FilePath))
+            var forceNew = true;
+
+            if(!File.Exists(FilePath) || forceNew)
             {
-                var worlds = new WorldGenerator(2000, 2000);
+                var worlds = new WorldGenerator()
+                                .UsingMapGenerator(x => x
+                                    .UsingDimension(2000, 2000)
+                                    .UsingLandThreshold(0.3f))
+                                .UsingNameGenerator(x => x
+                                    .UsingProvider(x => x
+                                        .WithVowels("aeiouy")
+                                        .WithConsonants("bcdfgthlmnprts")
+                                        .WithLeadingConsonantSequences("qu")
+                                        .WithProbability(x => x
+                                            .LeadingConsonantBecomesSequence(0.02))))
+                                .UsingDescriptionGenerator(new GibberishTextGenerator()
+                                    .UsingSentenceLength(1));
+
                 var world = worlds.Next();
 
                 Console.WriteLine("Generated after {0} seconds", (DateTime.Now - start).TotalSeconds);
@@ -42,63 +58,16 @@ namespace Loremaker.Example.MapRenderer
 
                 Console.WriteLine("Drew image after {0} seconds", (DateTime.Now - start).TotalSeconds);
 
-                var json = JsonSerializer.Serialize(world);
-                File.WriteAllText(FilePath, json);
+                World.Serialize(world, FilePath);
 
                 Console.WriteLine("Serialized after {0} seconds", (DateTime.Now - start).TotalSeconds);
             }
             else
             {
-                var json = File.ReadAllText(FilePath);
-                var world = JsonSerializer.Deserialize<World>(json);
+
+                var world = World.Deserialize(FilePath);
 
                 Console.WriteLine("Loaded existing file after {0} seconds", (DateTime.Now - start).TotalSeconds);
-
-                // Restore back references
-
-                foreach (var point in world.Map.MapPoints)
-                {
-                    world.Map.MapPointsById[point.Id] = point;
-                }
-
-                foreach (var cell in world.Map.MapCells)
-                {
-                    world.Map.MapCellsById[cell.Id] = cell;
-                    var points = cell.MapPointIds.Select(id => world.Map.MapPointsById[id]);
-                    cell.MapPoints.AddRange(points);
-                }
-
-                // This next loop cannot run until MapCellsById is fully populated
-                // in the previous loop
-                foreach (var cell in world.Map.MapCellsById.Values)
-                {
-                    var cells = cell.AdjacentMapCellIds.Select(id => world.Map.MapCellsById[id]);
-                    cell.AdjacentMapCells.AddRange(cells);
-                }
-
-                foreach (var landmass in world.Map.Landmasses)
-                {
-                    var cells = landmass.MapCellIds.Select(id => world.Map.MapCellsById[id]);
-                    landmass.MapCells.AddRange(cells);
-
-                    world.Map.LandmassesById[landmass.Id] = landmass;
-                }
-
-                // More backreferences
-
-                foreach (var pop in world.PopulationCenters)
-                {
-                    pop.MapCell = world.Map.MapCellsById[pop.MapCellId];
-                    pop.Landmass = world.Map.LandmassesById[pop.LandmassId];
-                }
-
-                foreach (var territory in world.Territories)
-                {
-                    var cells = territory.MapCellIds.Select(id => world.Map.MapCellsById[id]);
-                    territory.MapCells.AddRange(cells);
-                }
-
-                Console.WriteLine("Backreferences restored after {0} seconds", (DateTime.Now - start).TotalSeconds);
 
                 DrawWorld(world);
 
@@ -109,7 +78,6 @@ namespace Loremaker.Example.MapRenderer
 
         private static void DrawWorld(World world)
         {
-
             var map = world.Map;
             var output = "cellmap.png";
 
@@ -167,7 +135,6 @@ namespace Loremaker.Example.MapRenderer
                     }
                 }
 
-
                 // Now draw population centers
 
                 foreach (var pop in world.PopulationCenters)
@@ -215,58 +182,20 @@ namespace Loremaker.Example.MapRenderer
                     }   
                 }
 
-                /*
-                foreach(var landmass in world.Landmasses)
-                {
-                    var color = new Rgba32() { R = (byte)Random.Next(255), B = (byte)Random.Next(255), G = (byte)Random.Next(255), A = 255 };
-
-                    foreach (var cell in landmass.MapCells)
-                    {
-                        if (cell.Shape.Count > 2)
-                        {
-                            image.Mutate(x => x
-                                //.FillPolygon(color, cell.Shape.Select(p => new PointF(p.X, p.Y)).ToArray())
-                                .DrawLines(new Pen(color, 8f), new PointF(cell.Center.X, cell.Center.Y), new PointF(cell.Center.X, cell.Center.Y))
-                            );
-                        }
-                    }
-                }
-
-                // Coast
-
-                foreach (var cell in map.Cells.Values)
-                {
-                    if(cell.Shape.Count > 2 && cell.IsCoast)
-                    {
-                        // var color = new Rgba32() { R = 150, B = 25, G = 150, A = 255 };
-                        var color = Color.Red;
-
-                        image.Mutate(x => x
-                            //.FillPolygon(color, cell.Shape.Select(p => new PointF(p.X, p.Y)).ToArray())
-                            .DrawLines(new Pen(color, 2f), new PointF(cell.Center.X, cell.Center.Y), new PointF(cell.Center.X, cell.Center.Y))
-                        );
-                    }
-                }
-                */
-
-
-
                 using (var filestream = new FileStream(output, FileMode.Create))
                 {
                     image.SaveAsPng(filestream);
                 }
             }
 
-            
-            
             try
             {
                 var process = new ProcessStartInfo(output) { UseShellExecute = true, Verb = "open" };
                 Process.Start(process);
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
 
