@@ -11,9 +11,12 @@ namespace Loremaker
     {
         public uint Id { get; set; }
         public string Name { get; set; }
+        public MapPoint Center { get; set; }
         public HashSet<uint> MapCellIds { get; set; }
         [JsonIgnore]
         public virtual List<MapCell> MapCells { get; set; }
+
+    
 
         public Territory()
         {
@@ -21,5 +24,6 @@ namespace Loremaker
             this.MapCells = new List<MapCell>();
         }
 
+        
     }
 }
