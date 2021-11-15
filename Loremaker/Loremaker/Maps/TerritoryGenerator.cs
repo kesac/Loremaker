@@ -42,10 +42,8 @@ namespace Loremaker.Maps
                 territory.Name = this.TerritoryNameGenerator.Next();
                 territory.MapCellIds.AddRange(landmass.MapCellIds);
                 territory.MapCells.AddRange(landmass.MapCells);
-                territory.Center = new MapPoint(
-                    (int)landmass.MapCells.Average(x => x.Center.X),
-                    (int)landmass.MapCells.Average(x => x.Center.Y)
-                );
+                territory.X = (int)landmass.MapCells.Average(cell => cell.X);
+                territory.Y = (int)landmass.MapCells.Average(cell => cell.Y);
 
                 result.Add(territory);
             }

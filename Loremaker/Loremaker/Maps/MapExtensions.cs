@@ -20,14 +20,13 @@ namespace Loremaker.Maps
         }
 
 
-        public static double Distance(this MapPoint p1, MapPoint p2)
+        public static double Distance(this Locatable d1, Locatable d2)
         {
-            float x = p1.X - p2.X;
-            float y = p1.Y - p2.Y;
+            float x = d1.X - d2.X;
+            float y = d1.Y - d2.Y;
 
             return Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
         }
-
 
 
         /// <summary>
@@ -49,7 +48,7 @@ namespace Loremaker.Maps
             {
                 foreach(var cell2 in cells2)
                 {
-                    var distance = cell1.Center.Distance(cell2.Center);
+                    var distance = cell1.Distance(cell2);
                     if (distance < shortestDistance)
                     {
                         shortestDistance = distance;

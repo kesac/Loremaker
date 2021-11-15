@@ -47,10 +47,9 @@ namespace Loremaker.Maps
 
                 var landmass = new Landmass() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList(), Id = landmassId++ };
 
-                landmass.Center = new MapPoint(
-                    (int)landmass.MapCells.Average(x => x.Center.X),
-                    (int)landmass.MapCells.Average(x => x.Center.Y)
-                );
+                landmass.X = (int)landmass.MapCells.Average(cell => cell.X);
+                landmass.Y = (int)landmass.MapCells.Average(cell => cell.Y);
+                  
 
                 result.Add(landmass);
             }

@@ -94,8 +94,11 @@ namespace Loremaker.Maps
 
                 }
 
-                mcell.Center = mcell.MapPoints.Average();
-                mcell.Elevation = hmap[mcell.Center.X][mcell.Center.Y];
+                var average = mcell.MapPoints.Average();
+
+                mcell.X = average.X;
+                mcell.Y = average.Y;
+                mcell.Elevation = hmap[mcell.X][mcell.Y];
                 mcell.Elevation = (float)Math.Round(mcell.Elevation, 4); // To make the number shorter when serialized
 
                 map.MapCells.Add(mcell.Id, mcell); // Using Add() purposely on dictionary so it throws exception if same ID used twice
