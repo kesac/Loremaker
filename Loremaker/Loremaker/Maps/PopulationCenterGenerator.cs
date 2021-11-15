@@ -71,7 +71,7 @@ namespace Loremaker.Maps
 
             var coastalPopulations = this.NextPopulation(
                     landmass => landmass.Size > 2,
-                    landmass => (int)Math.Max(1, Math.Log(landmass.Size)/2),
+                    landmass => (int)Math.Max(1, landmass.Size/200 + Math.Log(landmass.Size)/2),
                     mapcell => mapcell.IsCoast);
 
             var landlockedPopulations = this.NextPopulation(
