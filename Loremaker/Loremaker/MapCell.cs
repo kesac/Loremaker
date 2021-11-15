@@ -12,10 +12,12 @@ namespace Loremaker
         Coast
     }
 
-    public class MapCell : Identifiable
+    public class MapCell : Identifiable, Locatable
     {
         public uint Id { get; set; }
-        public MapPoint Center { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+
         public List<uint> MapPointIds { get; set; } // The order that points were added must be preserved
         [JsonIgnore]
         public List<MapPoint> MapPoints { get; set; }
@@ -40,7 +42,8 @@ namespace Loremaker
             this.AdjacentMapCellIds = new HashSet<uint>();
             this.AdjacentMapCells = new List<MapCell>();
             this.Attributes = new HashSet<MapAttribute>();
-            this.Center = new MapPoint(0, 0);
+            this.X = 0;
+            this.Y = 0;
         }
 
     }
