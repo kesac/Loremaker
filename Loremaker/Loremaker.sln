@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Example.MapRender
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Experiments.Maps", "Loremaker.Experiments.Maps\Loremaker.Experiments.Maps.csproj", "{F031055C-8A39-45DD-8F7E-8152040ECBEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Tests", "Loremaker.Tests\Loremaker.Tests.csproj", "{509CC921-BFE4-410B-BE86-2A93D611570F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Tests", "Loremaker.Tests\Loremaker.Tests.csproj", "{509CC921-BFE4-410B-BE86-2A93D611570F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Experiments.Heightmaps", "Loremaker.Experiments.Heightmaps\Loremaker.Experiments.Heightmaps.csproj", "{DC75E399-D817-4EC1-90B7-706927218277}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{509CC921-BFE4-410B-BE86-2A93D611570F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{509CC921-BFE4-410B-BE86-2A93D611570F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{509CC921-BFE4-410B-BE86-2A93D611570F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC75E399-D817-4EC1-90B7-706927218277}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC75E399-D817-4EC1-90B7-706927218277}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC75E399-D817-4EC1-90B7-706927218277}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC75E399-D817-4EC1-90B7-706927218277}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
