@@ -26,8 +26,8 @@ namespace Loremaker.Maps
         {
             this.Random = new Random();
             this.AllowSeeding = true;
-            this.Width = 1001;
-            this.Height = 1001;
+            this.Width = 1024;
+            this.Height = 1024;
             this.VarianceDropModifier = 0.5f;
         }
 
@@ -82,6 +82,12 @@ namespace Loremaker.Maps
 
         private float[][] ShrinkArray(float[][] original, int targetWidth, int targetHeight)
         {
+
+            if(original.Length == targetWidth && original[0].Length == targetHeight)
+            {
+                return original;
+            }
+
             var result = new float[targetWidth][];
 
             for(int i = 0; i < result.GetLength(0); i++)
@@ -96,6 +102,7 @@ namespace Loremaker.Maps
                     result[i][j] = original[i][j];
                 }
             }
+
             return result;
         }
 

@@ -19,7 +19,7 @@ namespace Loremaker.Maps
             this.Height = height;
             this.Spacing = initialSpacing;
             this.ShiftingPermitted = true;
-            this.ShiftingMaxDistance = 3;
+            this.ShiftingMaxDistance = 4;
         }
 
         public MapPointsGenerator ShiftPoints(bool allow)
