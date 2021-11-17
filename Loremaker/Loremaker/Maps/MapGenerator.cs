@@ -9,15 +9,18 @@ namespace Loremaker.Maps
     public class MapGenerator : Generator<Map>
     {
         private IGenerator<float[][]> HeightMapGenerator;
+        private IGenerator<float[][]> ConditionalHeightMapGenerator;
         private IGenerator<MapPoint[]> PointsGenerator;
         private IGenerator<VoronoiMap> VoronoiMapGenerator;
+
+        private float LandThreshold { get; set; }
 
         public MapGenerator() : this(1000, 1000, 0.30f) { }
 
         public MapGenerator(int width, int height, float landThreshold)
         {
             this.UsingDimension(width, height);
-            this.UsingLandThreshold(landThreshold);
+            this.UsingLandThreshold(this.LandThreshold);
 
             this.ForEach(x =>
             {
@@ -34,14 +37,45 @@ namespace Loremaker.Maps
             this.PointsGenerator = new MapPointsGenerator(width, height, 25);
             this.VoronoiMapGenerator = new VoronoiMapGenerator(this.PointsGenerator);
             this.HeightMapGenerator = new IslandHeightMapGenerator(width, height);
+            this.ConditionalHeightMapGenerator = new ConditionalGenerator<float[][]>(this.HeightMapGenerator)
+                                                    .WithCondition(x => IsValidHeightMap(x));
 
             return this;
         }
 
         public MapGenerator UsingLandThreshold(float threshold)
         {
+            this.LandThreshold = threshold;
             this.ForProperty<float>(x => x.LandThreshold, threshold);
             return this;
+        }
+
+        private bool IsValidHeightMap(float[][] heightMap)
+        {
+            var percentage = this.PercentageAboveThreshold(heightMap, this.LandThreshold, 3);
+            return percentage >= 0.10 && percentage <= 0.33;
+        }
+
+        /// <summary>
+        /// Determines the percentage of heightmap cells that are above the specified
+        /// threshold. The percentage is expressed as a float between 0 and 1.
+        /// </summary>
+        private float PercentageAboveThreshold(float[][] map, float threshold, int skip = 1)
+        {
+            int aboveThreshold = 0;
+
+            for (int x = 0; x < map.Length; x += skip)
+            {
+                for (int y = 0; y < map[0].Length; y += skip)
+                {
+                    if (map[x][y] > threshold)
+                    {
+                        aboveThreshold++;
+                    }
+                }
+            }
+
+            return (float)aboveThreshold / (map.Length * map[0].Length) * skip * skip;
         }
 
         private void DefineMap(Map map)
@@ -55,8 +89,16 @@ namespace Loremaker.Maps
 
             // Construct a height map which will be used
             // to assign elevation to each of the map cells
-            var hmap = this.HeightMapGenerator.Next();
-            // map.HeightMap = hmap;
+            float[][] hmap = null;
+
+            try
+            {
+                hmap = this.ConditionalHeightMapGenerator.Next();
+            }
+            catch(Exception e)
+            {
+                hmap = this.HeightMapGenerator.Next();
+            }
 
             uint pointCounter = 0;
 
