@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.1-alpha4</Version>
+    <Version>0.1-alpha6</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archigen" Version="1.1.0" />
+    <PackageReference Include="Archigen" Version="1.2.0" />
     <PackageReference Include="Delaunator" Version="1.0.8" />
     <PackageReference Include="Markov" Version="2.0.0">
       <NoWarn>NU1701</NoWarn>
