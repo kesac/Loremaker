@@ -34,8 +34,8 @@ namespace Loremaker
 
             foreach(var mass in landmasses)
             {
-                world.Landmasses.Add(mass.Id, mass);
                 mass.Name = this.LocationNameGenerator.Next();
+                world.Landmasses.Add(mass.Id, mass);
             }
                    
             // Todo: Can we remove cast to list?
@@ -46,7 +46,7 @@ namespace Loremaker
                 world.PopulationCenters.Add(pc.Id, pc);
             }
 
-            var tg = new TerritoryGenerator(world);
+            var tg = new TerritoryGenerator(world, this.LocationNameGenerator);
 
             foreach(var t in tg.Next())
             {

@@ -14,5 +14,13 @@ namespace Loremaker
             }
         }
 
+        public static void AddRange<T>(this HashSet<T> set, List<T> values)
+        {
+            foreach(var value in values)
+            {
+                set.Add(value);
+            }
+        }
+
     }
 }

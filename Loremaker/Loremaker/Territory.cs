@@ -17,14 +17,11 @@ namespace Loremaker
         [JsonIgnore]
         public virtual List<MapCell> MapCells { get; set; }
 
-    
-
         public Territory()
         {
             this.MapCellIds = new HashSet<uint>();
             this.MapCells = new List<MapCell>();
         }
 
-        
     }
 }
