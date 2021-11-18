@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Syllabore" Version="2.0.0-alpha6" />
+    <PackageReference Include="Syllabore" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>

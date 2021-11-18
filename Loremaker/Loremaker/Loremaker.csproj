@@ -12,7 +12,7 @@
     <PackageReference Include="Markov" Version="2.0.0">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="Syllabore" Version="2.0.0-alpha6" />
+    <PackageReference Include="Syllabore" Version="2.0.1" />
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
   </ItemGroup>
 
