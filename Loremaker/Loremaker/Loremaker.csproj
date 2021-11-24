@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.1-alpha6</Version>
+    <Version>0.1-alpha7</Version>
   </PropertyGroup>
 
   <ItemGroup>

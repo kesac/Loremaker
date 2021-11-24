@@ -26,13 +26,12 @@ namespace Loremaker.Example.MapRenderer
         private static Font BigFont = DefaultFontFamily.CreateFont(100, FontStyle.Regular);
         private static Random Random = new Random();
         private static string FilePath = "world.json";
-        private static List<Color> SolidColors = new List<Color>() { Color.Red, Color.Blue, Color.Purple, Color.Gray, Color.BlueViolet, Color.DeepPink, Color.Orange };
-
+        
         public static void Main(string[] args)
         {
             var start = DateTime.Now;
 
-            var forceNew = false;
+            var forceNew = true;
 
             if(!File.Exists(FilePath) || forceNew)
             {
@@ -46,7 +45,8 @@ namespace Loremaker.Example.MapRenderer
                                         .WithConsonants("bcdfgthlmnprts")
                                         .WithLeadingConsonantSequences("qu")
                                         .WithProbability(x => x
-                                            .LeadingConsonantBecomesSequence(0.02))))
+                                            .LeadingConsonantBecomesSequence(0.02)))
+                                    .UsingSyllableCount(2, 3))
                                 .UsingDescriptionGenerator(new GibberishTextGenerator()
                                     .UsingSentenceLength(1));
 
@@ -116,23 +116,47 @@ namespace Loremaker.Example.MapRenderer
                     }
                 }
 
+                var colors = new List<Color>()
+                {
+                    Color.Red,
+                    Color.Orange,
+                    Color.Yellow,
+                    Color.GreenYellow,
+                    Color.Green,
+                    Color.DarkGreen,
+                    Color.DarkBlue,
+                    Color.Blue,
+                    Color.BlueViolet,
+                    Color.Violet,
+                    Color.PaleVioletRed
+                };
+
+                colors.AddRange(Color.WebSafePalette.ToArray());
+
                 // Regions
                 foreach (var territory in world.Territories.Values)
                 {
-                    var color = SolidColors.GetRandom();
+                    var color = colors.RemoveRandom();
 
+                    if (color == null) color = Color.White;
+
+                    /*
                     foreach (var cell in territory.MapCells)
                     {
                         if (cell.MapPoints.Count > 2)
                         {
-                            var centerX = cell.Center.X;
-                            var centerY = cell.Center.Y;
+                            var centerX = cell.X;
+                            var centerY = cell.Y;
 
                             image.Mutate(x => x
-                                .FillPolygon(color, cell.MapPoints.Select(p => new PointF(p.X, p.Y)).ToArray())
-                            );
+                                .FillPolygon(color, cell.MapPoints.Select(p => new PointF(p.X, p.Y)).ToArray()));
                         }
-                    }
+                    }/**/
+
+                    /*
+                    image.Mutate(x => x
+                        .DrawLines(new Pen(color, 2f), territory.ContainingMapPointIds.Select(id => new PointF(world.Map.MapPoints[id].X, world.Map.MapPoints[id].Y)).ToArray()));
+                    */
                 }
 
                 // Now draw population centers
@@ -140,8 +164,8 @@ namespace Loremaker.Example.MapRenderer
                 foreach (var pop in world.PopulationCenters.Values)
                 {
                     image.Mutate(x => x
-                        .DrawLines(new Pen(Color.LightGray, 10f), new PointF(pop.MapCell.Center.X, pop.MapCell.Center.Y), new PointF(pop.MapCell.Center.X, pop.MapCell.Center.Y))
-                        .DrawText(pop.Name, SmallFont, Color.White, new PointF(pop.MapCell.Center.X + 10, pop.MapCell.Center.Y + 10))
+                        .DrawLines(new Pen(Color.LightGray, 10f), new PointF(pop.MapCell.X, pop.MapCell.Y), new PointF(pop.MapCell.X, pop.MapCell.Y))
+                        .DrawText(pop.Name, SmallFont, Color.White, new PointF(pop.MapCell.X + 10, pop.MapCell.Y + 10))
                     );
                     
                 }
@@ -161,7 +185,7 @@ namespace Loremaker.Example.MapRenderer
                     if(landmass.MapCells.Count > 100)
                     {
                         image.Mutate(x => x
-                            .DrawText(drawingOptions, landmass.Name, BigFont, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.5f), new PointF(landmass.Center.X, landmass.Center.Y))
+                            .DrawText(drawingOptions, landmass.Name, BigFont, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.5f), new PointF(landmass.X, landmass.Y))
                         );
                     }
                     else if(landmass.MapCells.Count < 20)
@@ -177,7 +201,7 @@ namespace Loremaker.Example.MapRenderer
                     else
                     {
                         image.Mutate(x => x
-                            .DrawText(drawingOptions, landmass.Name, NormalFont, Brushes.Solid(Color.Black), Pens.Solid(Color.Black, 0.5f), new PointF(landmass.Center.X, landmass.Center.Y))
+                            .DrawText(drawingOptions, landmass.Name, NormalFont, Brushes.Solid(Color.Black), Pens.Solid(Color.Black, 0.5f), new PointF(landmass.X, landmass.Y))
                         );
                     }   
                 }
