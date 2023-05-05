@@ -15,7 +15,7 @@ namespace Loremaker.Text
     public class GibberishTextGenerator : ITextGenerator
     {
 
-        public ISyllableProvider SyllableGenerator { get; set; }
+        public ISyllableGenerator SyllableGenerator { get; set; }
 
         public int SentenceLength { get; set; }
 
@@ -24,7 +24,7 @@ namespace Loremaker.Text
         public GibberishTextGenerator()
         {
             this.SyllableGenerator = new SyllableSet(8, 32, 4)
-                .InitializeWith(x => x
+                .WithGenerator(x => x
                     .WithVowels("ae").Weight(4)
                     .WithVowels("i").Weight(2)
                     .WithVowels("ou").Weight(1)

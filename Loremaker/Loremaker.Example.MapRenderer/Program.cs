@@ -40,12 +40,12 @@ namespace Loremaker.Example.MapRenderer
                                     .UsingDimension(2000, 2000)
                                     .UsingLandThreshold(0.3f))
                                 .UsingNameGenerator(x => x
-                                    .UsingProvider(x => x
+                                    .UsingSyllables(x => x
                                         .WithVowels("aeiouy")
                                         .WithConsonants("bcdfgthlmnprts")
                                         .WithLeadingConsonantSequences("qu")
                                         .WithProbability(x => x
-                                            .LeadingConsonantBecomesSequence(0.02)))
+                                            .OfLeadingConsonantIsSequence(0.02)))
                                     .UsingSyllableCount(2, 3))
                                 .UsingDescriptionGenerator(new GibberishTextGenerator()
                                     .UsingSentenceLength(1));

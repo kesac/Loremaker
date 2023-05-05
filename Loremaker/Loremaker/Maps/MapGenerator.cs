@@ -38,7 +38,10 @@ namespace Loremaker.Maps
             this.VoronoiMapGenerator = new VoronoiMapGenerator(this.PointsGenerator);
             this.HeightMapGenerator = new IslandHeightMapGenerator(width, height);
             this.ConditionalHeightMapGenerator = new ConditionalGenerator<float[][]>(this.HeightMapGenerator)
-                                                    .WithCondition(x => IsValidHeightMap(x));
+                                                    .WithCondition(x => {
+                                                        // return IsValidHeightMap(x); 
+                                                        return true; // TODO: this was causing an infinite loop
+                                                    });
 
             return this;
         }

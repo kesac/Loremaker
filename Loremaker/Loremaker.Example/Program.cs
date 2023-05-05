@@ -17,8 +17,8 @@ namespace Loremaker.Example
         public static void Main(string[] args)
         {
             {
-                var generator = new WorldGenerator();
-                var world = generator.Next();
+                // var generator = new WorldGenerator();
+                // var world = generator.Next();
             }
             {
                 // Basic substitution
@@ -36,6 +36,7 @@ namespace Loremaker.Example
 
                 Console.WriteLine();
             }
+
             {
                 // More complicated
                 var text = new TextTemplate("{subject} {verb} to {place}.")
@@ -74,7 +75,7 @@ namespace Loremaker.Example
                                     .As("River", "Mountain", "Mountains", "Mountain Range", "Forest", "Ruins", "Canyon", "Sea", "Lake", "Plains")
                                     .ApplyDeterminers("", "the")
                                     .ApplyNameGenerator(x => x
-                                        .UsingProvider(x => x
+                                        .UsingSyllables(x => x
                                             .WithVowels("aeo")
                                             .WithLeadingConsonants("tvr"))));
 
@@ -89,26 +90,26 @@ namespace Loremaker.Example
 
                 var worldNames = new NameGenerator()
                    .UsingSyllableCount(3)
-                    .UsingProvider(x => x
+                    .UsingSyllables(x => x
                         .WithVowels("aeo")
                         .WithLeadingConsonants("tvr"));
 
                 var locationNames = new NameGenerator()
                     .UsingSyllableCount(3)
-                    .UsingProvider(x => x
+                    .UsingSyllables(x => x
                         .WithVowels("aieou")
                         .WithLeadingConsonants("strvbc")
                         .WithTrailingConsonants("strvgfc"));
 
                 var shipNames = new NameGenerator()
                     .UsingSyllableCount(2,3)
-                    .UsingProvider(x => new DefaultSyllableProvider()
+                    .UsingSyllables(x => new DefaultSyllableGenerator()
                         .WithProbability(x => x
-                            .TrailingConsonantExists(0)
-                            .VowelBecomesSequence(0)))
+                            .OfTrailingConsonants(0)
+                            .OfVowelIsSequence(0)))
                     .UsingFilter(x => x
-                        .DoNotAllowPattern("[wyz]")
-                        .DoNotAllowPattern("[^aeiou]{3,}"));
+                        .DoNotAllow("[wyz]")
+                        .DoNotAllow("[^aeiou]{3,}"));
 
                 var chain = new TextChain()
                     .Append("{subject} {raised} in {birthplace} near {place}.", x => x
@@ -164,8 +165,8 @@ namespace Loremaker.Example
 
             {
                 var g = new NameGenerator()
-                        .UsingProvider(new SyllableSet(4, 16, 4)
-                            .InitializeWith(x => x
+                        .UsingSyllables(new SyllableSet(4, 16, 4)
+                            .WithGenerator(x => x
                                 .WithVowels("aeiou")
                                 .WithLeadingConsonants("bcdfghijklmnprstvwyz")))
                         .UsingSyllableCount(3, 4);
@@ -193,7 +194,7 @@ namespace Loremaker.Example
             {
 
                 var worldNames = new NameGenerator()
-                                .UsingProvider(x => x
+                                .UsingSyllables(x => x
                                     .WithVowels("aei")
                                     .WithLeadingConsonants("str"));
                 var continentNames = new NameGenerator();
@@ -214,9 +215,10 @@ namespace Loremaker.Example
                     Console.WriteLine("World of " + world.Name + " (" + world.Description + ")");
                     Console.WriteLine("Has continents:");
 
-                    for(int j = 0; j < world.Landmasses.Count; j++)
+                    // TODO: Continents not generating
+                    for(uint j = 0; j < world.Landmasses.Count; j++)
                     {
-                        //Console.WriteLine(world.Landmasses[j].Name);
+                        Console.WriteLine(world.Landmasses[j].Name);
                     }
                 }
                 

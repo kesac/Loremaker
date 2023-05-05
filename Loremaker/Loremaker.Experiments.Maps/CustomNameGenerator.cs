@@ -18,21 +18,21 @@ namespace Loremaker.Experiments.Maps
         public CustomNameGenerator()
         {
             worlds = new NameGenerator()
-                        .UsingProvider(x => x
+                        .UsingSyllables(x => x
                             .WithLeadingConsonants("vrstl").Weight(4)
                             .WithLeadingConsonants("wznm")
                             .WithVowels("a").Weight(4)
                             .WithVowels("ei").Weight(2)
                             .WithVowels("ou"))
-                        .UsingTransformer(x => x
-                            .Select(1).Chance(0.33)
+                        .UsingTransform(0.33, new TransformSet()
+                            .RandomlySelect(1)
                             .WithTransform(x => x.AppendSyllable("gard"))
                             .WithTransform(x => x.AppendSyllable("grim"))
                             .WithTransform(x => x.AppendSyllable("dar")))
                         .UsingSyllableCount(2);
 
             continents = new NameGenerator()
-                        .UsingProvider(x => x
+                        .UsingSyllables(x => x
                             .WithLeadingConsonants("vrznmstl").Weight(2)
                             .WithLeadingConsonants("bckghw")
                             .WithVowels("a").Weight(4)

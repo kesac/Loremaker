@@ -21,9 +21,9 @@ namespace Loremaker.Names
             this.Random = new Random();
 
             this.GeneralNames = new NameGenerator()
-                .UsingProvider(new DefaultSyllableProvider())
+                // .UsingSyllables(new DefaultSyllableGenerator())
                 .UsingFilter(v => v
-                    .DoNotAllowPattern(@"(\w)\1\1"))
+                    .DoNotAllow(@"(\w)\1\1"))
                 .UsingSyllableCount(2,3);
         }
 
