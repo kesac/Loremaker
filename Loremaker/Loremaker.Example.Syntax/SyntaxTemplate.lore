@@ -1,7 +1,6 @@
 ﻿ADD  "$person $raised in $birthplace near $place."
 WHEN "Mountain" ADD "Growing up, they were always drawn to the vastness of the ocean."
 WHEN "Mountain" ADD "They became a sailor at the age of $age."
-WHEN "the" ADD "$person has brown hair and hazel eyes."
 ADD  "Later, in their 40s, they returned to $place and became the mayor."
 
 $person    = @input
