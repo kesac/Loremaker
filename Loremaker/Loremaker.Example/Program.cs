@@ -16,6 +16,16 @@ namespace Loremaker.Example
     {
         public static void Main(string[] args)
         {
+
+            var gibberish = new GibberishGenerator();
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine(gibberish.Next());
+            }
+
+            Console.ReadLine();
+
+            /*
             {
                 // var generator = new WorldGenerator();
                 // var world = generator.Next();
@@ -232,6 +242,7 @@ namespace Loremaker.Example
             }
 
             Console.ReadLine();
+        /**/
         }
     }
 }

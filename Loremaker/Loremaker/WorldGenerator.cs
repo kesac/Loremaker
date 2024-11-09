@@ -22,7 +22,7 @@ namespace Loremaker
         {
             this.UsingMapGenerator(mapGenerator);
             this.UsingNameGenerator(new DefaultNameGenerator());
-            this.UsingDescriptionGenerator(new GibberishTextGeneratorOld().UsingSentenceLength(2));
+            this.UsingDescriptionGenerator(new GibberishGenerator().UsingSentenceLength(2));
 
             this.ForEach(x => { this.PostGeneration(x); });
         }
