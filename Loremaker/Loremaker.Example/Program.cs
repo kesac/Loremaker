@@ -22,7 +22,7 @@ namespace Loremaker.Example
             }
             {
                 // Basic substitution
-                var text = new TextTemplate("{subject} {verb} to {place}.")
+                var text = new TextTemplateOld("{subject} {verb} to {place}.")
                             .Define("subject", "Alice", "Brian", "Cam")
                             .Define("verb", "ran", "walked", "hopped" )  
                             .Define("place", x => x
@@ -39,7 +39,7 @@ namespace Loremaker.Example
 
             {
                 // More complicated
-                var text = new TextTemplate("{subject} {verb} to {place}.")
+                var text = new TextTemplateOld("{subject} {verb} to {place}.")
                             .CapitalizeFirstWord()
                             .Define("subject", x => x
                                 .As("Alice", "Bob", "Chris")
@@ -62,7 +62,7 @@ namespace Loremaker.Example
             }
             {
                 // More complicated using randomly generated names for {place}
-                var text = new TextTemplate("{subject} {raised} in {birthplace} near {place}.")
+                var text = new TextTemplateOld("{subject} {raised} in {birthplace} near {place}.")
                                 .Define("subject", x => x
                                     .As("Alice", "Brian", "Cam"))
                                 .Define("raised", x => x
@@ -111,7 +111,7 @@ namespace Loremaker.Example
                         .DoNotAllow("[wyz]")
                         .DoNotAllow("[^aeiou]{3,}"));
 
-                var chain = new TextChain()
+                var chain = new TextChainOld()
                     .Append("{subject} {raised} in {birthplace} near {place}.", x => x
                         .Define("raised", "grew up", "was raised", "was brought up")
                         .Define("birthplace", x => x
@@ -152,7 +152,7 @@ namespace Loremaker.Example
 
 
                 var options = new JsonSerializerOptions() { WriteIndented = true };
-                string result = JsonSerializer.Serialize<TextChain>(chain, options);
+                string result = JsonSerializer.Serialize<TextChainOld>(chain, options);
                 File.WriteAllText("test.json.txt", result);
 
                 for (int i = 0; i < 5; i++)
@@ -176,7 +176,7 @@ namespace Loremaker.Example
                                 .WithLeadingConsonants("bcdfghijklmnprstvwyz")))
                         .UsingSyllableCount(3, 4);
 
-                    var t = new MarkovTextGenerator()
+                    var t = new MarkovTextGeneratorOld()
                         .FromCorpus("sample.txt")
                         .FromCorpus("sample2.txt")
                         // .UsingDepth(2)             // Default is 2
@@ -208,7 +208,7 @@ namespace Loremaker.Example
 
                 var g = new Generator<World>()
                         .ForProperty<string>(x => x.Name, worldNames)
-                        .ForProperty<string>(x => x.Description, new GibberishTextGenerator()
+                        .ForProperty<string>(x => x.Description, new GibberishTextGeneratorOld()
                             .UsingSentenceLength(2))
                         .ForProperty<Map>(x => x.Map, new MapGenerator())
                         .ForEach(x =>

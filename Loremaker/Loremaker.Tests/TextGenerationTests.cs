@@ -10,14 +10,14 @@ namespace Loremaker.Tests
         [TestMethod]
         public void TextEntity_NoValueGeneratesBlankString()
         {
-            var e = new TextEntity();
+            var e = new TextEntityOld();
             Assert.IsTrue(e.Next() == string.Empty);
         }
 
         [TestMethod]
         public void TextEntity_ValuePropertyAppearsInOutput()
         {
-            var e = new TextEntity("planet");
+            var e = new TextEntityOld("planet");
             Assert.IsTrue(e.Next() == "planet");
         }
 
@@ -28,7 +28,7 @@ namespace Loremaker.Tests
             string[] adjectives = new string[] { "large", "red", "fragile" };
             bool[] adjectiveAppeared = new bool[adjectives.Length];
 
-            var e = new TextEntity("planet").UsingAdjectives(adjectives);
+            var e = new TextEntityOld("planet").UsingAdjectives(adjectives);
 
             for(int i = 0; i < 100; i++)
             {
@@ -57,7 +57,7 @@ namespace Loremaker.Tests
             string[] determiners = new string[] { "a", "the", "one" };
             bool[] determinersAppeared = new bool[determiners.Length];
 
-            var e = new TextEntity("planet").UsingDeterminers(determiners);
+            var e = new TextEntityOld("planet").UsingDeterminers(determiners);
 
             for (int i = 0; i < 100; i++)
             {
@@ -88,7 +88,7 @@ namespace Loremaker.Tests
                         .WithVowels("ae")
                         .WithLeadingConsonants("str"));
 
-            var e = new TextEntity("planet").UsingNameGenerator(g);
+            var e = new TextEntityOld("planet").UsingNameGenerator(g);
 
             for (int i = 0; i < 100; i++)
             {
