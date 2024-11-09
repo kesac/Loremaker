@@ -12,7 +12,7 @@ namespace Loremaker.Text
     /// are used to generate the gibberish much like a
     /// real language.
     /// </summary>
-    public class GibberishTextGenerator : ITextGenerator
+    public class GibberishTextGeneratorOld : ITextGeneratorOld
     {
 
         public ISyllableGenerator SyllableGenerator { get; set; }
@@ -21,7 +21,7 @@ namespace Loremaker.Text
 
         public string Conjunction { get; set; }
 
-        public GibberishTextGenerator()
+        public GibberishTextGeneratorOld()
         {
             this.SyllableGenerator = new SyllableSet(8, 32, 4)
                 .WithGenerator(x => x
@@ -37,7 +37,7 @@ namespace Loremaker.Text
             this.Conjunction = this.SyllableGenerator.NextStartingSyllable().ToLower();
         }
 
-        public GibberishTextGenerator UsingSentenceLength(int length)
+        public GibberishTextGeneratorOld UsingSentenceLength(int length)
         {
             this.SentenceLength = length;
             return this;
@@ -72,9 +72,9 @@ namespace Loremaker.Text
             return result[0].ToString().ToUpper() + result.ToString().Substring(1).Trim() + ".";
         }
 
-        public TextOutput NextOutput()
+        public TextOutputOld NextOutput()
         {
-            return new TextOutput(this.Next());
+            return new TextOutputOld(this.Next());
         }
 
         public string Next()

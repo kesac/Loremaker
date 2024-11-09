@@ -6,24 +6,24 @@ using System.Text;
 
 namespace Loremaker.Text
 {
-    public class TextChain : ITextGenerator
+    public class TextChainOld : ITextGeneratorOld
     {
-        public List<TextTemplate> Templates { get; set; }
-        public Dictionary<string, ITextGenerator> GlobalEntities { get; set; }
+        public List<TextTemplateOld> Templates { get; set; }
+        public Dictionary<string, ITextGeneratorOld> GlobalEntities { get; set; }
 
-        public TextChain()
+        public TextChainOld()
         {
-            this.Templates = new List<TextTemplate>();
-            this.GlobalEntities = new Dictionary<string, ITextGenerator>();
+            this.Templates = new List<TextTemplateOld>();
+            this.GlobalEntities = new Dictionary<string, ITextGeneratorOld>();
         }
 
         /// <summary>
         /// Used to define <c>TextEntities</c> for use across multiple <c>TextTemplates</c>
         /// in a <c>TextChain</c>.
         /// </summary>
-        public TextChain DefineGlobally(string key, Func<TextEntityPool, TextEntityPool> configureEntity)
+        public TextChainOld DefineGlobally(string key, Func<TextEntityPoolOld, TextEntityPoolOld> configureEntity)
         {
-            var e = configureEntity(new TextEntityPool());
+            var e = configureEntity(new TextEntityPoolOld());
 
             if (this.GlobalEntities.Keys.Contains(key))
             {
@@ -37,7 +37,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public TextChain DefineGlobally(string key, ITextGenerator generator)
+        public TextChainOld DefineGlobally(string key, ITextGeneratorOld generator)
         {
             if (this.GlobalEntities.Keys.Contains(key))
             {
@@ -51,27 +51,27 @@ namespace Loremaker.Text
             return this;
         }
 
-        public TextChain DefineGlobally(string key, INameGenerator generator)
+        public TextChainOld DefineGlobally(string key, INameGenerator generator)
         {
-            this.DefineGlobally(key, new TextEntity().UsingNameGenerator(generator));
+            this.DefineGlobally(key, new TextEntityOld().UsingNameGenerator(generator));
             return this;
         }
 
-        public TextChain DefineGlobally(string key, params string[] substitutions)
+        public TextChainOld DefineGlobally(string key, params string[] substitutions)
         {
             this.DefineGlobally(key, x => x.As(substitutions));
             return this;
         }
 
-        public TextChain Append(string template)
+        public TextChainOld Append(string template)
         {
-            this.Templates.Add(new TextTemplate(template));
+            this.Templates.Add(new TextTemplateOld(template));
             return this;
         }
 
-        public TextChain Append(string template, Func<TextTemplate, TextTemplate> configure)
+        public TextChainOld Append(string template, Func<TextTemplateOld, TextTemplateOld> configure)
         {
-            this.Templates.Add(configure(new TextTemplate(template)));
+            this.Templates.Add(configure(new TextTemplateOld(template)));
             return this;
         }
 
@@ -97,10 +97,10 @@ namespace Loremaker.Text
             return result.ToString().Trim();
         }
 
-        public TextOutput NextOutput()
+        public TextOutputOld NextOutput()
         {
             // TODO: Should contain contexts?
-            return new TextOutput(this.Next());
+            return new TextOutputOld(this.Next());
         }
     }
 }

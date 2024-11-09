@@ -6,7 +6,7 @@ using Markov;
 
 namespace Loremaker.Text
 {
-    public class MarkovTextGenerator : ITextGenerator
+    public class MarkovTextGeneratorOld : ITextGeneratorOld
     {
         public int Depth { get; set; }
         public char Delimiter { get; set; }
@@ -15,7 +15,7 @@ namespace Loremaker.Text
         public string EndingWord { get; set; }
         private MarkovChain<string> MarkovChain { get; set; }
 
-        public MarkovTextGenerator()
+        public MarkovTextGeneratorOld()
         {
             this.Delimiter = ' ';
             this.Depth = 2;
@@ -23,19 +23,19 @@ namespace Loremaker.Text
             this.CorpusFilepaths = new List<string>();
         }
 
-        public MarkovTextGenerator UsingDepth(int depth)
+        public MarkovTextGeneratorOld UsingDepth(int depth)
         {
             this.Depth = depth;
             return this;
         }
 
-        public MarkovTextGenerator UsingDelimiter(char c)
+        public MarkovTextGeneratorOld UsingDelimiter(char c)
         {
             this.Delimiter = c;
             return this;
         }
 
-        public MarkovTextGenerator FromCorpus(params string[] filepaths)
+        public MarkovTextGeneratorOld FromCorpus(params string[] filepaths)
         {
             foreach(var filepath in filepaths)
             {
@@ -45,7 +45,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public MarkovTextGenerator LoadCorpus()
+        public MarkovTextGeneratorOld LoadCorpus()
         {
             foreach (var filepath in this.CorpusFilepaths)
             {
@@ -61,7 +61,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public MarkovTextGenerator BeginTextWith(params string[] words)
+        public MarkovTextGeneratorOld BeginTextWith(params string[] words)
         {
             foreach(var w in words)
             {
@@ -74,7 +74,7 @@ namespace Loremaker.Text
             return this;
         }
 
-        public MarkovTextGenerator EndTextWith(string substring)
+        public MarkovTextGeneratorOld EndTextWith(string substring)
         {
             this.EndingWord = substring;
             return this;
@@ -118,9 +118,9 @@ namespace Loremaker.Text
 
         }
 
-        public TextOutput NextOutput()
+        public TextOutputOld NextOutput()
         {
-            return new TextOutput(this.Next());
+            return new TextOutputOld(this.Next());
         }
     }
 }

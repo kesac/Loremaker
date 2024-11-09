@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Loremaker.Text
 {
-    public interface ITextGenerator : IGenerator<string>
+    public interface ITextGeneratorOld : IGenerator<string>
     {
         // string Next();
-        TextOutput NextOutput();
+        TextOutputOld NextOutput();
     }
 }

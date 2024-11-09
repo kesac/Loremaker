@@ -6,45 +6,45 @@ using System.Text;
 
 namespace Loremaker.Text
 {
-    public class TextEntity : ITextGenerator
+    public class TextEntityOld : ITextGeneratorOld
     {
         public string Value { get; set; }
         public List<string> Adjectives { get; set; }
         public List<string> Determiners { get; set; }
         public INameGenerator NameGenerator { get; set; }
 
-        public TextEntity(string value = "")
+        public TextEntityOld(string value = "")
         {
             this.Value = value;
             this.Adjectives = new List<string>();
             this.Determiners = new List<string>();
         }
 
-        public TextEntity UsingValue(string value)
+        public TextEntityOld UsingValue(string value)
         {
             this.Value = value;
             return this;
         }
 
-        public TextEntity UsingAdjectives(params string[] adjectives)
+        public TextEntityOld UsingAdjectives(params string[] adjectives)
         {
             this.Adjectives.AddRange(adjectives);
             return this;
         }
 
-        public TextEntity UsingDeterminers(params string[] determiners)
+        public TextEntityOld UsingDeterminers(params string[] determiners)
         {
             this.Determiners.AddRange(determiners);
             return this;
         }
 
-        public TextEntity UsingNameGenerator(INameGenerator nameGenerator)
+        public TextEntityOld UsingNameGenerator(INameGenerator nameGenerator)
         {
             this.NameGenerator = nameGenerator;
             return this;
         }
 
-        public TextEntity UsingNameGenerator(Func<NameGenerator, NameGenerator> configure)
+        public TextEntityOld UsingNameGenerator(Func<NameGenerator, NameGenerator> configure)
         {
             this.NameGenerator = configure(new NameGenerator());
             return this;
@@ -55,9 +55,9 @@ namespace Loremaker.Text
             return this.NextOutput().Value;
         }
 
-        public TextOutput NextOutput()
+        public TextOutputOld NextOutput()
         {
-            var result = new TextOutput();
+            var result = new TextOutputOld();
             var builder = new StringBuilder();
 
             if(this.Determiners.Count > 0)
@@ -92,7 +92,7 @@ namespace Loremaker.Text
 
             
 
-            return new TextOutput(builder.ToString().Trim());
+            return new TextOutputOld(builder.ToString().Trim());
 
         }
     }

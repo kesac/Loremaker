@@ -11,78 +11,78 @@ namespace Loremaker.Text
     /// Represents one or more entities that can be captured
     /// as a single word of text. Entities can have adjectives,
     /// determiners, or form part of a name. TextEntities produce
-    /// <see cref="TextOutput"/>.
+    /// <see cref="TextOutputOld"/>.
     /// </summary>
-    public class TextEntityPool : ITextGenerator
+    public class TextEntityPoolOld : ITextGeneratorOld
     {
-        public List<TextEntity> Entities { get; set; }
+        public List<TextEntityOld> Entities { get; set; }
 
-        private List<TextEntity> LastAddedEntities { get; set; }
+        private List<TextEntityOld> LastAddedEntities { get; set; }
 
-        public TextEntityPool()
+        public TextEntityPoolOld()
         {
-            this.Entities = new List<TextEntity>();
+            this.Entities = new List<TextEntityOld>();
         }
 
-        public TextEntityPool As(params string[] objects)
+        public TextEntityPoolOld As(params string[] objects)
         {
-            this.LastAddedEntities = objects.Select(x => new TextEntity(x)).ToList();
+            this.LastAddedEntities = objects.Select(x => new TextEntityOld(x)).ToList();
             this.Entities.AddRange(this.LastAddedEntities);
             return this;
         }
 
-        public TextEntityPool As(Func<TextEntity, TextEntity> configure)
+        public TextEntityPoolOld As(Func<TextEntityOld, TextEntityOld> configure)
         {
-            var entity = configure(new TextEntity(string.Empty));
-            this.LastAddedEntities = new List<TextEntity>() { entity };
+            var entity = configure(new TextEntityOld(string.Empty));
+            this.LastAddedEntities = new List<TextEntityOld>() { entity };
             this.Entities.Add(entity);
             return this;
         }
 
-        public TextEntityPool ApplyAdjectives(params string[] adjectives)
+        public TextEntityPoolOld ApplyAdjectives(params string[] adjectives)
         {
             this.LastAddedEntities.ForEach(x => x.Adjectives.AddRange(adjectives));
             return this;
         }
 
-        public TextEntityPool ApplyAdjectivesToAll(params string[] adjectives)
+        public TextEntityPoolOld ApplyAdjectivesToAll(params string[] adjectives)
         {
             this.Entities.ForEach(x => x.Adjectives.AddRange(adjectives));
             return this;
         }
 
-        public TextEntityPool ApplyDeterminers(params string[] determiners)
+        public TextEntityPoolOld ApplyDeterminers(params string[] determiners)
         {
             this.LastAddedEntities.ForEach(x => x.Determiners.AddRange(determiners));
             return this;
         }
 
-        public TextEntityPool ApplyDeterminersToAll(params string[] determiners)
+        public TextEntityPoolOld ApplyDeterminersToAll(params string[] determiners)
         {
             this.Entities.ForEach(x => x.Determiners.AddRange(determiners));
             return this;
         }
 
-        public TextEntityPool ApplyNameGenerator(INameGenerator nameGenerator)
+        public TextEntityPoolOld ApplyNameGenerator(INameGenerator nameGenerator)
         {
             this.LastAddedEntities.ForEach(x => x.NameGenerator = nameGenerator);
             return this;
         }
 
-        public TextEntityPool ApplyNameGeneratorToAll(INameGenerator nameGenerator)
+        public TextEntityPoolOld ApplyNameGeneratorToAll(INameGenerator nameGenerator)
         {
             this.Entities.ForEach(x => x.NameGenerator = nameGenerator);
             return this;
         }
 
-        public TextEntityPool ApplyNameGenerator(Func<NameGenerator, NameGenerator> configure)
+        public TextEntityPoolOld ApplyNameGenerator(Func<NameGenerator, NameGenerator> configure)
         {
             var generator = configure(new NameGenerator());
             this.LastAddedEntities.ForEach(x => x.NameGenerator = generator);
             return this;
         }
 
-        public TextEntityPool ApplyNameGeneratorToAll(Func<NameGenerator, NameGenerator> configure)
+        public TextEntityPoolOld ApplyNameGeneratorToAll(Func<NameGenerator, NameGenerator> configure)
         {
             var generator = configure(new NameGenerator());
             this.Entities.ForEach(x => x.NameGenerator = generator);
@@ -94,17 +94,17 @@ namespace Loremaker.Text
             return NextOutput().Value;
         }
 
-        public TextOutput NextOutput()
+        public TextOutputOld NextOutput()
         {
             var builder = new StringBuilder();
-            var result = new TextOutput();
+            var result = new TextOutputOld();
             var context = new List<string>();
 
 
             if (this.Entities.Count > 0)
             {
 
-                var o = this.Entities.GetRandom<TextEntity>().Next();
+                var o = this.Entities.GetRandom<TextEntityOld>().Next();
 
                 if (o.HasContextClues())
                 {

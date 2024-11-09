@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Loremaker.Text
 {
-    public static class TextExtensions
+    public static class TextExtensionsOld
     {
         public static bool HasContextClues(this string s)
         {
