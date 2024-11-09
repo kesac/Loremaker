@@ -27,17 +27,23 @@ namespace Loremaker.Maps
 
             foreach (var landmass in this.Landmasses.Where(x => landmassCondition(x)))
             {
-                var coasts = landmass.MapCells.Where(x => mapCellCondition(x)).ToList();
+                var targetCells = landmass.MapCells.Where(x => mapCellCondition(x)).ToList();
+                
+                if(targetCells.Count == 0)
+                {
+                    targetCells = landmass.MapCells.Where(x => x.IsLand).ToList();
+                }
+                
                 var pops = maxSize(landmass);
 
                 for (int i = 0; i < pops; i++)
                 {
-                    var homecell = coasts.GetRandom();
+                    var homecell = targetCells.GetRandom();
                     var tries = 1;
 
                     while (offlimits.Contains(homecell.Id) && tries < maxTries)
                     {
-                        homecell = coasts.GetRandom();
+                        homecell = targetCells.GetRandom();
                         tries++;
                     }
 
