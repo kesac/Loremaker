@@ -11,114 +11,71 @@ using System.Text.RegularExpressions;
 
 namespace Loremaker.Text
 {
-    public class TextLine
-    {
-        public string Value { get; set; }
-        public string RequiredContext { get; set; }
 
-        public TextLine(string value)
-        {
-            Value = value;
-        }
-        public TextLine(string value, string requiredContext)
-        {
-            Value = value;
-            RequiredContext = requiredContext;
-        }
-
-        public bool HasRequiredContext()
-        {
-            return RequiredContext != null;
-        }
-
-        public override string ToString()
-        {
-            return Value;
-        }
-
-    }
-
-    public class SimpleGenerator : IGenerator<string>
-    {
-        private Random _random;
-        public List<string> Values { get; set; }
-
-        public SimpleGenerator(List<string> values)
-        {
-            _random = new Random();
-            Values = values;
-        }
-
-        public string Next()
-        {
-            return Values[_random.Next(Values.Count)];
-        }
-    }
-
-    public class SubjectDto
-    {
-        [JsonPropertyName("determiners")]
-        public List<string> Determiners { get; set; }
-        [JsonPropertyName("adjectives")]
-        public List<string> Adjectives { get; set; }
-        [JsonPropertyName("values")]
-        public List<string> Values { get; set; }
-    }
-
-    public class SubjectGenerator : IGenerator<string>
-    {
-        private Random _random;
-        public SimpleGenerator Determiners { get; set; }
-        public SimpleGenerator Adjectives { get; set; }
-        public SimpleGenerator Values { get; set; }
-
-        public SubjectGenerator(List<string> values)
-        {
-            _random = new Random();
-            Values = new SimpleGenerator(values);
-        }
-
-        public void SetDeterminers(List<string> determiners)
-        {
-            Determiners = new SimpleGenerator(determiners);
-        }
-
-        public void SetAdjectives(List<string> adjectives)
-        {
-            Adjectives = new SimpleGenerator(adjectives);
-        }
-
-        public string Next()
-        {
-            var result = Values.Next();
-
-            if (Adjectives != null)
-            {
-                result = Adjectives.Next() + " " + result;
-            }
-
-            if (Determiners != null)
-            {
-                result = Determiners.Next() + " " + result;
-            }
-
-            return result;
-        }
-    }
-
+    /// <summary>
+    /// A type of random generator that generates text
+    /// from a template with substitution rules.
+    /// </summary>
     public class TextTemplate : IGenerator<string>
     {
-        public List<TextLine> Lines { get; set; }
+        /// <summary>
+        /// Used during .lore file processing. Subject data
+        /// is stored in a JSON format and this class is used
+        /// as part of the deserialization process. Not meant
+        /// for use outside of  <see cref="TextTemplate"/>.
+        /// </summary>
+        private class IntermediarySubjectData
+        {
+            [JsonPropertyName("determiners")]
+            public List<string> Determiners { get; set; }
+            [JsonPropertyName("adjectives")]
+            public List<string> Adjectives { get; set; }
+            [JsonPropertyName("values")]
+            public List<string> Values { get; set; }
+        }
+
+        /// <summary>
+        /// The lines of text that will be used to
+        /// generate text during calls to <see cref="Next()"/>.
+        /// The order of lines matter.
+        /// </summary>
+        public List<TextTemplateLine> Lines { get; set; }
+
+        /// <summary>
+        /// The substitution rules that will be used to generate 
+        /// text during calls to <see cref="Next()"/>.
+        /// </summary>
         public Dictionary<string, IGenerator<string>> Substitutions { get; set; }
+
+        /// <summary>
+        /// A list of substitution keys that are required to be defined 
+        /// before a call to <see cref="Next()"/> can be made. 
+        /// (<see cref="Substitutions"/> must contain the key.)
+        /// </summary>
         public List<string> Required { get; set; }
 
+        /// <summary>
+        /// Instantiates a new <see cref="TextTemplate"/>.
+        /// </summary>
         public TextTemplate() 
         {
-            Lines = new List<TextLine>();
+            Lines = new List<TextTemplateLine>();
             Substitutions = new Dictionary<string, IGenerator<string>>();
             Required = new List<string>();
         }
 
+        /// <summary>
+        /// <para>
+        ///    Generates text based on the template and substitution rules.
+        /// </para>
+        /// <para>
+        ///    To build the output, each line in the template has
+        ///    the substitution rules applied to it individually. If a line has 
+        ///    a context requirement, it will only be added to the output if any
+        ///    previous line contains the context.
+        /// </para>
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public string Next()
         {
             foreach (var requirement in Required)
@@ -129,6 +86,8 @@ namespace Loremaker.Text
                 }
             }
 
+            // Keep substitution values consistent for multiple instances
+            // of the same substitution. This could become toggleable in the future.
             var finalizedSubstitutions = new Dictionary<string, string>();
 
             foreach (var substitution in Substitutions)
@@ -161,44 +120,38 @@ namespace Loremaker.Text
             return result.ToString();
         }
 
+        /// <summary>
+        /// Reads and parses a .lore file from the specified path 
+        /// and returns a <see cref="TextTemplate"/> based on its contents.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
         public static TextTemplate LoadFromFile(string path)
         {
             if (path == null)
             {
                 throw new ArgumentNullException("No file path was specified.");
             }
-
-            if (!File.Exists(path))
+            else if (!File.Exists(path))
             {
                 throw new FileNotFoundException(path + " does not exist.");
             }
 
             var result = new TextTemplate();
-
-            var allText = File.ReadAllText(path);
-
-            // Regex breakdown:
-            //    ^\s*        Match the start of the line, followed by any amount of whitespace
-            //    (add|when)  Match either "add" or "when", case insensitive
-            //    .*          Match all remaining characters on the line, if there are any
-            var rawLines = Regex.Matches(allText, @"^\s*(add|when).*", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            var rawText = File.ReadAllText(path);
+            var rawLines = Regex.Matches(rawText, @"^\s*(add|when).*", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
             foreach (Match rawLine in rawLines)
             {
-                var tokens = GetTokens(rawLine.Value.Trim());
+                var tokens = rawLine.Value.Trim().Tokenize();
 
-                // Format: add "text"
-                if (tokens.Count >= 2 
-                    && String.Equals("add", tokens[0], StringComparison.OrdinalIgnoreCase))
+                if (tokens.Count >= 2 && tokens[0].CaseInsensitiveEquals("add"))
                 {
-                    result.Lines.Add(new TextLine(tokens[1]));
+                    result.Lines.Add(new TextTemplateLine(tokens[1])); // "ADD <text>"
                 }
-                // Format: when "condition" add "text"
-                else if (tokens.Count >= 4 
-                    && String.Equals("when", tokens[0], StringComparison.OrdinalIgnoreCase)
-                    && String.Equals("add", tokens[2], StringComparison.OrdinalIgnoreCase))
+                else if (tokens.Count >= 4 && tokens[0].CaseInsensitiveEquals("when") && tokens[2].CaseInsensitiveEquals("add"))
                 {
-                    result.Lines.Add(new TextLine(tokens[3], tokens[1]));
+                    result.Lines.Add(new TextTemplateLine(tokens[3], tokens[1])); // "WHEN <condition> ADD <text>"
                 }
             }
 
@@ -210,7 +163,7 @@ namespace Loremaker.Text
             //    |\{.*?\}\s*$         Or match anything between opening and closing curly brackets. The closing brackets must end a line
             //    |@[a-zA-Z0-9_]+\s*$  Or match an "@" sign followed by any alphanumeric characters
             var rawSubstitutions = Regex.Matches(
-                allText,
+                rawText,
                 @"^\s*\$[a-zA-Z0-9_]+\s*=\s*(\[.*?\]\s*$|\{.*?\}\s*$|@[a-zA-Z0-9_]+?\s*$)",
                 RegexOptions.Multiline | RegexOptions.Singleline
             );
@@ -224,12 +177,12 @@ namespace Loremaker.Text
                 if (tokens[1].Trim().StartsWith("["))
                 {
                     var data = JsonSerializer.Deserialize<List<string>>(tokens[1]);
-                    result.Substitutions[key] = new SimpleGenerator(data);
+                    result.Substitutions[key] = new Randomizer<string>(data);
                 }
                 else if (tokens[1].Trim().StartsWith("{"))
                 {
-                    var data = JsonSerializer.Deserialize<SubjectDto>(tokens[1]);
-                    var generator = new SubjectGenerator(data.Values);
+                    var data = JsonSerializer.Deserialize<IntermediarySubjectData>(tokens[1]);
+                    var generator = new SubjectRandomizer(data.Values);
                     generator.SetDeterminers(data.Determiners);
                     generator.SetAdjectives(data.Adjectives);
                     result.Substitutions[key] = generator;
@@ -239,39 +192,6 @@ namespace Loremaker.Text
                     result.Required.Add(key);
                 }
 
-            }
-
-            return result;
-        }
-
-        private static List<string> GetTokens(string line)
-        {
-            var result = new List<string>();
-
-            // Using regex, split the line into individual words, but ensure
-            // everything between quotes is treated as a single word.
-            var matches = Regex.Matches(line, "\"[^\"]*\"|[^ ]+");
-
-            if (matches.Count > 0)
-            {
-                foreach (var match in matches)
-                {
-                    var value = match.ToString();
-
-                    if(value.StartsWith("\"") && value.EndsWith("\""))
-                    {
-                        result.Add(value.Substring(1, value.Length - 2));
-                    }
-                    else
-                    {
-                        result.Add(value);
-                    }
-
-                }
-            }
-            else
-            {
-                result.Add(line);
             }
 
             return result;
