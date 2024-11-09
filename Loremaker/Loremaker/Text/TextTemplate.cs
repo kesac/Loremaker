@@ -1,257 +1,281 @@
-﻿using Syllabore;
+﻿using Archigen;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Loremaker.Text
 {
-    /// <summary>
-    /// A TextTemplate is specfically formatted string where
-    /// specific substrings can be substituted by <see cref="TextOutput"/>
-    /// generated from <see cref="ITextGenerator">ITextGenerators</see>,
-    /// especially those created by <see cref="TextEntityPool">TextEntities</see>
-    /// </summary>
-    public class TextTemplate : ITextGenerator
+    public class TextLine
     {
-        public string Template { get; set; }
+        public string Value { get; set; }
+        public string RequiredContext { get; set; }
 
-        // When a template is initantiated, only the placeholders for TextEntities are known.
-        // When a TextEntity is defined, the specified entity ID is checked with the list
-        // EntityPlaceholders before being stored in EntityDefinitions.
-        public HashSet<string> EntityPlaceholders { get; set; } 
-        public Dictionary<string, ITextGenerator> EntityDefinitions { get; set; }
-        
-        public List<string> MandatoryContextTags { get; set; } // Used by TextChain to generate context aware chains of text
-        public List<string> RejectedContextTags { get; set; } 
-
-        public bool EnableCapitalization { get; set; }
-
-        public TextTemplate(string template)
+        public TextLine(string value)
         {
-            this.Template = template;
-            this.EntityPlaceholders = new HashSet<string>();
-            this.EntityDefinitions = new Dictionary<string, ITextGenerator>();
-            this.MandatoryContextTags = new List<string>();
-            this.RejectedContextTags = new List<string>();
-
-            foreach (var m in Regex.Matches(template, @"({[^}]+})"))
-            {
-                var s = m.ToString();
-                var key = s.Substring(1, s.Length - 2);
-
-                if (this.EntityPlaceholders.Contains(key))
-                {
-                    throw new InvalidOperationException(string.Format("An entity with key '{0}' already exists.", key));
-                }
-                else
-                {
-                    this.EntityPlaceholders.Add(key);
-                }
-            }
-
+            Value = value;
+        }
+        public TextLine(string value, string requiredContext)
+        {
+            Value = value;
+            RequiredContext = requiredContext;
         }
 
-
-
-        /// <summary>
-        /// Defines a new <see cref="TextEntityPool"/> and adds it to this TextTemplate.
-        /// </summary>
-        public TextTemplate Define(string key, Func<TextEntityPool, TextEntityPool> configureEntity)
+        public bool HasRequiredContext()
         {
-            var e = configureEntity(new TextEntityPool());
-
-            if (!this.EntityPlaceholders.Contains(key))
-            {
-                throw new InvalidOperationException(string.Format("No entity with key '{0}' was defined through the TextGenerator constructor.", key));
-            }
-            else
-            {
-                this.EntityDefinitions[key] = e;
-            }
-
-            return this;
+            return RequiredContext != null;
         }
 
-        public TextTemplate Define(string key, ITextGenerator generator)
+        public override string ToString()
         {
-            if (!this.EntityPlaceholders.Contains(key))
-            {
-                throw new InvalidOperationException(string.Format("No entity with key '{0}' was defined through the TextGenerator constructor.", key));
-            }
-            else
-            {
-                this.EntityDefinitions[key] = generator;
-            }
-
-            return this;
+            return Value;
         }
 
-        public TextTemplate Define(string key, INameGenerator generator)
+    }
+
+    public class SimpleGenerator : IGenerator<string>
+    {
+        private Random _random;
+        public List<string> Values { get; set; }
+
+        public SimpleGenerator(List<string> values)
         {
-            this.Define(key, new TextEntity().UsingNameGenerator(generator));
-            return this;
-        }
-
-        /// <summary>
-        /// Convenience method for defining text substitutions if you don't
-        /// need to specify determiners, adjectives, context, etc. 
-        /// </summary>
-        public TextTemplate Define(string key, params string[] substitutions)
-        {
-            this.Define(key, x => x.As(substitutions));
-            return this;
-        }
-
-        public TextTemplate CapitalizeFirstWord()
-        {
-            this.EnableCapitalization = true;
-            return this;
-        }
-
-        public TextTemplate DoNotCapitalizeFirstWord()
-        {
-            this.EnableCapitalization = false;
-            return this;
-        }
-
-        /// <summary>
-        /// Adds context tags that represent this template's context requirements.
-        /// Context tags affect the return value of <c>MeetsContextRequirements()</c>
-        /// </summary>
-        public TextTemplate WhenContextHas(params string[] contextRequirements)
-        {
-            foreach(var c in contextRequirements)
-            {
-                this.MandatoryContextTags.Add(c.ToLower());
-            }
-            return this;
-        }
-
-        public TextTemplate AvoidWhenContextHas(params string[] rejectedContextRequirements)
-        {
-            foreach (var c in rejectedContextRequirements)
-            {
-                this.RejectedContextTags.Add(c.ToLower());
-            }
-            return this;
-        }
-
-        /// <summary>
-        /// Returns true if all the provided context tags are in the 
-        /// list of approved context tags and none are in the list of 
-        /// rejected context tags..
-        /// Context requirements are defined through <c>RequiredContext()</c>.
-        /// This method is used in <c>TextChains</c> where text that appears
-        /// earlier in a chain influences text added later to the chain.
-        /// </summary>
-        public bool IsFulfilledBy(List<string> contextTags)
-        {
-            if(contextTags.Count == 0) { return true; }
-
-            bool isFullfilled = true;
-            foreach(var tag in this.MandatoryContextTags)
-            {
-                if (!contextTags.Contains(tag.ToLower()))
-                {
-                    isFullfilled = false;
-                    break;
-                }
-            }
-
-            foreach (var tag in this.RejectedContextTags)
-            {
-                if (contextTags.Contains(tag.ToLower()))
-                {
-                    isFullfilled = false;
-                    break;
-                }
-            }
-
-            return isFullfilled;
+            _random = new Random();
+            Values = values;
         }
 
         public string Next()
         {
-            return this.NextOutput(null, null).Value;
+            return Values[_random.Next(Values.Count)];
         }
+    }
 
-        /// <summary>
-        /// Generates text from the template provided to the constructor.
-        /// Placeholders are replaced with TextEntities defined through
-        /// calls to <c>Define()</c>.
-        /// </summary>
-        public TextOutput NextOutput()
+    public class SubjectDto
+    {
+        [JsonPropertyName("determiners")]
+        public List<string> Determiners { get; set; }
+        [JsonPropertyName("adjectives")]
+        public List<string> Adjectives { get; set; }
+        [JsonPropertyName("values")]
+        public List<string> Values { get; set; }
+    }
+
+    public class SubjectGenerator : IGenerator<string>
+    {
+        private Random _random;
+        public SimpleGenerator Determiners { get; set; }
+        public SimpleGenerator Adjectives { get; set; }
+        public SimpleGenerator Values { get; set; }
+
+        public SubjectGenerator(List<string> values)
         {
-            return this.NextOutput(null, null);
+            _random = new Random();
+            Values = new SimpleGenerator(values);
         }
 
-
-
-        /// TODO this method doesn't need two for-loops
-        /// <summary>
-        /// This method is used by <c>TextChain</c>.
-        /// Identical to the parameterless <c>NextOutput()</c> except it
-        /// takes a Dictionary of TextEntities to supplement this template's
-        /// TextEntities (generation pulls from both pools of entities). This is useful
-        /// when "globally" defining TextEntities across multiple templates. 
-        /// This method also takes a Dictionary representing previously generated
-        /// values. This is useful when the first output of a TextEntity must be
-        /// used across multiple templates.
-        /// </summary>
-        /// 
-
-        public TextOutput NextOutput(Dictionary<string, ITextGenerator> supplementaryEntities, Dictionary<string, string> overrideValues)
+        public void SetDeterminers(List<string> determiners)
         {
-            var result = new StringBuilder(this.Template);
-            var output = new TextOutput();
-
-            foreach (var m in Regex.Matches(result.ToString(), @"({[^}]+})"))
-            {
-                var bracketedKey = m.ToString();
-                var key = bracketedKey.RemoveCurlyBrackets();
-
-                if (overrideValues != null && overrideValues.ContainsKey(key))
-                {
-                    result.Replace("{" + key + "}", overrideValues[key]);
-                    output.TextEntityOutput[key] = overrideValues[key];
-                }
-                else if (this.EntityDefinitions.ContainsKey(key))
-                {
-                    var e = this.EntityDefinitions[key].NextOutput();
-                    result.Replace("{" + key + "}", e.Value);
-                    output.Context.AddRange(e.Context);
-                    output.TextEntityOutput[key] = e.Value;
-                }
-                else if (supplementaryEntities.ContainsKey(key))
-                {
-                    var s = supplementaryEntities[key].NextOutput();
-                    result.Replace("{" + key + "}", s.Value);
-                    output.Context.AddRange(s.Context);
-                    output.TextEntityOutput[key] = s.Value;
-                }
-                
-
-            }
-
-            output.Value = result.ToString().Trim();
-
-            // Are there are context clues in the template?
-            if (output.Value.HasContextClues())
-            {
-                output.Context.AddRange(output.Value.GetContextClues());
-                output.Value = output.Value.RemoveSquareBrackets();
-            }
-
-            if (this.EnableCapitalization)
-            {
-                output.Value = output.Value.Substring(0, 1).ToUpper() + output.Value.Substring(1);
-            }
-
-            return output;
+            Determiners = new SimpleGenerator(determiners);
         }
 
+        public void SetAdjectives(List<string> adjectives)
+        {
+            Adjectives = new SimpleGenerator(adjectives);
+        }
+
+        public string Next()
+        {
+            var result = Values.Next();
+
+            if (Adjectives != null)
+            {
+                result = Adjectives.Next() + " " + result;
+            }
+
+            if (Determiners != null)
+            {
+                result = Determiners.Next() + " " + result;
+            }
+
+            return result;
+        }
+    }
+
+    public class TextTemplate : IGenerator<string>
+    {
+        public List<TextLine> Lines { get; set; }
+        public Dictionary<string, IGenerator<string>> Substitutions { get; set; }
+        public List<string> Required { get; set; }
+
+        public TextTemplate() 
+        {
+            Lines = new List<TextLine>();
+            Substitutions = new Dictionary<string, IGenerator<string>>();
+            Required = new List<string>();
+        }
+
+        public string Next()
+        {
+            foreach (var requirement in Required)
+            {
+                if (!Substitutions.ContainsKey(requirement))
+                {
+                    throw new InvalidOperationException("Cannot generate text for this template without substitution '" + requirement + "' defined");
+                }
+            }
+
+            var finalizedSubstitutions = new Dictionary<string, string>();
+
+            foreach (var substitution in Substitutions)
+            {
+                finalizedSubstitutions[substitution.Key] = substitution.Value.Next();
+            }
+
+            var result = new StringBuilder();
+
+            foreach (var line in Lines)
+            {
+                if (!line.HasRequiredContext() 
+                    || (line.HasRequiredContext() && result.ToString().Contains(line.RequiredContext)))
+                {
+                    var processedLine = line.Value;
+
+                    foreach (var finalizedSubstitution in finalizedSubstitutions)
+                    {
+                        if (processedLine.Contains("$" + finalizedSubstitution.Key))
+                        {
+                            processedLine = processedLine.Replace("$" + finalizedSubstitution.Key, finalizedSubstitution.Value);
+                        }
+                    }
+
+                    result.AppendLine(processedLine);
+
+                }
+            }
+
+            return result.ToString();
+        }
+
+        public static TextTemplate LoadFromFile(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException("No file path was specified.");
+            }
+
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException(path + " does not exist.");
+            }
+
+            var result = new TextTemplate();
+
+            var allText = File.ReadAllText(path);
+
+            // Regex breakdown:
+            //    ^\s*        Match the start of the line, followed by any amount of whitespace
+            //    (add|when)  Match either "add" or "when", case insensitive
+            //    .*          Match all remaining characters on the line, if there are any
+            var rawLines = Regex.Matches(allText, @"^\s*(add|when).*", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            foreach (Match rawLine in rawLines)
+            {
+                var tokens = GetTokens(rawLine.Value.Trim());
+
+                // Format: add "text"
+                if (tokens.Count >= 2 
+                    && String.Equals("add", tokens[0], StringComparison.OrdinalIgnoreCase))
+                {
+                    result.Lines.Add(new TextLine(tokens[1]));
+                }
+                // Format: when "condition" add "text"
+                else if (tokens.Count >= 4 
+                    && String.Equals("when", tokens[0], StringComparison.OrdinalIgnoreCase)
+                    && String.Equals("add", tokens[2], StringComparison.OrdinalIgnoreCase))
+                {
+                    result.Lines.Add(new TextLine(tokens[3], tokens[1]));
+                }
+            }
+
+            // Regex breakdown:
+            //    ^\s*                 Match the start of the line, followed by any amount of whitespace
+            //    \$[a-zA-Z0-9_]+      Match an alphanumeric variable name that starts with a dollar sign
+            //    \s*=\s*              Match an equals sign, surrounded by any amount of whitespace
+            //    \[.*?\]\s*$          After the equals sign, match everything between opening and closing brackets. The closing bracket must end a line
+            //    |\{.*?\}\s*$         Or match anything between opening and closing curly brackets. The closing brackets must end a line
+            //    |@[a-zA-Z0-9_]+\s*$  Or match an "@" sign followed by any alphanumeric characters
+            var rawSubstitutions = Regex.Matches(
+                allText,
+                @"^\s*\$[a-zA-Z0-9_]+\s*=\s*(\[.*?\]\s*$|\{.*?\}\s*$|@[a-zA-Z0-9_]+?\s*$)",
+                RegexOptions.Multiline | RegexOptions.Singleline
+            );
+
+            foreach (Match rawSubstitution in rawSubstitutions)
+            {
+                var tokens = Regex.Split(rawSubstitution.Value, @"\s*=\s*", RegexOptions.None);
+
+                var key = tokens[0].Trim().Substring(1); // removes the leading "$"
+
+                if (tokens[1].Trim().StartsWith("["))
+                {
+                    var data = JsonSerializer.Deserialize<List<string>>(tokens[1]);
+                    result.Substitutions[key] = new SimpleGenerator(data);
+                }
+                else if (tokens[1].Trim().StartsWith("{"))
+                {
+                    var data = JsonSerializer.Deserialize<SubjectDto>(tokens[1]);
+                    var generator = new SubjectGenerator(data.Values);
+                    generator.SetDeterminers(data.Determiners);
+                    generator.SetAdjectives(data.Adjectives);
+                    result.Substitutions[key] = generator;
+                }
+                else if (string.Equals(tokens[1].Trim(), "@input", StringComparison.OrdinalIgnoreCase))
+                { 
+                    result.Required.Add(key);
+                }
+
+            }
+
+            return result;
+        }
+
+        private static List<string> GetTokens(string line)
+        {
+            var result = new List<string>();
+
+            // Using regex, split the line into individual words, but ensure
+            // everything between quotes is treated as a single word.
+            var matches = Regex.Matches(line, "\"[^\"]*\"|[^ ]+");
+
+            if (matches.Count > 0)
+            {
+                foreach (var match in matches)
+                {
+                    var value = match.ToString();
+
+                    if(value.StartsWith("\"") && value.EndsWith("\""))
+                    {
+                        result.Add(value.Substring(1, value.Length - 2));
+                    }
+                    else
+                    {
+                        result.Add(value);
+                    }
+
+                }
+            }
+            else
+            {
+                result.Add(line);
+            }
+
+            return result;
+        }
 
     }
 }
