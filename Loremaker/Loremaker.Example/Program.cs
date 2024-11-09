@@ -2,7 +2,6 @@
 using Loremaker.Maps;
 using Loremaker.Names;
 using Loremaker.Text;
-using Markov;
 using Syllabore;
 using System;
 using System.Collections.Generic;
@@ -16,15 +15,12 @@ namespace Loremaker.Example
     {
         public static void Main(string[] args)
         {
-            useGibberishGenerator();
-
-            Console.ReadLine();
+            UseTextTemplate();
+            UseGibberishGenerator();
+            UseWorldGenerator();
 
             /*
-            {
-                // var generator = new WorldGenerator();
-                // var world = generator.Next();
-            }
+
             {
                 // Basic substitution
                 var text = new TextTemplateOld("{subject} {verb} to {place}.")
@@ -205,11 +201,58 @@ namespace Loremaker.Example
                 
             }
 
-            Console.ReadLine();
         /**/
+
+
+            Console.ReadLine();
         }
 
-        private static void useGibberishGenerator()
+        private static void UseTextTemplate()
+        {
+            var names = new NameGenerator();
+            var template = new TextTemplate();
+
+            template.Add("$person $raised in $birthplace near $place.");
+            template.Add("Growing up, they were always drawn to the vastness of the ocean.", "Mountain");
+            template.Add("They became a sailor at the age of $age.", "Mountain");
+            template.Add("Later, in their 40s, they returned to $place and became the mayor.");
+
+            template.Substitute("person", names);
+            template.Substitute("raised", "grew up", "was raised", "was brought up");
+
+            var subjects = new string[] { "village", "town" };
+            var adjectives = new List<string> { "modest", "poor", "busy", "remote", "trade", "coastal", "underground" };
+            var determiners = new[] { "a" };
+
+            var birthPlaces = new SubjectRandomizer(subjects);
+            birthPlaces.SetAdjectives(adjectives);
+            birthPlaces.SetDeterminers(determiners);
+
+            template.Substitute("birthplace", birthPlaces);
+
+            var placeNames = new string[] {
+                "$placeName River",
+                "the Mountains of $placeName",
+                "the $placeName Mountain Range",
+                "$placeName Forest",
+                "the Ruins of $placeName",
+                "the $placeName Sea",
+                "$placeName Lake",
+                "the $placeName Plains"
+            };
+
+            template.Substitute("place", placeNames);
+            template.Substitute("placeName", names);
+
+            template.Substitute("age", "20", "21", "22");
+
+            for (int i = 0; i < 3; i++)
+            {
+                Console.WriteLine(template.Next());
+            }
+        }
+
+        private static void UseGibberishGenerator()
         {
             Console.WriteLine();
             var gibberish = new GibberishGenerator();
@@ -217,7 +260,13 @@ namespace Loremaker.Example
             {
                 Console.WriteLine(gibberish.Next());
             }
-        }  
+        }
 
+        private static void UseWorldGenerator()
+        {
+            var generator = new WorldGenerator();
+            var world = generator.Next();
+            Console.WriteLine("Created world " + world.Name + " (" + world.Description + ")");
+        }
     }
 }
