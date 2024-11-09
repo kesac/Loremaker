@@ -164,28 +164,35 @@ namespace Loremaker.Example
             Console.WriteLine();
 
             {
-                var g = new NameGenerator()
+                
+
+
+                if(File.Exists("sample1.txt") && File.Exists("sample2.txt"))
+                {
+                    var g = new NameGenerator()
                         .UsingSyllables(new SyllableSet(4, 16, 4)
                             .WithGenerator(x => x
                                 .WithVowels("aeiou")
                                 .WithLeadingConsonants("bcdfghijklmnprstvwyz")))
                         .UsingSyllableCount(3, 4);
 
-                var t = new MarkovTextGenerator()
+                    var t = new MarkovTextGenerator()
                         .FromCorpus("sample.txt")
                         .FromCorpus("sample2.txt")
                         // .UsingDepth(2)             // Default is 2
                         // .UsingDelimiter(' ')       // Default is a single space character ' '
                         .BeginTextWith("a")      // Try to start all generated text with this substring
-                        // .EndTextWith("with")       // There are nuances to this
+                                                 // .EndTextWith("with")       // There are nuances to this
                         .LoadCorpus();                // If not called, corpuses will be implicitly loaded on first call to Next()
 
-                for(int i = 0; i < 10; i++)
-                {
-                    Console.WriteLine(g.Next().ToUpper());
-                    Console.WriteLine(" " + t.Next());
-                    Console.WriteLine();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Console.WriteLine(g.Next().ToUpper());
+                        Console.WriteLine(" " + t.Next());
+                        Console.WriteLine();
+                    }
                 }
+
 
             }
 
