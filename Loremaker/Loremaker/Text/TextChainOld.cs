@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Loremaker.Text
 {
+    /*
     public class TextChainOld : ITextGeneratorOld
     {
         public List<TextTemplateOld> Templates { get; set; }
@@ -102,5 +103,7 @@ namespace Loremaker.Text
             // TODO: Should contain contexts?
             return new TextOutputOld(this.Next());
         }
+
     }
+    /**/
 }
