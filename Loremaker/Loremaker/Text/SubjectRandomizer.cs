@@ -29,12 +29,12 @@ namespace Loremaker.Text
         /// Creates a new <see cref="SubjectRandomizer"/> that
         /// will return subjects from the specified list.
         /// </summary>
-        public SubjectRandomizer(List<string> values) : base(values) { }
+        public SubjectRandomizer(IEnumerable<string> values) : base(values) { }
 
         /// <summary>
         /// Sets the determiners that the generator will use.
         /// </summary>
-        public void SetDeterminers(List<string> determiners)
+        public void SetDeterminers(IEnumerable<string> determiners)
         {
             Determiners = new Randomizer<string>(determiners);
         }
@@ -42,7 +42,7 @@ namespace Loremaker.Text
         /// <summary>
         /// Sets the adjectives that the generator will use.
         /// </summary>
-        public void SetAdjectives(List<string> adjectives)
+        public void SetAdjectives(IEnumerable<string> adjectives)
         {
             Adjectives = new Randomizer<string>(adjectives);
         }

@@ -23,10 +23,10 @@ namespace Loremaker.Text
         /// Creates a new <see cref="Randomizer{T}"/>
         /// that will return random values from the specified list.
         /// </summary>
-        public Randomizer(List<T> values)
+        public Randomizer(IEnumerable<T> values)
         {
             _random = new Random();
-            Values = values;
+            Values = new List<T>(values);
         }
 
         /// <summary>
