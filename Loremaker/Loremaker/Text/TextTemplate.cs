@@ -146,7 +146,7 @@ namespace Loremaker.Text
 
             foreach (var substitution in Substitutions)
             {
-                finalizedSubstitutions[substitution.Key] = substitution.Value.Next();
+                finalizedSubstitutions[substitution.Key] = substitution.Value.Next().Trim();
             }
 
             var result = new StringBuilder();
@@ -156,7 +156,7 @@ namespace Loremaker.Text
                 if (!line.HasRequiredContext() 
                     || (line.HasRequiredContext() && result.ToString().Contains(line.RequiredContext)))
                 {
-                    var processedLine = line.Value;
+                    var processedLine = line.Value.Trim();
 
                     foreach (var finalizedSubstitution in finalizedSubstitutions)
                     {
@@ -166,12 +166,12 @@ namespace Loremaker.Text
                         }
                     }
 
-                    result.AppendLine(processedLine);
+                    result.Append(" " + processedLine);
 
                 }
             }
 
-            return result.ToString();
+            return result.ToString().Trim();
         }
 
         /// <summary>

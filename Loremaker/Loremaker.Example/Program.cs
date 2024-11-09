@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 
 namespace Loremaker.Example
@@ -246,27 +247,31 @@ namespace Loremaker.Example
 
             template.Substitute("age", "20", "21", "22");
 
-            for (int i = 0; i < 3; i++)
-            {
-                Console.WriteLine(template.Next());
-            }
+            Console.WriteLine(template.Next());
+            
         }
 
         private static void UseGibberishGenerator()
         {
             Console.WriteLine();
+
+            var result = new StringBuilder();
             var gibberish = new GibberishGenerator();
+
             for (int i = 0; i < 10; i++)
             {
-                Console.WriteLine(gibberish.Next());
+                result.Append(" " + gibberish.Next());
             }
+
+            Console.WriteLine(result.ToString().Trim());
         }
 
         private static void UseWorldGenerator()
         {
+            Console.WriteLine();
             var generator = new WorldGenerator();
             var world = generator.Next();
-            Console.WriteLine("Created world " + world.Name + " (" + world.Description + ")");
+            Console.WriteLine("World: " + world.Name + "\nDescription: " + world.Description);
         }
     }
 }
