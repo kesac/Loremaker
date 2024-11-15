@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Syllabore" Version="2.3.3" />
+    <PackageReference Include="Archigen" Version="1.3.0" />
+    <PackageReference Include="Syllabore" Version="2.3.4" />
   </ItemGroup>
 
   <ItemGroup>
