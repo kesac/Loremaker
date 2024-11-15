@@ -103,7 +103,7 @@ namespace Loremaker.Text
         /// </summary>
         public void Substitute(string key, List<string> values)
         {
-            this.Substitutions[key] = new Randomizer<string>(values);
+            this.Substitutions[key] = new RandomSelector<string>(values);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Loremaker.Text
         /// </summary>
         public void Substitute(string key, params string[] values)
         {
-            this.Substitutions[key] = new Randomizer<string>(values);
+            this.Substitutions[key] = new RandomSelector<string>(values);
         }
 
 
@@ -231,7 +231,7 @@ namespace Loremaker.Text
                 if (tokens[1].Trim().StartsWith("["))
                 {
                     var data = JsonSerializer.Deserialize<List<string>>(tokens[1]);
-                    result.Substitutions[key] = new Randomizer<string>(data);
+                    result.Substitutions[key] = new RandomSelector<string>(data);
                 }
                 else if (tokens[1].Trim().StartsWith("{"))
                 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Archigen;
+using System.Collections.Generic;
 
 namespace Loremaker.Text
 {
@@ -6,8 +7,15 @@ namespace Loremaker.Text
     /// A generator that returns random 
     /// subjects with leading adjectives and determiners.
     /// </summary>
-    public class SubjectRandomizer : Randomizer<string>
+    public class SubjectRandomizer : IGenerator<string>
     {
+
+        /// <summary>
+        /// The list of subjects that the generator will
+        /// return in output during calls to <see cref="Next()"/>.
+        /// </summary>
+        public RandomSelector<string> Values { get; set; }
+
         /// <summary>
         /// The list of determiners that the generator will
         /// include in the output during calls to <see cref="Next()"/>.
@@ -15,7 +23,7 @@ namespace Loremaker.Text
         /// adjectives and the subject. All values are equally likely
         /// to be selected.
         /// </summary>
-        public Randomizer<string> Determiners { get; set; }
+        public RandomSelector<string> Determiners { get; set; }
 
         /// <summary>
         /// The list of adjectives that the generator will
@@ -23,20 +31,23 @@ namespace Loremaker.Text
         /// The adjectives will appear before the subject, but after
         /// determiners. All values are equally likely to be selected.
         /// </summary>
-        public Randomizer<string> Adjectives { get; set; }
+        public RandomSelector<string> Adjectives { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="SubjectRandomizer"/> that
         /// will return subjects from the specified list.
         /// </summary>
-        public SubjectRandomizer(IEnumerable<string> values) : base(values) { }
+        public SubjectRandomizer(IEnumerable<string> values)
+        {
+            Values = new RandomSelector<string>(values);
+        }
 
         /// <summary>
         /// Sets the determiners that the generator will use.
         /// </summary>
         public void SetDeterminers(IEnumerable<string> determiners)
         {
-            Determiners = new Randomizer<string>(determiners);
+            Determiners = new RandomSelector<string>(determiners);
         }
 
         /// <summary>
@@ -44,15 +55,15 @@ namespace Loremaker.Text
         /// </summary>
         public void SetAdjectives(IEnumerable<string> adjectives)
         {
-            Adjectives = new Randomizer<string>(adjectives);
+            Adjectives = new RandomSelector<string>(adjectives);
         }
 
         /// <summary>
         /// Generates a random subject in the format "[determiner] [adjective] [subject]".
         /// </summary>
-        public override string Next()
+        public string Next()
         {
-            var result = base.Next();
+            var result = Values.Next();
 
             if (Adjectives != null && Adjectives.Values.Count > 0)
             {
