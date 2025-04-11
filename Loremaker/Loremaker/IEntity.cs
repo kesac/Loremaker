@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Loremaker
 {
-    public interface Identifiable
+    public interface IEntity
     {
         uint Id { get; }
     }

@@ -8,7 +8,7 @@ namespace Loremaker
     /// Represents any entity with a locatable center
     /// in 2D space.
     /// </summary>
-    public interface Locatable
+    public interface ILocatable
     {
         /// <summary>
         /// The X coordinate representing the center of
