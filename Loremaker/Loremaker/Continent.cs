@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Loremaker
 {
-    public class Landmass : Identifiable, Locatable
+    public class Continent : IEntity, ILocatable
     {
         public uint Id { get; set; }
         public int X { get; set; }
@@ -26,7 +26,7 @@ namespace Loremaker
             }
         }
 
-        public Landmass()
+        public Continent()
         {
             this.MapCellIds = new List<uint>();
             this.MapCells = new List<MapCell>();

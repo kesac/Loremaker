@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Loremaker
 {
-    public class Territory : Identifiable, Locatable
+    public class Region : IEntity, ILocatable
     {
         public uint Id { get; set; }
         public int X { get; set; }
@@ -17,7 +17,7 @@ namespace Loremaker
         [JsonIgnore]
         public virtual List<MapCell> MapCells { get; set; }
 
-        public Territory()
+        public Region()
         {
             this.MapCellIds = new HashSet<uint>();
             this.MapCells = new List<MapCell>();
