@@ -12,7 +12,7 @@ namespace Loremaker
         Coast
     }
 
-    public class MapCell : Identifiable, Locatable
+    public class MapCell : IEntity, ILocatable
     {
         public uint Id { get; set; }
         public int X { get; set; }

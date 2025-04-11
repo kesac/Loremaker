@@ -20,7 +20,7 @@ namespace Loremaker.Maps
         }
 
 
-        public static double Distance(this Locatable d1, Locatable d2)
+        public static double Distance(this ILocatable d1, ILocatable d2)
         {
             float x = d1.X - d2.X;
             float y = d1.Y - d2.Y;
