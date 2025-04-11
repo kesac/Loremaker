@@ -9,6 +9,6 @@ namespace Loremaker.Names
         string NextGovernmentName();
         string NextReligiousOrderName();
         string NextGuildName();
-        string NextGroupName();
+        string NextFactionName();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Archigen;
 using Syllabore;
+using Syllabore.Fluent;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -31,18 +32,14 @@ namespace Loremaker.Text
 
         public GibberishGenerator()
         {
-            _generator = new SyllableSet(8, 32, 4)
-                .WithGenerator(x => x
-                    .WithVowels("ae").Weight(4)
-                    .WithVowels("i").Weight(2)
-                    .WithVowels("ou").Weight(1)
-                    .WithLeadingConsonants("hlmnstr").Weight(4)
-                    .WithLeadingConsonants("dpc").Weight(2)
-                    .WithLeadingConsonants("bgv").Weight(1));
+            var syllables = new SyllableGenerator()
+                .Add(SymbolPosition.First, "strlmnbcd")
+                .Add(SymbolPosition.Middle, "aeio");
+
+            _generator = new SyllableSet(syllables, 16);
 
             this.SentenceLength = 1;
-
-            this.Conjunction = _generator.NextStartingSyllable().ToLower();
+            this.Conjunction = _generator.Next().ToLower();
         }
 
         /// <summary>
@@ -82,7 +79,7 @@ namespace Loremaker.Text
                 var syllableLength = Chance.Between(2, 4);
                 for (int j = 0; j < syllableLength; j++)
                 {
-                    result.Append(_generator.NextSyllable());
+                    result.Append(_generator.Next());
                 }
 
                 if (Chance.Roll(0.05) && i < wordLength - 1)
