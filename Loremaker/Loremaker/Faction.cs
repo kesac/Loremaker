@@ -64,25 +64,6 @@ namespace Loremaker
             this.Type = "faction";
         }
 
-        public static string GenerateFactionDecoratedName(string name)
-        {
-            var templates = new string[]
-            {
-               "{name} Clan",
-               "the {name} Tribe",
-               "the {name} House",
-               "House {name}",
-               "the {name} Guild",
-               "the {name} Order",
-               "Order of {name}",
-               "the {name} League",
-               "the {name} Kingdom",
-               "the Kingdom of {name}",
-            };
 
-            var selector = new RandomSelector<string>(templates);
-            return selector.Next().Replace("{name}", name);
-
-        }
     }
 }
