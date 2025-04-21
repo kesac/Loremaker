@@ -7,10 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archigen" Version="1.3.0" />
+    <None Remove="Completions\historian-01.prompt" />
+    <None Remove="Data\Colors.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Archigen" Version="1.3.1" />
     <PackageReference Include="Delaunator" Version="1.0.11" />
-    <PackageReference Include="Syllabore" Version="2.3.4" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="Stateless" Version="5.17.0" />
+    <PackageReference Include="Syllabore" Version="3.0.1-alpha" />
+    <PackageReference Include="System.Text.Json" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Completions\Biographer-01.prompt" />
+    <EmbeddedResource Include="Completions\Historian-01.prompt" />
+    <EmbeddedResource Include="Data\Colors.json" />
   </ItemGroup>
 
 </Project>

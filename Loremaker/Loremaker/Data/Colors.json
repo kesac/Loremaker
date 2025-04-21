@@ -1,0 +1,97 @@
+﻿[
+	{
+		"name": "red",
+		"variations": [
+			"rose",
+			"maroon",
+			"crimson",
+			"scarlet",
+			"ruby",
+			"vermilion"
+		]
+	},
+	{
+		"name": "green",
+		"variations": [
+			"emerald",
+			"jade",
+			"sage",
+			"olive",
+			"lime"
+		]
+	},
+	{
+		"name": "blue",
+		"variations": [
+			"azure",
+			"cobalt",
+			"cerulean",
+			"turquoise",
+			"indigo",
+			"aqua"
+		]
+	},
+	{
+		"name": "yellow",
+		"variations": [
+			"amber",
+			"gold",
+			"honey",
+			"saffron",
+			"flaxen",
+			"daffodil"
+		]
+	},
+	{
+		"name": "orange",
+		"variations": [
+			"tangerine",
+			"amber",
+			"coral"
+		]
+	},
+	{
+		"name": "indigo",
+		"variations": [
+			"midnight",
+			"royal",
+			"violet-blue",
+			"ultramarine",
+			"navy",
+			"sapphire",
+			"twilight",
+			"blueberry"
+		]
+	},
+	{
+		"name": "purple",
+		"variations": [
+			"lavender",
+			"violet",
+			"plum",
+			"lilac",
+			"amethyst",
+			"mauve",
+			"magenta",
+			"orchid"
+		]
+	},
+	{
+		"name": "black",
+		"variations": [
+			"onyx",
+			"charcoal",
+			"sable"
+		]
+	},
+	{
+		"name": "white",
+		"variations": [
+			"ivory",
+			"alabaster",
+			"pearl",
+			"cream",
+			"chalk"
+		]
+	}
+]
