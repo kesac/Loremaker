@@ -45,5 +45,15 @@ namespace Loremaker
             get => this.HasProperty("faction-id") ? this["faction-id"] : null;
             set => this["faction-id"] = value;
         }
+
+        /// <summary>
+        /// Gets or sets the age of this person.
+        /// </summary>
+        [JsonIgnore]
+        public int Age
+        {
+            get => this.HasProperty("age") ? this.GetProperty<int>("age") : 0;
+            set => this["age"] = value.ToString();
+        }
     }
 }
