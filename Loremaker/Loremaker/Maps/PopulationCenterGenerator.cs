@@ -6,50 +6,56 @@ using System.Text;
 
 namespace Loremaker.Maps
 {
-    public class PopulationCenterGenerator : IGenerator<List<PopulationCenter>>
+    public class PopulationCenterGenerator : IGenerator<List<City>>
     {
-        private List<Landmass> Landmasses;
+        private List<Continent> Landmasses;
         private IGenerator<string> NameGenerator;
 
-        public PopulationCenterGenerator(List<Landmass> landmasses, IGenerator<string> nameGenerator)
+        public PopulationCenterGenerator(List<Continent> landmasses, IGenerator<string> nameGenerator)
         {
-            this.Landmasses = new List<Landmass>();
+            this.Landmasses = new List<Continent>();
             this.Landmasses.AddRange(landmasses);
             this.NameGenerator = nameGenerator;
         }
 
-        private List<PopulationCenter> NextPopulation(Func<Landmass,bool> landmassCondition, Func<Landmass,int> maxSize, Func<MapCell,bool> mapCellCondition)
+        private List<City> NextPopulation(Func<Continent,bool> landmassCondition, Func<Continent,int> maxSize, Func<MapCell,bool> mapCellCondition)
         {
-            var result = new List<PopulationCenter>();
+            var result = new List<City>();
 
             var offlimits = new List<uint>();
             var maxTries = 100;
 
             foreach (var landmass in this.Landmasses.Where(x => landmassCondition(x)))
             {
-                var coasts = landmass.MapCells.Where(x => mapCellCondition(x)).ToList();
+                var targetCells = landmass.MapCells.Where(x => mapCellCondition(x)).ToList();
+                
+                if(targetCells.Count == 0)
+                {
+                    targetCells = landmass.MapCells.Where(x => x.IsLand).ToList();
+                }
+                
                 var pops = maxSize(landmass);
 
                 for (int i = 0; i < pops; i++)
                 {
-                    var homecell = coasts.GetRandom();
+                    var homecell = targetCells.GetRandom();
                     var tries = 1;
 
                     while (offlimits.Contains(homecell.Id) && tries < maxTries)
                     {
-                        homecell = coasts.GetRandom();
+                        homecell = targetCells.GetRandom();
                         tries++;
                     }
 
                     if (tries >= maxTries) continue;
 
                     // ID of PopulationCenters are done inside Next()
-                    var pc = new PopulationCenter()
+                    var pc = new City()
                     {
                         MapCell = homecell,
                         MapCellId = homecell.Id,
                         Name = this.NameGenerator.Next(),
-                        Type = PopulationCenterType.Town,
+                        Type = CityType.Town,
                         Landmass = landmass, // backreference
                     };
 
@@ -65,9 +71,9 @@ namespace Loremaker.Maps
         }
 
         // TODO: Simplify
-        public List<PopulationCenter> Next()
+        public List<City> Next()
         {
-            var result = new List<PopulationCenter>();
+            var result = new List<City>();
 
             var coastalPopulations = this.NextPopulation(
                     landmass => landmass.Size > 2,

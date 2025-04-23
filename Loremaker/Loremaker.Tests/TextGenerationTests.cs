@@ -1,6 +1,8 @@
 using Loremaker.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Syllabore;
+using System;
+using System.Diagnostics;
 
 namespace Loremaker.Tests
 {
@@ -10,33 +12,44 @@ namespace Loremaker.Tests
         [TestMethod]
         public void TextEntity_NoValueGeneratesBlankString()
         {
-            var e = new TextEntity();
+            var e = new TextTemplate();
             Assert.IsTrue(e.Next() == string.Empty);
         }
 
         [TestMethod]
         public void TextEntity_ValuePropertyAppearsInOutput()
         {
-            var e = new TextEntity("planet");
-            Assert.IsTrue(e.Next() == "planet");
+            var template = new TextTemplate();
+            template.Add("planet");
+
+            var result = template.Next();
+
+            Assert.IsTrue(result == "planet");
         }
 
         [TestMethod]
         public void TextEntity_AdjectivesAppearInOutput()
         {
 
-            string[] adjectives = new string[] { "large", "red", "fragile" };
-            bool[] adjectiveAppeared = new bool[adjectives.Length];
+            var planetNames = new string[] { "Elnea", "Setaphor Prime", "Gestadomeia" };
+            var planetAdjectives = new string[] { "green", "bright blue" };
+            bool[] adjectiveAppeared = new bool[planetAdjectives.Length];
 
-            var e = new TextEntity("planet").UsingAdjectives(adjectives);
 
-            for(int i = 0; i < 100; i++)
+            var planetRandomizer = new SubjectRandomizer(planetNames);
+            planetRandomizer.SetAdjectives(planetAdjectives);
+
+            var e = new TextTemplate();
+            e.Add("$planet is populated by a million people.");
+            e.Substitute("planet", planetRandomizer);
+
+            for (int i = 0; i < 100; i++)
             {
                 var output = e.Next();
 
                 for (int j = 0; j < adjectiveAppeared.Length; j++)
                 {
-                    if(output.Contains(adjectives[j]))
+                    if(output.Contains(planetAdjectives[j]))
                     {
                         adjectiveAppeared[j] = true;
                     }
@@ -53,11 +66,16 @@ namespace Loremaker.Tests
         [TestMethod]
         public void TextEntity_DeterminersAppearInOutput()
         {
+            var planetNames = new string[] { "Elnea", "Setaphor Prime", "Gestadomeia" };
+            var planetDeterminers = new string[] { "the" };
+            bool[] determinersAppeared = new bool[planetDeterminers.Length];
 
-            string[] determiners = new string[] { "a", "the", "one" };
-            bool[] determinersAppeared = new bool[determiners.Length];
+            var planetRandomizer = new SubjectRandomizer(planetNames);
+            planetRandomizer.SetDeterminers(planetDeterminers);
 
-            var e = new TextEntity("planet").UsingDeterminers(determiners);
+            var e = new TextTemplate();
+            e.Add("$planet is populated by a million people.");
+            e.Substitute("planet", planetRandomizer);
 
             for (int i = 0; i < 100; i++)
             {
@@ -65,7 +83,7 @@ namespace Loremaker.Tests
 
                 for (int j = 0; j < determinersAppeared.Length; j++)
                 {
-                    if (output.Contains(determiners[j]))
+                    if (output.Contains(planetDeterminers[j]))
                     {
                         determinersAppeared[j] = true;
                     }
@@ -83,12 +101,11 @@ namespace Loremaker.Tests
         public void TextEntity_NamesAppearInOutput()
         {
 
-            var g = new NameGenerator()
-                    .UsingProvider(x => x
-                        .WithVowels("ae")
-                        .WithLeadingConsonants("str"));
+            var g = new NameGenerator("ae", "str");
 
-            var e = new TextEntity("planet").UsingNameGenerator(g);
+            var e = new TextTemplate();
+            e.Add("$planet");
+            e.Substitute("planet", g);
 
             for (int i = 0; i < 100; i++)
             {
@@ -96,56 +113,6 @@ namespace Loremaker.Tests
                 Assert.IsTrue(output.Replace("planet", string.Empty).Length > 0);
             }
 
-        }
-
-        [TestMethod]
-        public void TextEntityPool_Placeholder()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
-        public void TextTemplate_BasicSubstitutionsAppearInOutput()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
-        public void TextTemplate_ITextGeneratorSubstitutionsAppearInOutput()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
-        public void TextTemplate_INameGeneratorSubstitutionsAppearInOutput()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
-        public void TextTemplate_FirstLetterCanBeCapitlized()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
-        public void TextTemplate_ContextTagsAppearInTextOutputResult()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
-        public void TextTemplate_ContextTagsCanBeValidated()
-        {
-            Assert.IsTrue(false);
-        }
-
-
-
-        [TestMethod]
-        public void TextChain_Placeholder()
-        {
-            Assert.IsTrue(false);
         }
 
     }

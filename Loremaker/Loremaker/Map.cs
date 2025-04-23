@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Loremaker
 {
     // Does not implement Identifiable because
-    // Worlds can currently only have one map.
+    // Worlds can currently only have one map at the moment.
     public class Map
     {
         public int Width { get; set; }

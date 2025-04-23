@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Loremaker.Maps
 {
-    public class TerritoryGenerator : IGenerator<List<Territory>>
+    public class TerritoryGenerator : IGenerator<List<Region>>
     {
 
         private World World;
@@ -29,15 +29,15 @@ namespace Loremaker.Maps
         // For landmasses with a certain size, subdivide into smaller territories using
         //   similar method of growth as last algorithm
 
-        public List<Territory> Next()
+        public List<Region> Next()
         {
-            var result = new List<Territory>();
+            var result = new List<Region>();
 
             // Each landmass of MinimumLandmassSize or more is automatically its own territory, at
             // least initially before any subdivision occurs
-            foreach (var landmass in this.World.Landmasses.Values.Where(x => x.Size >= this.MinimumTerritorySize))
+            foreach (var landmass in this.World.Continents.Values.Where(x => x.Size >= this.MinimumTerritorySize))
             {
-                var territory = new Territory();
+                var territory = new Region();
 
                 territory.Name = this.TerritoryNameGenerator.Next();
                 territory.MapCellIds.AddRange(landmass.MapCellIds);
@@ -66,7 +66,7 @@ namespace Loremaker.Maps
             // Each landmass of size under 3 is assigned to the closest territory
             // Note that if there aren't any landmasses of size 3 or greater this will
             // result in territory-less islands
-            foreach (var landmass in this.World.Landmasses.Values.Where(x => x.Size < this.MinimumTerritorySize))
+            foreach (var landmass in this.World.Continents.Values.Where(x => x.Size < this.MinimumTerritorySize))
             {
                 var closestTerritory = result.FirstOrDefault();
 
@@ -102,7 +102,7 @@ namespace Loremaker.Maps
             return result;
         }
 
-        private Territory[] Subdivide(Territory original, int divisions = 2)
+        private Region[] Subdivide(Region original, int divisions = 2)
         {
 
             if(original.MapCells.Count < divisions)
@@ -113,7 +113,7 @@ namespace Loremaker.Maps
             var unclaimed = new List<uint>(); // For RemoveRandom()
             unclaimed.AddRange(original.MapCellIds);
 
-            var territories = Enumerable.Range(0, divisions).Select(_ => new Territory()).ToArray();
+            var territories = Enumerable.Range(0, divisions).Select(_ => new Region()).ToArray();
             var adjacencies = Enumerable.Range(0, divisions).Select(_ => new List<uint>()).ToArray();
 
             for (int i = 0; i < divisions; i++)

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Syllabore" Version="2.2.1" />
+    <PackageReference Include="Delaunator" Version="1.0.11" />
   </ItemGroup>
 
   <ItemGroup>

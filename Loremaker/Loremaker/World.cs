@@ -6,31 +6,31 @@ using System.Text.Json;
 
 namespace Loremaker
 {
-    public class World : Identifiable
+    public class World : IEntity
     {
         public uint Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public Map Map { get; set; }
-        public Dictionary<uint, Landmass> Landmasses { get; set; }
-        public Dictionary<uint, PopulationCenter> PopulationCenters { get; set; }
-        public Dictionary<uint, Territory> Territories { get; set; }
+        public Dictionary<uint, Continent> Continents { get; set; }
+        public Dictionary<uint, City> Cities { get; set; }
+        public Dictionary<uint, Region> Regions { get; set; }
 
         public World()
         {
-            this.Landmasses = new Dictionary<uint, Landmass>();
-            this.PopulationCenters = new Dictionary<uint, PopulationCenter>();
-            this.Territories = new Dictionary<uint, Territory>();
+            this.Continents = new Dictionary<uint, Continent>();
+            this.Cities = new Dictionary<uint, City>();
+            this.Regions = new Dictionary<uint, Region>();
         }
 
-        private MapCell FindMapCell(PopulationCenter p)
+        private MapCell FindMapCell(City p)
         {
             return this.Map.MapCells[p.MapCellId];
         }
 
-        private Landmass FindLandmass(PopulationCenter p)
+        private Continent FindLandmass(City p)
         {
-            foreach(var landmass in Landmasses.Values)
+            foreach(var landmass in Continents.Values)
             {
                 if(landmass.MapCellIds.Contains(p.MapCellId))
                 {
@@ -41,7 +41,7 @@ namespace Loremaker
             return null;
         }
 
-        private Territory FindTerritory(PopulationCenter p)
+        private Region FindTerritory(City p)
         {
             throw new NotImplementedException();
         }
@@ -67,20 +67,20 @@ namespace Loremaker
                 cell.AdjacentMapCells.AddRange(cells);
             }
 
-            foreach (var landmass in world.Landmasses.Values)
+            foreach (var landmass in world.Continents.Values)
             {
                 var cells = landmass.MapCellIds.Select(id => world.Map.MapCells[id]);
                 landmass.MapCells.AddRange(cells);
             }
 
-            foreach (var pop in world.PopulationCenters.Values)
+            foreach (var pop in world.Cities.Values)
             {
                 pop.MapCell = world.FindMapCell(pop);
                 pop.Landmass = world.FindLandmass(pop);
                 // pop.Territory = world.FindTerritory(pop);
             }
 
-            foreach (var territory in world.Territories.Values)
+            foreach (var territory in world.Regions.Values)
             {
                 var cells = territory.MapCellIds.Select(id => world.Map.MapCells[id]);
                 territory.MapCells.AddRange(cells);

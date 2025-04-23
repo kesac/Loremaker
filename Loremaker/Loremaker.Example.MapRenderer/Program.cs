@@ -16,6 +16,16 @@ using Loremaker.Text;
 
 namespace Loremaker.Example.MapRenderer
 {
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            // Temporary until we fix remove deprecated calls below
+        }
+    }
+
+    /*
     // This is for experimentation only
     public class Program
     {
@@ -153,97 +163,98 @@ namespace Loremaker.Example.MapRenderer
                         }
                     }/**/
 
-                    /*
-                    image.Mutate(x => x
-                        .DrawLines(new Pen(color, 2f), territory.ContainingMapPointIds.Select(id => new PointF(world.Map.MapPoints[id].X, world.Map.MapPoints[id].Y)).ToArray()));
-                    */
-                }
+    /*
+    image.Mutate(x => x
+        .DrawLines(new Pen(color, 2f), territory.ContainingMapPointIds.Select(id => new PointF(world.Map.MapPoints[id].X, world.Map.MapPoints[id].Y)).ToArray()));
+    *//*
+}
 
-                // Now draw population centers
+// Now draw population centers
 
-                foreach (var pop in world.PopulationCenters.Values)
-                {
-                    image.Mutate(x => x
-                        .DrawLines(new Pen(Color.LightGray, 10f), new PointF(pop.MapCell.X, pop.MapCell.Y), new PointF(pop.MapCell.X, pop.MapCell.Y))
-                        .DrawText(pop.Name, SmallFont, Color.White, new PointF(pop.MapCell.X + 10, pop.MapCell.Y + 10))
-                    );
-                    
-                }
+foreach (var pop in world.PopulationCenters.Values)
+{
+    image.Mutate(x => x
+        .DrawLines(new Pen(Color.LightGray, 10f), new PointF(pop.MapCell.X, pop.MapCell.Y), new PointF(pop.MapCell.X, pop.MapCell.Y))
+        .DrawText(pop.Name, SmallFont, Color.White, new PointF(pop.MapCell.X + 10, pop.MapCell.Y + 10))
+    );
 
-                // Show names of landmasses
-                var textOptions = new TextOptions()
-                {
-                     HorizontalAlignment = HorizontalAlignment.Center,
-                     VerticalAlignment = VerticalAlignment.Center,
-                };
+}
 
-                var drawingOptions = new DrawingOptions() { TextOptions = textOptions };
+// Show names of landmasses
+var textOptions = new TextOptions()
+{
+     HorizontalAlignment = HorizontalAlignment.Center,
+     VerticalAlignment = VerticalAlignment.Center,
+};
 
-                
-                foreach (var landmass in world.Landmasses.Values.Where(x => x.MapCells.Count > 2))
-                {
-                    if(landmass.MapCells.Count > 100)
-                    {
-                        image.Mutate(x => x
-                            .DrawText(drawingOptions, landmass.Name, BigFont, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.5f), new PointF(landmass.X, landmass.Y))
-                        );
-                    }
-                    else if(landmass.MapCells.Count < 20)
-                    {
-                        /*
-                        drawingOptions.TextOptions.VerticalAlignment = VerticalAlignment.Bottom;
-
-                        image.Mutate(x => x
-                            .DrawText(drawingOptions, landmass.Name, SmallFont, Brushes.Solid(Color.Black), Pens.Solid(Color.Black, 1), new PointF(landmass.Center.X, landmass.Center.Y))
-                        );
-                        /**/
-                    }
-                    else
-                    {
-                        image.Mutate(x => x
-                            .DrawText(drawingOptions, landmass.Name, NormalFont, Brushes.Solid(Color.Black), Pens.Solid(Color.Black, 0.5f), new PointF(landmass.X, landmass.Y))
-                        );
-                    }   
-                }
-
-                using (var filestream = new FileStream(output, FileMode.Create))
-                {
-                    image.SaveAsPng(filestream);
-                }
-            }
-
-            try
-            {
-                var process = new ProcessStartInfo(output) { UseShellExecute = true, Verb = "open" };
-                Process.Start(process);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        private static Color GetColor(MapCell cell, double landThreshold)
-        {
-            var result = new Rgba32() { A = 255 };
-            var elevation = cell.Elevation;
-
-            if (cell.IsWater)
-            {
-                result.R = 0;
-                result.G = (byte)((150 - 30) * (elevation / landThreshold) + 30);
-                result.B = (byte)(elevation < (landThreshold / 2) ? ((255 - 150) * elevation / (landThreshold / 2) + 150) : 255);
-            }
-            else
-            {
-                result.R = 30;
-                result.G = (byte)Math.Min(255, ((255 - 155) * elevation / (1 - landThreshold) + 155));
-                result.B = 0;
-            }
-
-            return result;
-        }
+var drawingOptions = new DrawingOptions() { TextOptions = textOptions };
 
 
+foreach (var landmass in world.Landmasses.Values.Where(x => x.MapCells.Count > 2))
+{
+    if(landmass.MapCells.Count > 100)
+    {
+        image.Mutate(x => x
+            .DrawText(drawingOptions, landmass.Name, BigFont, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.5f), new PointF(landmass.X, landmass.Y))
+        );
     }
+    else if(landmass.MapCells.Count < 20)
+    {
+        /*
+        drawingOptions.TextOptions.VerticalAlignment = VerticalAlignment.Bottom;
+
+        image.Mutate(x => x
+            .DrawText(drawingOptions, landmass.Name, SmallFont, Brushes.Solid(Color.Black), Pens.Solid(Color.Black, 1), new PointF(landmass.Center.X, landmass.Center.Y))
+        );
+        /**//*
+    }
+    else
+    {
+        image.Mutate(x => x
+            .DrawText(drawingOptions, landmass.Name, NormalFont, Brushes.Solid(Color.Black), Pens.Solid(Color.Black, 0.5f), new PointF(landmass.X, landmass.Y))
+        );
+    }   
+}
+
+using (var filestream = new FileStream(output, FileMode.Create))
+{
+    image.SaveAsPng(filestream);
+}
+}
+
+try
+{
+var process = new ProcessStartInfo(output) { UseShellExecute = true, Verb = "open" };
+Process.Start(process);
+}
+catch(Exception ex)
+{
+Console.WriteLine(ex.Message);
+}
+}
+
+private static Color GetColor(MapCell cell, double landThreshold)
+{
+var result = new Rgba32() { A = 255 };
+var elevation = cell.Elevation;
+
+if (cell.IsWater)
+{
+result.R = 0;
+result.G = (byte)((150 - 30) * (elevation / landThreshold) + 30);
+result.B = (byte)(elevation < (landThreshold / 2) ? ((255 - 150) * elevation / (landThreshold / 2) + 150) : 255);
+}
+else
+{
+result.R = 30;
+result.G = (byte)Math.Min(255, ((255 - 155) * elevation / (1 - landThreshold) + 155));
+result.B = 0;
+}
+
+return result;
+}
+
+
+}
+/**/
 }

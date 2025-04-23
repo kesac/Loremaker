@@ -1,230 +1,248 @@
 ﻿using Archigen;
+using Loremaker.Completions;
+using Loremaker.Completions.OpenRouter;
+using Loremaker.Data;
 using Loremaker.Maps;
 using Loremaker.Names;
 using Loremaker.Text;
-using Markov;
 using Syllabore;
+using Syllabore.Fluent;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Loremaker.Example
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
-            {
-                // var generator = new WorldGenerator();
-                // var world = generator.Next();
-            }
-            {
-                // Basic substitution
-                var text = new TextTemplate("{subject} {verb} to {place}.")
-                            .Define("subject", "Alice", "Brian", "Cam")
-                            .Define("verb", "ran", "walked", "hopped" )  
-                            .Define("place", x => x
-                                .As("store", "park", "house")
-                                .ApplyDeterminersToAll("a", "the"));
+            // TryChainedWorldGeneration();
+            // TryWorldGeneration();
 
-                for (int i = 0; i < 10; i++)
-                {
-                    Console.WriteLine(text.Next());
-                }
+            // TryTextTemplate();
+            // TryGibberishGenerator();
+            // TryTextomatic();
+            
+            // await GetModelsAsync();
+            // await SummarizeHistoricalEventsAsync();
+            // await CompleteItemsAsync();
+        }
 
-                Console.WriteLine();
-            }
+        private static void TryChainedWorldGeneration()
+        {
 
-            {
-                // More complicated
-                var text = new TextTemplate("{subject} {verb} to {place}.")
-                            .CapitalizeFirstWord()
-                            .Define("subject", x => x
-                                .As("Alice", "Bob", "Chris")
-                                .ApplyAdjectivesToAll("outgoing", "impatient", "energetic")
-                                .ApplyDeterminersToAll("an",""))
-                            .Define("verb", "ran", "walked", "hopped")
-                            .Define("place", x => x
-                                .As("lake")
-                                .ApplyAdjectives("placid", "still", "crystal-clear") // This only applies to "lake"
-                                .As("store", "park", "house")
-                                .ApplyAdjectives("green", "busy", "bustling")       // This only applies to "store", "park", and "house"
-                                .ApplyDeterminersToAll("a", "the"));                // This applies to everything
+            var worldNames = new NameGenerator()
+                .Any(x => x
+                    .First("str")
+                    .Middle("aei"));
 
-                for (int i = 0; i < 10; i++)
-                {
-                    Console.WriteLine(text.Next());
-                }
+            var continentNames = new NameGenerator();
 
-                Console.WriteLine();
-            }
-            {
-                // More complicated using randomly generated names for {place}
-                var text = new TextTemplate("{subject} {raised} in {birthplace} near {place}.")
-                                .Define("subject", x => x
-                                    .As("Alice", "Brian", "Cam"))
-                                .Define("raised", x => x
-                                    .As("grew up", "was raised", "was brought up"))
-                                .Define("birthplace", x => x
-                                    .As("[village]", "[town]")
-                                    .ApplyAdjectives("small", "modest", "poor", "large", "busy", "remote", "trade", "coastal", "underground")
-                                    .ApplyDeterminers("a"))
-                                .Define("place", x => x
-                                    .As("River", "Mountain", "Mountains", "Mountain Range", "Forest", "Ruins", "Canyon", "Sea", "Lake", "Plains")
-                                    .ApplyDeterminers("", "the")
-                                    .ApplyNameGenerator(x => x
-                                        .UsingSyllables(x => x
-                                            .WithVowels("aeo")
-                                            .WithLeadingConsonants("tvr"))));
-
-                for (int i = 0; i < 10; i++)
-                {
-                    Console.WriteLine(text.Next());
-                }
-                Console.WriteLine();
-            }
-            {
-                // Complex example multiple templates using context from each other
-
-                var worldNames = new NameGenerator()
-                   .UsingSyllableCount(3)
-                    .UsingSyllables(x => x
-                        .WithVowels("aeo")
-                        .WithLeadingConsonants("tvr"));
-
-                var locationNames = new NameGenerator()
-                    .UsingSyllableCount(3)
-                    .UsingSyllables(x => x
-                        .WithVowels("aieou")
-                        .WithLeadingConsonants("strvbc")
-                        .WithTrailingConsonants("strvgfc"));
-
-                var shipNames = new NameGenerator()
-                    .UsingSyllableCount(2,3)
-                    .UsingSyllables(x => new DefaultSyllableGenerator()
-                        .WithProbability(x => x
-                            .OfTrailingConsonants(0)
-                            .OfVowelIsSequence(0)))
-                    .UsingFilter(x => x
-                        .DoNotAllow("[wyz]")
-                        .DoNotAllow("[^aeiou]{3,}"));
-
-                var chain = new TextChain()
-                    .Append("{subject} {raised} in {birthplace} near {place}.", x => x
-                        .Define("raised", "grew up", "was raised", "was brought up")
-                        .Define("birthplace", x => x
-                            .As("[village]") // square brackets tells text generator to record these as context tags
-                            .ApplyAdjectives("small", "modest", "poor", "remote")
-                            .As("[town]")
-                            .ApplyAdjectives("large", "busy", "trade", "coastal", "underground")
-                            .ApplyDeterminersToAll("a"))
-                        .Define("place", x => x
-                            .As("[Mountain]", "[Mountain] Range", "[Ocean]")
-                            .ApplyDeterminers("", "the")
-                            .ApplyNameGenerator(locationNames)))
-                    .Append("Growing up, {pronoun} {waswere} always drawn to {passion}.", x => x
-                        .Define("waswere", "was")
-                        .Define("passion", "the beauty and power of [fire]", "the vastness of the [ocean]")
-                        .WhenContextHas("mountain")) // this line of text won't be used unless "mountain" was used in previous lines of text
-                    .Append("{pronoun} {waswere} banished from the community after accidentally setting the [house] of the local [priest] on fire.", x => x
-                        .CapitalizeFirstWord()
-                        .WhenContextHas("fire"))
-                    .Append("With the priest trapped inside, to everyone's horror.", x => x
-                        .WhenContextHas("fire", "priest"))
-                    .Append("{pronoun} became a [sailor] at the age of {age}.", x => x
-                        .CapitalizeFirstWord()
-                        .Define("age", "16", "17", "18")
-                        .WhenContextHas("ocean")
-                        .AvoidWhenContextHas("mountain"))
-                    .Append("At the age of {olderAge}, {pronoun} became captain of the {shipname}.", x => x
-                        .Define("olderAge", "29", "30", "31")
-                        .Define("shipname", shipNames)
-                        .WhenContextHas("sailor"))
-                    .Append("{subject} now sails {place}.", x => x
-                        .WhenContextHas("sailor"))
-                    .Append("{subject} now travels {world}.", x => x
-                        .AvoidWhenContextHas("sailor"))
-                    .DefineGlobally("world", worldNames)
-                    .DefineGlobally("subject", "Alice", "Brian", "Cam")
-                    .DefineGlobally("pronoun", "he", "she");
-
-
-                var options = new JsonSerializerOptions() { WriteIndented = true };
-                string result = JsonSerializer.Serialize<TextChain>(chain, options);
-                File.WriteAllText("test.json.txt", result);
-
-                for (int i = 0; i < 5; i++)
-                {
-                    Console.WriteLine(chain.Next());
-                }
-            }
-
-            Console.WriteLine();
-
-            {
-                var g = new NameGenerator()
-                        .UsingSyllables(new SyllableSet(4, 16, 4)
-                            .WithGenerator(x => x
-                                .WithVowels("aeiou")
-                                .WithLeadingConsonants("bcdfghijklmnprstvwyz")))
-                        .UsingSyllableCount(3, 4);
-
-                var t = new MarkovTextGenerator()
-                        .FromCorpus("sample.txt")
-                        .FromCorpus("sample2.txt")
-                        // .UsingDepth(2)             // Default is 2
-                        // .UsingDelimiter(' ')       // Default is a single space character ' '
-                        .BeginTextWith("a")      // Try to start all generated text with this substring
-                        // .EndTextWith("with")       // There are nuances to this
-                        .LoadCorpus();                // If not called, corpuses will be implicitly loaded on first call to Next()
-
-                for(int i = 0; i < 10; i++)
-                {
-                    Console.WriteLine(g.Next().ToUpper());
-                    Console.WriteLine(" " + t.Next());
-                    Console.WriteLine();
-                }
-
-            }
-
-            Console.WriteLine();
-
-            {
-
-                var worldNames = new NameGenerator()
-                                .UsingSyllables(x => x
-                                    .WithVowels("aei")
-                                    .WithLeadingConsonants("str"));
-                var continentNames = new NameGenerator();
-
-                var g = new Generator<World>()
-                        .ForProperty<string>(x => x.Name, worldNames)
-                        .ForProperty<string>(x => x.Description, new GibberishTextGenerator()
-                            .UsingSentenceLength(2))
-                        .ForProperty<Map>(x => x.Map, new MapGenerator())
-                        .ForEach(x =>
-                        {
-                            // To do: populate continents
-                        });
-
-                for(int i = 0; i < 3; i++)
-                {
-                    var world = g.Next();
-                    Console.WriteLine("World of " + world.Name + " (" + world.Description + ")");
-                    Console.WriteLine("Has continents:");
-
-                    // TODO: Continents not generating
-                    for(uint j = 0; j < world.Landmasses.Count; j++)
+            var g = new Generator<World>()
+                    .ForProperty<string>(x => x.Name, worldNames)
+                    .ForProperty<string>(x => x.Description, new GibberishGenerator()
+                        .UsingSentenceLength(2))
+                    .ForProperty<Map>(x => x.Map, new MapGenerator())
+                    .ForEach(x =>
                     {
-                        Console.WriteLine(world.Landmasses[j].Name);
-                    }
+                        // To do: populate continents
+                    });
+
+            for (int i = 0; i < 3; i++)
+            {
+                var world = g.Next();
+                Console.WriteLine("World of " + world.Name + " (" + world.Description + ")");
+                Console.WriteLine("Has continents:");
+
+                // TODO: Continents not generating
+                for (uint j = 0; j < world.Continents.Count; j++)
+                {
+                    Console.WriteLine(world.Continents[j].Name);
                 }
-                
+            }
+        }
+
+        private static void TryWorldGeneration()
+        {
+            Console.WriteLine();
+            var generator = new WorldGenerator();
+            var world = generator.Next();
+            Console.WriteLine("World: " + world.Name + "\nDescription: " + world.Description);
+        }
+
+        private static void TryTextTemplate()
+        {
+            var names = new NameGenerator("stlrmn", "aeiou");
+            var template = new TextTemplate();
+
+            template.Add("$person $raised in $birthplace near $place.");
+            template.Add("Their family was poor, but they were happy.");
+            template.Add("Growing up, they were always drawn to the vastness of the ocean.", "Mountain");
+            template.Add("They became a sailor at the age of $age.", "Mountain");
+            template.Add("An encounter with a $color $monster gave them a facial scar.");
+            template.Add("Later, in their 40s, they returned to $place and became the mayor.");
+
+            template.Substitute("person", names);
+            template.Substitute("raised", "grew up", "was raised", "was brought up");
+
+            var subjects = new string[] { "village", "town" };
+            var adjectives = new List<string> { "modest", "poor", "busy", "remote", "trade", "coastal", "underground" };
+            var determiners = new[] { "a" };
+
+            var birthPlaces = new SubjectRandomizer(subjects);
+            birthPlaces.SetAdjectives(adjectives);
+            birthPlaces.SetDeterminers(determiners);
+
+            template.Substitute("birthplace", birthPlaces);
+
+            var placeNames = new string[] {
+                "$placeName River",
+                "the Mountains of $placeName",
+                "the $placeName Mountain Range",
+                "$placeName Forest",
+                "the Ruins of $placeName",
+                "the $placeName Sea",
+                "$placeName Lake",
+                "the $placeName Plains"
+            };
+
+            template.Substitute("place", placeNames);
+            template.Substitute("placeName", names);
+
+
+            var monsters = new string[] { "dragon", "ogre", "goblin", "troll", "giant" };
+            template.Substitute("monster", monsters);
+            template.Substitute("color", Things.GetDefaultColorGenerator());
+
+            template.Substitute("age", "20", "21", "22");
+
+            Console.WriteLine(template.Next());
+            
+        }
+
+        private static void TryGibberishGenerator()
+        {
+            Console.WriteLine();
+
+            var result = new StringBuilder();
+            var gibberish = new GibberishGenerator();
+
+            for (int i = 0; i < 10; i++)
+            {
+                result.Append(" " + gibberish.Next());
             }
 
+            Console.WriteLine(result.ToString().Trim());
+        }
+
+        private static void TryTextomatic()
+        {
+            var textomatic = new Textomatic(Things.GetDefaultItemDescriptionTemplateGenerator());
+            textomatic.Define("object", Things.GetDefaultObjectsGenerator());
+            textomatic.Define("color", Things.GetDefaultColorGenerator());
+            textomatic.Define("material", Things.GetDefaultMaterialsGenerator());
+            textomatic.Define("concept", Things.GetDefaultConceptsGenerator());
+
+            for (int i = 0; i < 5; i++)
+            {
+                Console.WriteLine(textomatic.Next());
+            }
+        }
+
+
+
+        private async static Task GetModelsAsync()
+        {
+            var openRouter = new OpenRouterClient();
+            var models = await openRouter.GetModels("models.json");
+            foreach (var model in models.Models)
+            {
+                Console.WriteLine($"{model.Id} - {model.Name}");
+            }
             Console.ReadLine();
         }
+
+        private async static Task CompleteItemsAsync()
+        {
+            var items = new List<Item>();
+            for (int i = 0; i < 5; i++)
+            {
+                var item = new Item();
+                var itemThemes = new List<string>();
+                itemThemes.Add(Things.GetDefaultConceptsGenerator().Next());
+                itemThemes.Add(Things.GetDefaultConceptsGenerator().Next());
+                itemThemes.Add(Things.GetDefaultMaterialsGenerator().Next());
+
+                if (new Random().NextDouble() > 0.5)
+                {
+                    itemThemes.Add(Things.GetDefaultColorGenerator().Next());
+                }
+                else
+                {
+                    itemThemes.Add(Things.GetDefaultConceptsGenerator().Next());
+                }
+
+                item["thematic-hints"] = string.Join(", ", itemThemes);
+                items.Add(item);
+            }
+
+            var prompt = Prompts.Get("item-completer") + JsonSerializer.Serialize(items);
+
+            Console.WriteLine(prompt);
+            Console.WriteLine("---");
+
+            var openRouter = new OpenRouterClient();
+            var response = await openRouter.GetCompletion("openai/gpt-4.1-mini", prompt);
+
+            var completedItems = JsonSerializer.Deserialize<List<Item>>(response.CompletionText);
+            foreach (var item in completedItems)
+            {
+                Console.WriteLine($"[{item.Name}]");
+                Console.WriteLine($"{item.Description}");
+                Console.WriteLine();
+            }
+        }
+
+        private async static Task SummarizeHistoricalEventsAsync()
+        {
+            var g = new HistoryGenerator(1001, 1100);
+            var codex = g.Next();
+
+            var useCompletion = true;
+            if (useCompletion)
+            {
+                var openRouter = new OpenRouterClient();
+                var people = codex.Entities.Values.Where(x => x.Type == "person").Select(x => x as Person).ToList();
+                var biographerPrompt = Prompts.Get("biographer");
+
+                foreach (var person in people)
+                {
+                    var prompt = $"{biographerPrompt}\n{JsonSerializer.Serialize(person)}";
+                    var bioResponse = await openRouter.GetCompletion("openai/gpt-4.1-mini", prompt);
+                    Console.WriteLine("-----");
+                    Console.WriteLine(bioResponse.CompletionText);
+                }
+
+                var codexJson = JsonSerializer.Serialize(codex, new JsonSerializerOptions
+                {
+                    IncludeFields = true
+                });
+
+                var peoplesContext = JsonSerializer.Serialize(people);
+                var historianPrompt = $"{peoplesContext}\n\n{Prompts.Get("historian")}\n\n{codexJson}";
+                var historyResponse = await openRouter.GetCompletion("openai/gpt-4o-mini", historianPrompt);
+
+                Console.WriteLine("-----");
+                Console.WriteLine(historyResponse.CompletionText);
+            }
+
+        }
+
     }
 }

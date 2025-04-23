@@ -1,6 +1,7 @@
 ﻿using Archigen;
 using Loremaker.Names;
 using Syllabore;
+using Syllabore.Fluent;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,45 +11,45 @@ namespace Loremaker.Experiments.Maps
     public class CustomNameGenerator : ILocationNameGenerator, IGenerator<string>
     {
 
-        private NameGenerator worlds;
-        private NameGenerator continents;
-        private NameGenerator regions;
-        private NameGenerator settlements;
+        private IGenerator<string> worlds;
+        private IGenerator<string> continents;
+        private DefaultNameGenerator DefaultNameGenerator;
 
         public CustomNameGenerator()
         {
             worlds = new NameGenerator()
-                        .UsingSyllables(x => x
-                            .WithLeadingConsonants("vrstl").Weight(4)
-                            .WithLeadingConsonants("wznm")
-                            .WithVowels("a").Weight(4)
-                            .WithVowels("ei").Weight(2)
-                            .WithVowels("ou"))
-                        .UsingTransform(0.33, new TransformSet()
-                            .RandomlySelect(1)
-                            .WithTransform(x => x.AppendSyllable("gard"))
-                            .WithTransform(x => x.AppendSyllable("grim"))
-                            .WithTransform(x => x.AppendSyllable("dar")))
-                        .UsingSyllableCount(2);
+                .Any(x => x
+                    .First(x => x
+                        .Add("vrstl").Weight(4)
+                        .Add("wznm"))
+                    .Middle(x => x
+                        .Add("a").Weight(4)
+                        .Add("ei").Weight(2)
+                        .Add("ou")))
+                .Transform(new TransformSet()
+                    .Chance(0.33)
+                    .RandomlySelect(1)
+                    .Add(x => x.Append("gard"))
+                    .Add(x => x.Append("grim"))
+                    .Add(x => x.Append("dar")))
+                .SetSize(2);
 
             continents = new NameGenerator()
-                        .UsingSyllables(x => x
-                            .WithLeadingConsonants("vrznmstl").Weight(2)
-                            .WithLeadingConsonants("bckghw")
-                            .WithVowels("a").Weight(4)
-                            .WithVowels("ei").Weight(2)
-                            .WithVowels("ou"))
-                        .UsingSyllableCount(2, 3);
-
-            regions = new NameGenerator().UsingSyllableCount(2, 3);
-
-            settlements = new NameGenerator().UsingSyllableCount(2, 4);
+                .Any(x => x
+                    .First(x => x
+                        .Add("vrznmstl").Weight(4)
+                        .Add("bckghw"))
+                    .Middle(x => x
+                        .Add("a").Weight(4)
+                        .Add("ei").Weight(2)
+                        .Add("ou")))
+                .SetSize(2, 3);
 
         }
 
         public string Next()
         {
-            return this.settlements.Next();
+            return this.DefaultNameGenerator.Next();
         }
 
         public string NextContinentName()
@@ -58,12 +59,12 @@ namespace Loremaker.Experiments.Maps
 
         public string NextRegionName()
         {
-            return regions.Next();
+            return this.DefaultNameGenerator.NextRegionName();
         }
 
         public string NextSettlementName()
         {
-            return settlements.Next();
+            return this.DefaultNameGenerator.NextSettlementName();
         }
 
         public string NextWorldName()

@@ -1,39 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Loremaker.Text
 {
     public static class TextExtensions
     {
-        public static bool HasContextClues(this string s)
+        public static bool CaseInsensitiveEquals(this string s, string target)
         {
-            return Regex.IsMatch(s, @"(\[[^\]]+\])");
+            return String.Equals(s, target, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static string RemoveCurlyBrackets(this string s)
-        {
-            return s.Replace("{", string.Empty).Replace("}", string.Empty);
-        }
-
-        public static string RemoveSquareBrackets(this string s)
-        {
-            return s.Replace("[", string.Empty).Replace("]", string.Empty);
-        }
-
-        public static List<string> GetContextClues(this string s)
+        /// <summary>
+        /// Splits a line of text into individual words, but treats
+        /// everything between quotes as a single word.
+        /// </summary>
+        public static List<string> Tokenize(this string s)
         {
             var result = new List<string>();
-            if (s.HasContextClues())
+            var matches = Regex.Matches(s, "\"[^\"]*\"|[^ ]+");
+
+            if (matches.Count > 0)
             {
-                foreach (var m in Regex.Matches(s, @"(\[[^\]]+\])"))
+                foreach (var match in matches)
                 {
-                    var capture = m.ToString();
-                    var value = capture.RemoveSquareBrackets();
-                    result.Add(value.ToLower());
+                    var value = match.ToString();
+
+                    if (value.StartsWith("\"") && value.EndsWith("\""))
+                    {
+                        result.Add(value.Substring(1, value.Length - 2));
+                    }
+                    else
+                    {
+                        result.Add(value);
+                    }
+
                 }
             }
+            else
+            {
+                result.Add(s);
+            }
+
             return result;
         }
     }

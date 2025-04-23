@@ -7,13 +7,29 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archigen" Version="1.2.0" />
-    <PackageReference Include="Delaunator" Version="1.0.8" />
-    <PackageReference Include="Markov" Version="2.0.0">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
-    <PackageReference Include="Syllabore" Version="2.3.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <None Remove="Data\Colors.json" />
+    <None Remove="Data\Materials.json" />
+    <None Remove="Data\Objects.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Archigen" Version="1.3.1" />
+    <PackageReference Include="Delaunator" Version="1.0.11" />
+    <PackageReference Include="Stateless" Version="5.17.0" />
+    <PackageReference Include="Syllabore" Version="3.0.1-alpha" />
+    <PackageReference Include="System.Text.Json" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Completions\biographer.prompt" />
+    <EmbeddedResource Include="Completions\item-completer.prompt" />
+    <EmbeddedResource Include="Completions\item-maker.prompt" />
+    <EmbeddedResource Include="Completions\historian.prompt" />
+    <EmbeddedResource Include="Data\colors.json" />
+    <EmbeddedResource Include="Data\concepts.json" />
+    <EmbeddedResource Include="Data\materials.json" />
+    <EmbeddedResource Include="Data\object-descriptions.json" />
+    <EmbeddedResource Include="Data\objects.json" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,10 @@ namespace Loremaker.Experiments.Maps
 {
     public class Program
     {
+        public static void Main(string[] args) { }
 
+
+        /*
         private static FontCollection DefaultFontCollection = new FontCollection();
         private static FontFamily DefaultFontFamily = DefaultFontCollection.Install("GlacialIndifference-Regular.ttf");
         private static Font DefaultFont = DefaultFontFamily.CreateFont(30, FontStyle.Regular); 
@@ -84,7 +87,7 @@ namespace Loremaker.Experiments.Maps
             
         }
         */
-
+        /**/
 
     }
 }

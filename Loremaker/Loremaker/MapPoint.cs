@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Loremaker
 {
-    public class MapPoint : Identifiable, Locatable
+    public class MapPoint : IEntity, ILocatable
     {
         public uint Id { get; set; }
         public int X { get; set; }

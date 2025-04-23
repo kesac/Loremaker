@@ -16,9 +16,9 @@ namespace Loremaker.Maps
             this.Random = new Random();
         }
 
-        public List<Landmass> FindLandmasses()
+        public List<Continent> FindLandmasses()
         {
-            var result = new List<Landmass>();
+            var result = new List<Continent>();
 
             var unprocessed = new List<MapCell>();
             unprocessed.AddRange(this.Map.MapCells.Values.Where(x => x.IsLand));
@@ -45,7 +45,7 @@ namespace Loremaker.Maps
 
                 scanned.AddRange(adjacencies);
 
-                var landmass = new Landmass() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList(), Id = landmassId++ };
+                var landmass = new Continent() { MapCells = scanned, MapCellIds = scanned.Select(x => x.Id).ToList(), Id = landmassId++ };
 
                 landmass.X = (int)landmass.MapCells.Average(cell => cell.X);
                 landmass.Y = (int)landmass.MapCells.Average(cell => cell.Y);

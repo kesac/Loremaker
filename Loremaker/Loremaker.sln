@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker", "Loremaker\Loremaker.csproj", "{AFB9D560-EC46-448B-9D84-25ED011F648D}"
 EndProject
@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Experiments.Maps"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Tests", "Loremaker.Tests\Loremaker.Tests.csproj", "{509CC921-BFE4-410B-BE86-2A93D611570F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Experiments.Heightmaps", "Loremaker.Experiments.Heightmaps\Loremaker.Experiments.Heightmaps.csproj", "{DC75E399-D817-4EC1-90B7-706927218277}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loremaker.Experiments.Heightmaps", "Loremaker.Experiments.Heightmaps\Loremaker.Experiments.Heightmaps.csproj", "{DC75E399-D817-4EC1-90B7-706927218277}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loremaker.Example.Syntax", "Loremaker.Example.Syntax\Loremaker.Example.Syntax.csproj", "{4AD29E90-140E-4896-BA46-99C4C5B628FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{DC75E399-D817-4EC1-90B7-706927218277}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC75E399-D817-4EC1-90B7-706927218277}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC75E399-D817-4EC1-90B7-706927218277}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AD29E90-140E-4896-BA46-99C4C5B628FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AD29E90-140E-4896-BA46-99C4C5B628FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AD29E90-140E-4896-BA46-99C4C5B628FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AD29E90-140E-4896-BA46-99C4C5B628FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
