@@ -34,6 +34,14 @@ namespace Loremaker.Text
         public RandomSelector<string> Adjectives { get; set; }
 
         /// <summary>
+        /// Creates an empty <see cref="SubjectRandomizer"/>.
+        /// </summary>
+        public SubjectRandomizer()
+        {
+            Values = new RandomSelector<string>();
+        }
+
+        /// <summary>
         /// Creates a new <see cref="SubjectRandomizer"/> that
         /// will return subjects from the specified list.
         /// </summary>
@@ -43,19 +51,66 @@ namespace Loremaker.Text
         }
 
         /// <summary>
+        /// Creates a new <see cref="SubjectRandomizer"/> that
+        /// will return subjects from the specified values.
+        /// </summary>
+        public SubjectRandomizer(params string[] values)
+        {
+            Values = new RandomSelector<string>(values);
+        }
+
+        /// <summary>
         /// Sets the determiners that the generator will use.
         /// </summary>
-        public void SetDeterminers(IEnumerable<string> determiners)
+        public SubjectRandomizer SetValues(IEnumerable<string> values)
+        {
+            Values = new RandomSelector<string>(values);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the determiners that the generator will use.
+        /// </summary>
+        public SubjectRandomizer SetValues(params string[] values)
+        {
+            Values = new RandomSelector<string>(values);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the determiners that the generator will use.
+        /// </summary>
+        public SubjectRandomizer SetDeterminers(IEnumerable<string> determiners)
         {
             Determiners = new RandomSelector<string>(determiners);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the determiners that the generator will use.
+        /// </summary>
+        public SubjectRandomizer SetDeterminers(params string[] determiners)
+        {
+            Determiners = new RandomSelector<string>(determiners);
+            return this;
         }
 
         /// <summary>
         /// Sets the adjectives that the generator will use.
         /// </summary>
-        public void SetAdjectives(IEnumerable<string> adjectives)
+        public SubjectRandomizer SetAdjectives(IEnumerable<string> adjectives)
         {
             Adjectives = new RandomSelector<string>(adjectives);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the adjectives that the generator will use.
+        /// </summary>
+        public SubjectRandomizer SetAdjectives(params string[] adjectives)
+        {
+            Adjectives = new RandomSelector<string>(adjectives);
+            return this;
         }
 
         /// <summary>
