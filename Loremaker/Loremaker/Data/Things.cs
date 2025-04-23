@@ -7,10 +7,17 @@ using System.Text.Json.Serialization;
 
 namespace Loremaker.Data
 {
-    public class Things
+    /// <summary>
+    /// Gives access to generators that select from embedded lists of "things".
+    /// </summary>
+    public static class Things
     {
         private static Assembly _assembly;
         private static IGenerator<string> _colorGenerator;
+        private static IGenerator<string> _objectsGenerator;
+        private static IGenerator<string> _materialsGenerator;
+        private static IGenerator<string> _conceptsGenerator;
+        private static IGenerator<string> _itemDescriptionTemplateGenerator;
 
         private static void Initialize()
         {
@@ -18,6 +25,69 @@ namespace Loremaker.Data
             {
                 _assembly = Assembly.GetExecutingAssembly();
             }
+        }
+
+        private static IGenerator<string> GetDefaultListGenerator(string name)
+        {
+            if (_assembly == null)
+            {
+                Initialize();
+            }
+
+            var resourceName = $"Loremaker.Data.{name}.json";
+            using (var stream = _assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                {
+                    throw new InvalidOperationException($"Could not find resource: {resourceName}");
+                }
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    var json = reader.ReadToEnd();
+                    var items = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
+                    return new RandomSelector<string>(items);
+                }
+            }
+        }
+
+        public static IGenerator<string> GetDefaultObjectsGenerator()
+        {
+            if (_objectsGenerator == null)
+            {
+                _objectsGenerator = GetDefaultListGenerator("objects");
+            }
+
+            return _objectsGenerator;
+        }
+
+        public static IGenerator<string> GetDefaultItemDescriptionTemplateGenerator()
+        {
+            if (_objectsGenerator == null)
+            {
+                _itemDescriptionTemplateGenerator = GetDefaultListGenerator("object-descriptions");
+            }
+
+            return _itemDescriptionTemplateGenerator;
+        }
+
+        public static IGenerator<string> GetDefaultMaterialsGenerator()
+        {
+            if (_materialsGenerator == null)
+            {
+                _materialsGenerator = GetDefaultListGenerator("materials");
+            }
+
+            return _materialsGenerator;
+        }
+
+        public static IGenerator<string> GetDefaultConceptsGenerator()
+        {
+            if (_conceptsGenerator == null)
+            {
+                _conceptsGenerator = GetDefaultListGenerator("concepts");
+            }
+
+            return _conceptsGenerator;
         }
 
         /// <summary>
@@ -29,11 +99,11 @@ namespace Loremaker.Data
             {
                 Initialize();
 
-                using (var stream = _assembly.GetManifestResourceStream("Loremaker.Data.Colors.json"))
+                using (var stream = _assembly.GetManifestResourceStream("Loremaker.Data.colors.json"))
                 {
                     if (stream == null)
                     {
-                        throw new InvalidOperationException("Could not find resource: Loremaker.Data.Colors.json");
+                        throw new InvalidOperationException("Could not find resource: Loremaker.Data.colors.json");
                     }
 
                     using (var reader = new System.IO.StreamReader(stream))
